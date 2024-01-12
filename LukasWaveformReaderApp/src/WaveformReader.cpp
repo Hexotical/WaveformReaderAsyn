@@ -1,15 +1,20 @@
 //WaveformReader.cpp
 
 #include "WaveformReader.h"
-#include <unistd.h>
-#include <chrono>
 
-void streamTask(void * driverPointer); //added to fix compiler errors
-void streamInit(void *driverPointer); //TODO Add a stream argument so it can check on a specific stream
-void streamInit(int channel);                                
+void streamTask(void * driverPointer); 
+void streamInit(void *driverPointer); 
+void streamInit(int channel);
 
-WaveformReader *bayManager;
+WaveformReader *bayManager; //Global pointer so iocshell commands can interact with our initialized port driver
 
+/**
+ * Initialize an ASYN Port Driver
+ *
+ * @param portName port for the asyn driver to use
+ * @param bufferSize amount of words to read from the buffer
+ * @param waveformPVs amount of EPICS waveform records our port driver should be of
+ */
 WaveformReader::WaveformReader(const char *portName, int bufferSize, int waveformPVs) : asynPortDriver
                                                        (
                                                         portName,
@@ -22,11 +27,12 @@ WaveformReader::WaveformReader(const char *portName, int bufferSize, int wavefor
                                                         0
                                                         )
 {
-//Craete params here at some point
-  waveformData = (epicsInt16 *)calloc(STREAM_MAX_SIZE, sizeof(epicsInt16));
-
+  waveformData = (epicsInt16 *)calloc(STREAM_MAX_SIZE, sizeof(epicsInt16)); 
+ 
+  //Connecting to the records our port driver will eventually need to interact with
   for(int pvID = 0; pvID < waveformPVs; pvID++)
   {
+    //For loop generates the string identifier for each Waveform records and then creates a parameter our asynDriver can interact with for it
     int waveform_param_index;
     std::string pvIdentifier = "WAVEFORM:" + std::to_string(pvID);
     std::cout << pvIdentifier << std::endl;
@@ -34,38 +40,32 @@ WaveformReader::WaveformReader(const char *portName, int bufferSize, int wavefor
     pv_param_map.insert(std::pair<std::string, int>(pvIdentifier, waveform_param_index));
     waveform_param_indices.push_back(pvIdentifier);
   }
-  
-  //createParam(WAVEFORM0_PV_STRING, asynParamInt16Array, &waveform_param_index_0);
-  //createParam(WAVEFORM1_PV_STRING, asynParamInt16Array, &waveform_param_index_1);
+  //TODO: Do this is a more systematic way, individually connecting isn't really aesthetic 
   createParam(WAVEFORM_RUN_STRING, asynParamUInt32Digital, &waveform_run_index);
   createParam(WAVEFORM0_INITIALIZE_STRING, asynParamUInt32Digital, &waveform_init_index);
   createParam(WAVEFORM0_END_ADDR_STRING, asynParamInt32, &waveform_endAddr_index);
   createParam(WAVEFORM0_BEGIN_ADDR_STRING, asynParamInt32, &waveform_beginAddr_index);
   createParam(WAVEFORM0_BUFFER_SIZE_STRING, asynParamInt32, &waveform_buffer_size_index);
   
-  MAX_BUFFER_SIZE = bufferSize;
+  MAX_BUFFER_SIZE = bufferSize; //One of the parameters we pass to our port driver is the bufferSize, which is essentially how many words of information we want at a time
+
+  //We register some useful hardware interfaces our port driver could want to know
 
   Path p;
   p = cpswGetRoot();
-  std::cout << "Path " << p;
   _TriggerHwAutoRearm = IScalVal::create(p->findByName("/mmio/AppTop/DaqMuxV2[0]/TriggerHwAutoRearm"));
   _DataBufferSize = IScalVal::create(p->findByName("/mmio/AppTop/DaqMuxV2[0]/DataBufferSize"));
   _TrigCount = IScalVal_RO::create(p->findByName("/mmio/AppTop/DaqMuxV2[0]/TrigCount"));
+  //TODO: Do these for the other hardware addresses that are useful
   _Web0StartAddr = IScalVal::create(p->findByName("/mmio/AmcCarrierCore/AmcCarrierBsa/BsaWaveformEngine[0]/WaveformEngineBuffers/StartAddr[0]"));
   _Web0EndAddr = IScalVal::create(p->findByName("/mmio/AmcCarrierCore/AmcCarrierBsa/BsaWaveformEngine[0]/WaveformEngineBuffers/EndAddr[0]"));
   _Web0Init = ICommand::create(p->findByName("/mmio/AmcCarrierCore/AmcCarrierBsa/BsaWaveformEngine[0]/WaveformEngineBuffers/Initialize")); 
-  asynStatus status;
-  //status = (asynStatus)(epicsThreadCreate("WaveformTask", epicsThreadPriorityMedium, epicsThreadGetStackSize(epicsThreadStackMedium), (EPICSTHREADFUNC)::streamTask, this) == NULL);
 }
 
-void streamInit(void* driverPointer)
-{
-  WaveformReader *pPvt = (WaveformReader *) driverPointer;
-  pPvt->streamInit();
-  //TODO add some registers to do a healthcheck 
-
-}
-
+//TODO Make this actually useful, tell us what streams are currently connected and meant to be streaming, if they're doing that successfully or not
+/**
+ * Check the health of any stream our port driver is connected to
+ */
 void WaveformReader::statusCheck(void)
 {
   for(std::string paramIndex:waveform_param_indices)
@@ -73,153 +73,117 @@ void WaveformReader::statusCheck(void)
     std::cout << paramIndex << ' ';
   }
 }
-void WaveformReader::streamInit(std::string pv_identifier, std::string file_path)
+
+/**
+ * Launch a thread to stream data to an EPICS records
+ *
+ * @param pv_identifier string corresponding to the Epics record we wish to have data in
+ * @param stream_path string form of the path to the stream we want to connect to
+ *
+ * Does not return
+ */
+void WaveformReader::streamInit(std::string pv_identifier, std::string stream_path)
 {
-  StreamArgs toPass;
+  StreamArgs toPass; //Initialize a structure to pass the arguments we need to begin streaming
+
   toPass.pPvt = this;
-  //toPass.stream = channel;
   toPass.pv_identifier = pv_identifier;
-  toPass.stream_path_to_find = file_path; // file path is a little bit of a misnomer, path to the stream to use 
-  std::cout << "The path we pass is: " << toPass.stream_path_to_find << std::endl;
-  printf("\nChannel number in toPass is %d\n" ,toPass.stream);
+  toPass.stream_path_to_find = stream_path; 
+
+  //std::cout << "The path we pass is: " << toPass.stream_path_to_find << std::endl;
+  //printf("\nChannel number in toPass is %d\n" ,toPass.stream);
+
   asynStatus status;
   status = (asynStatus)(epicsThreadCreate("WaveformTask", epicsThreadPriorityMedium, epicsThreadGetStackSize(epicsThreadStackMedium), (EPICSTHREADFUNC)::streamTask, &toPass) == NULL);
-  sleep(3); //Sleep so the launched thread can find the structure before it's overwritten by garbage
+  sleep(3); //Sleep so the launched thread can find the structure before it's overwritten by garbage TODO: Do this in a better way 
 }
 
-void WaveformReader::streamInit(void)
-{
-  asynStatus status;
-  //Need to pass an argument to stream task that tells it the appropriate register access
-  
-  StreamArgs toPass;
-  toPass.pPvt = this;
-  
-  status = (asynStatus)(epicsThreadCreate("WaveformTask", epicsThreadPriorityMedium, epicsThreadGetStackSize(epicsThreadStackMedium), (EPICSTHREADFUNC)::streamTask, &toPass) == NULL);
-  printf("Successful status check\n");
-  //TODO Check on things we care about in the stream, if it's errored or not etc
-}
- 
-
+/**
+ * Tell a port driver to use it's streamTask method with the passed args generally called by streamInit
+ *
+ * @param streamArgs port driver and the required args to begin streaming
+ */
 void streamTask(void* streamArgs)
 {
   StreamArgs *passedArgs = static_cast<StreamArgs*>(streamArgs);
 
   WaveformReader *pPvt = (WaveformReader *) passedArgs->pPvt;
-  //printf("\nSuccessfulyl converted streamArgs given trying to launch streamTask.\n");
-  //printf("Stored channel is %d\n", passedArgs->stream);
   pPvt->streamTask(passedArgs->stream_path_to_find.c_str(), passedArgs->pv_identifier);
-  //std::cout << passedArgs->streamPath << std::endl;
-  //pPvt->streamTask(passedArgs->streamPath); //TODO add args
 }
- 
- /**
-//This function is called when creating a thread do read for some reason.
-void streamTask(void* waveformPointer)
-{
-  WaveformReader *pPvt = (WaveformReader *) waveformPointer;
-  const char* toPass = "/Stream1";
-  pPvt->streamTask(toPass);
-}
-**/ 
 
+/**
+ * Connect to a stream, write the data retrieved from the stream to the specified EPICS record
+ *
+ * @param streamInit path to the stream to connect and read from
+ * @param pvID Identifier of the EPICS record to write data from the stream to
+ */
 void WaveformReader::streamTask(const char *streamInit = "/Stream0", std::string pvID = "WAVEFORM:0")//, int waveform_param_index = -1)//Stream stm, int param16index, int param32index)
 {
         sleep(1);
 
         //TODO based on streamInit, add key and param to the asynPortDriver
-        
-        createParamMutex.lock();
 
         std::cout << "Passed pvID: " << pvID << std::endl;
         int waveform_param_index = pv_param_map[pvID];
         std::cout << pvID << std::endl;
 
-        createParamMutex.unlock();
-
-
-        int retrievedVal;
-        printf("Max size passed = %d\n", MAX_BUFFER_SIZE);
-
-        //_TriggerHwAutoRearm->setVal((uint64_t)1);
         Path p;
         p = cpswGetRoot();
 
-        std::cout << "Path " << p;
         std::cout << "Stream Init: " << streamInit;
-        //while(1);
         Stream stm;
+
         try {
-          //const char *stream = "/Stream0";
-          //stm = IStream::create(p->findByName("/Stream1")); //Baseline working finds a stream
           stm = IStream::create(p->findByName(streamInit));
         }
         catch (CPSWError &e) {
         }
+
         if(stm)
         {
           printf("Did that thing with a stream?\n");
         }
         else {
-          printf("No stream access ");
+          printf("No stream access");
+          return;
         }
-        //while(1);
+
         uint8_t *buf = new uint8_t[STREAM_MAX_SIZE];
-        printf("STREAM MAX SIZE IS %d\n", STREAM_MAX_SIZE);
-        size_t nWords16, nWords32, nBytes;
-        int nFrame;
+        size_t nWords16, nBytes;
         int64_t got = 0;
         int64_t lastGot = 0;
 
-        int iter = 0;
-        
         while(1)
         {
             //std::cout << streamInit << std::endl;
-            //getIntegerParam(MAX_STREAM_SIZE, &waveform_buffer_size_init_index);
-            //printf("Max stream size %d\n", MAX_STREAM_SIZE);
-            epicsInt32 run;
-            iter += 1;
-            /**
-            MAX_BUFFER_SIZE = MAX_BUFFER_SIZE - 10000;
-            if(MAX_BUFFER_SIZE <= 500000)
-            {
-              MAX_BUFFER_SIZE = 500000;
-            }
-            **/ 
             std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
             got = stm->read( buf, MAX_BUFFER_SIZE, CTimeout(-1));
-            std::chrono::steady_clock::time_point end1 = std::chrono::steady_clock::now();
-            
-            //printf("We got %d bytes, iter %d, max buffer size: %d.\n", got, iter, MAX_BUFFER_SIZE);
+            //std::chrono::steady_clock::time_point end1 = std::chrono::steady_clock::now();
 
             if(got > 8)
             {
-                //std::cout << 
                 //printf("Theres a thing in the stream? %ld bytes\n", got);
                 lock();
                 nBytes = (got - 9); // header = 8 bytes, footer = 1 byte, data = 32bit words.
-                nWords16 = nBytes / 2;
-                nWords32 = nWords16 / 2;
+                nWords16 = nBytes / 2; //Amount of words in our buffer to read
 
-                nFrame = (buf[1]<<4) | (buf[0] >> 4);
-
-                //Need to grab the word count from the thing, check the asyn params
-                
                 doCallbacksInt16Array((epicsInt16*)(buf + 8), nWords16, waveform_param_index, 0);
 
                 for(int i = 0; i < MAX_BUFFER_SIZE; i++)
                 {
-                  //printf("Index %d, Value %d\n", i, buf[i]);
+                  /**
+                   * Take data gathered from the stream and move it into an array we can play with
+                   * TODO take options so we know how we'd want to modify the array
+                   */
+
                   waveformData[i] = (int16_t)buf[i];
                   //std::cout << buf[i];
                 }
-                //doCallbacksInt16Array(waveformData, 100000, waveform_param_index, 0);
-
-                //doCallbacksInt16Array((epicsInt16*)(buf+8), nWord16, param16index, DEV_STM);
                 if (lastGot > got)
-                    memset(buf+got, 0, (lastGot-got)*sizeof(int8_t));
-
+                {
+                  //Clear the the buffer of previously read data
+                  memset(buf+got, 0, (lastGot-got)*sizeof(int8_t));
+                }
                 lastGot = got;
                 unlock();
             }
@@ -244,6 +208,9 @@ void WaveformReader::streamTask(const char *streamInit = "/Stream0", std::string
     return;
 }
 
+/**
+ * Override of asyn port driver default writeUInt32Digital,lets us set hardware by writing to epics records
+ */
 asynStatus WaveformReader::writeUInt32Digital(asynUser *pasynUser, epicsUInt32 value, epicsUInt32 mask)
 {
   asynStatus status = setUIntDigitalParam(pasynUser->reason, value, mask);
@@ -265,6 +232,10 @@ asynStatus WaveformReader::writeUInt32Digital(asynUser *pasynUser, epicsUInt32 v
   return status;
 }
 
+
+/**
+ * Override of asyn port driver default writeInt32,lets us set hardware by writing to epics records
+ */
 asynStatus WaveformReader::writeInt32(asynUser *pasynUser, epicsInt32 value)
 {
   printf("Driver calls write Int32\n");

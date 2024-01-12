@@ -15,6 +15,8 @@
 #include <vector>
 #include <map>
 #include <mutex>
+#include <unistd.h>
+#include <chrono>
 
 #include <cpsw_api_user.h>
 #include <yaml-cpp/yaml.h>
@@ -54,26 +56,19 @@ class WaveformReader : public asynPortDriver
     void statusCheck(void);
 
 
-    void streamTask(void);
     void streamTask(const char *stream, std::string pvID);// takes a path to the stream and then a pv identifier for connection
-    void streamTask(Stream stm, int param16index, int param32index);
-    void streamInit(void);
     void streamInit(std::string pv_identifier, std::string stream_path);
     virtual asynStatus writeUInt32Digital(asynUser *pasynUser, epicsUInt32 value, epicsUInt32 mask);
     virtual asynStatus writeInt32(asynUser *pasynUser, epicsInt32 value);
-    //asyn int 16 array things
-    //virtual asynStatus write
 
     //Parameter list indices, should never be written to but need to be read, I really don't want to deal with encapsulation
+    //TODO find a way to make these read only without having to write a weird get or set method
 
-    std::mutex createParamMutex;
     std::vector<std::string> waveform_param_indices; //order of this doesn't really matter
     std::map<std::string, int> pv_param_map; //Identifier of pv to parameter in param list
     //std::map<std::string, std::string> stream_pv_map; //stream path to pv identifier
+
     //Variables to store indices of records which the asynPortDriver can talk to.
-    int waveform_param_index_0; //Parameter list index for waveform record associated with Stream 0
-    int waveform_param_index_1; //Parameter list index for waveform record associated with Stream 1
-    int waveform_param_index_2; //Parameter list index for waveform record associated with Stream 2
     int waveform_run_index;
     int waveform_init_index;
     int waveform_beginAddr_index;
@@ -95,6 +90,11 @@ class WaveformReader : public asynPortDriver
 
 };
 
+/**
+ * EpicsThreadCreate only lets us use a void pointer as an argument to the function
+ * we would like to pass to it so we define a struct with the necessary information 
+ * for streaming data.
+ */
 typedef struct StreamArgs 
 {
   void * pPvt;
