@@ -1,0 +1,98 @@
+##Template file waveform
+
+record(waveform, "$(USER):waveform:${channel}")
+{
+    field(PINI, "1")
+    field(DTYP, "asynInt16ArrayIn")
+    field(INP, "@asyn($(PORT),$(ADDR),$(TIMEOUT))WAVEFORM:$(channel)")
+    field(FTVL, "SHORT")
+    field(NELM, "$(WAVEFORM_SIZE)")
+    field(FLNK, "$(USER):subArray:${channel} PP")
+    field(SCAN, "I/O Intr")
+  }
+
+record(subArray, "$(USER):subArray:${channel}")
+{
+  field(INP, "$(USER):waveform:${channel}.VAL")
+  field(FTVL, "SHORT")
+  field(MALM, "$(WAVEFORM_SIZE)")
+  field(NELM, "25000")
+  field(INDX, "0")
+  }
+
+record(bo, "$(USER):web:init:${channel}")
+{
+    field(DTYP, "asynUInt32Digital")
+    field(SCAN, "Passive")
+    field(OUT, "@asynMask($(PORT), $(ADDR), 1, $(TIMEOUT))INITIALIZE${channel}")
+    field(ZNAM, "Why")
+    field(ONAM, "INIT")
+  }
+
+record(longin, "$(USER):begin_addr:${channel}")
+{
+    field(DTYP, asynInt32)
+    field(SCAN, "I/O Intr")
+    field(INP, "@asyn($(PORT, $(ADDR), $(TIMEOUT))BEGIN_ADDR${channel})")
+  }
+
+record(longin, "$(USER):end_addr:${channel}")
+{
+    field(DTYP, "asynInt32")
+    field(SCAN, "I/O Intr")
+    field(INP, "@asyn($(PORT), $(ADDR), $(TIMEOUT))END_ADDR${channel})")
+  }
+
+record(longout, "$(USER):buffer_size")
+{
+    field(DTYP, "asynInt32")
+    field(SCAN, "Passive")
+    field(OUT, "@asyn($(PORT), $(ADDR), $(TIMEOUT))BUFFER_SIZE")
+  }
+
+record(ao, "$(USER):word:count:${channel}")
+{
+    field(SCAN, "Passive")
+    field(OUT, "$(USER):init:seq:${channel}  PP")
+  }
+
+record(seq, "$(USER):init:seq:${channel}")
+{
+    field(SCAN, "Passive")
+    field(DOL1, "$(USER):word:count:${channel}")
+    field(LNK1, "$(USER):fanout:buffer PP")
+    field(DO2, "1")
+    field(LNK2, "$(USER):web:init:${channel} PP")
+  }
+
+record(dfanout, "$(USER):fanout:buffer:${channel}")
+{
+    field(SCAN, "Passive")
+    field(OUTA, "$(USER):buffer:rbv:${channel} PP")
+    field(OUTB, "$(USER):to:div:${channel}.A PP")
+    field(OUTC, "$(USER):web:init:${channel}.A PP")
+  }
+
+record(ai, "$(USER):buffer:rbv:${channel}")
+{
+    field(SCAN, "Passive")
+  }
+
+record(calcout, "$(USER):to:div:${channel}")
+{
+    field(SCAN, "Passive")
+    field(CALC, "A/2")
+    field(OUT, "$(USER):buffer_size PP")
+  }
+
+#Single register for all the things
+
+record(bo, "$(USER):run")
+{
+    field(SCAN, "Passive")
+    field(DTYP, "asynUInt32Digital")
+    field(OUT, "@asynMask($(PORT),$(ADDR), 1, $(TIMEOUT))RUN")
+    #field(PINI, "1")
+    field(ZNAM, "STOP")
+    field(ONAM, "RUN")
+  }

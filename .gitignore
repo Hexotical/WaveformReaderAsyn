@@ -1,6 +1,9 @@
 # Prerequisites
 *.d
 
+#Hanging vim swap files
+*.swp
+
 # Compiled Object files
 *.slo
 *.lo
