@@ -95,6 +95,10 @@ void WaveformReader::streamInit(std::string pv_identifier, std::string stream_pa
 
   asynStatus status;
   status = (asynStatus)(epicsThreadCreate("WaveformTask", epicsThreadPriorityMedium, epicsThreadGetStackSize(epicsThreadStackMedium), (EPICSTHREADFUNC)::streamTask, &toPass) == NULL);
+  if(status == asynError)
+  {
+    std::cout << "Unable to launch a waveform stream; " << status << std::endl;
+  }
   sleep(3); //Sleep so the launched thread can find the structure before it's overwritten by garbage TODO: Do this in a better way 
 }
 
@@ -137,6 +141,7 @@ void WaveformReader::streamTask(const char *streamInit = "/Stream0", std::string
           stm = IStream::create(p->findByName(streamInit));
         }
         catch (CPSWError &e) {
+          std::cerr << e.what() << std::endl;
         }
 
         if(stm)
