@@ -95,7 +95,7 @@ class WaveformReader : public asynPortDriver
  * we would like to pass to it so we define a struct with the necessary information 
  * for streaming data.
  */
-typedef struct StreamArgs 
+struct StreamArgs 
 {
   void * pPvt;
   std::string stream_path_to_find;

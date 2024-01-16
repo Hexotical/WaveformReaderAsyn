@@ -322,7 +322,32 @@ void WaveformStatusRegister(void)
   iocshRegister(&statusFuncDef, statusCallFunc);
 }
 
+static void PrintHelp() 
+{
+  std::cout << "Supported waveform commands:" << std::endl
+    << "WaveformStreamInit" << std::endl
+    << "Usage: WaveformStreamInit [channel] [waveform pv ID]" << std::endl
+    << "[channel] is the path to the stream that cpsw can find, eg '/Stream0' " << std::endl
+    << "[waveform pv ID] refers to the asyn string identifier for a given record, generally located in OUT or INP field" <<std::endl
+    << std::endl
+    << "WaveformStatus" << std::endl
+    << "Usage: WaveformStatus" << std::endl
+    << "Health check of initialized streams." << std::endl;
+}
+
+static const iocshFuncDef helpFuncDef = {"PrintHelp", 0};
+static void helpCallFunc(const iocshArgBuf *args)
+{
+  PrintHelp();
+}
+
+void PrintHelpRegister(void)
+{
+  iocshRegister(&helpFuncDef, helpCallFunc);
+}
+
 extern "C" {
+  epicsExportRegistrar(PrintHelpRegister);
   epicsExportRegistrar(WaveformStatusRegister);
   epicsExportRegistrar(WaveformReaderRegister);
   epicsExportRegistrar(WaveformStreamRegister);
