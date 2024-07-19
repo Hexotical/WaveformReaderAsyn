@@ -1,4 +1,4 @@
-registrar(WaveformReaderRegister)
-registrar(WaveformStreamRegister)
-registrar(WaveformStatusRegister)
-registrar(PrintHelpRegister)
+registrar(waveformReaderRegister)
+registrar(waveformStreamRegister)
+registrar(waveformStatusRegister)
+registrar(printHelpRegister)
