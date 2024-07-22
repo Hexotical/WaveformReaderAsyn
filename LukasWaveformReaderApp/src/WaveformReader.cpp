@@ -40,6 +40,8 @@ WaveformReader::WaveformReader(const char *portName, int bufferSize, int wavefor
     std::cout << "The identifier is: " << pvIdentifier << " and the waveform_param_index is : " << waveform_param_index << std::endl;
     pv_param_map.insert(std::pair<std::string, int>(pvIdentifier, waveform_param_index));
     waveform_param_indices.push_back(pvIdentifier);
+    //initialization_status_map[pvIdentifier] = "Not initialized yet";
+    streaming_status_map[pvIdentifier] = "Not initialized yet";
   }
   //TODO: Do this is a more systematic way, individually connecting isn't really aesthetic 
   createParam(WAVEFORM_RUN_STRING, asynParamUInt32Digital, &waveform_run_index);
@@ -69,10 +71,13 @@ WaveformReader::WaveformReader(const char *portName, int bufferSize, int wavefor
  */
 void WaveformReader::statusCheck(void)
 {
+  std::cout << "Status of connected waveforms: " << std::endl;
   for(std::string paramIndex:waveform_param_indices)
   {
-    std::cout << paramIndex << ' ' << pv_param_map[paramIndex] << std::endl;
+    std::cout << "------------------------------------------------------------------------" << std::endl;
+    std::cout << "| " << std::setw(15) << paramIndex << " | " << std::setw(50) << streaming_status_map[paramIndex] << " |" << std::endl;
   }
+  std::cout << "------------------------------------------------------------------------" << std::endl;
 }
 
 /**
@@ -99,6 +104,12 @@ void WaveformReader::streamInit(std::string pv_identifier, std::string stream_pa
   if(status == asynError)
   {
     std::cout << "Unable to launch a waveform stream; " << status << std::endl;
+    //streaming_status_map[pv_identifier] = "Initialization failed";
+  }
+  else
+  {
+    std::cout << "Succesfully launched waveform stream=> " << pv_identifier << " status: " << status << std::endl;
+    //streaming_status_map[pv_identifier] = "Successfully initialized"; 
   }
   sleep(3); //Sleep so the launched thread can find the structure before it's overwritten by garbage TODO: Do this in a better way 
 }
@@ -135,7 +146,7 @@ void WaveformReader::streamTask(const char *streamInit = "/Stream0", std::string
         Path p;
         p = cpswGetRoot();
 
-        std::cout << "Stream Init (path to the stream): " << streamInit;
+        std::cout << "Stream Init (path to the stream): " << streamInit << std::endl;
         Stream stm;
 
         try {
@@ -147,10 +158,13 @@ void WaveformReader::streamTask(const char *streamInit = "/Stream0", std::string
 
         if(stm)
         {
+          std::cout << "Value of stm: " << stm << std::endl;
           printf("Did that thing with a stream?\n");
+          streaming_status_map[pvID] = "Successfully initialized"; 
         }
         else {
           printf("No stream access");
+          streaming_status_map[pvID] = "Initialization failed";
           return;
         }
 
@@ -163,12 +177,12 @@ void WaveformReader::streamTask(const char *streamInit = "/Stream0", std::string
 
         while(1)
         {
-            //std::cout << "INside the while loop " << std::endl;
+            //std::cout << "Inside the while loop " << std::endl;
             //std::cout << streamInit << std::endl;
             //std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
             got = stm->read( buf, MAX_BUFFER_SIZE, CTimeout(-1));
             //std::chrono::steady_clock::time_point end1 = std::chrono::steady_clock::now();
-            //std::cout << "No. of long int values read in from the stream (value of got): " << got << std::endl;
+            //std::cout << "No. of values read in from the stream (value of got): " << got << std::endl;
             //std::cout << "Value of lastGot: " << lastGot << std::endl;
 
             if(got > 8)
@@ -177,6 +191,14 @@ void WaveformReader::streamTask(const char *streamInit = "/Stream0", std::string
                 lock();
                 nBytes = (got - 9); // header = 8 bytes, footer = 1 byte, data = 32bit words.
                 nWords16 = nBytes / 2; //Amount of words in our buffer to read
+                if (nWords16 > 0)
+                {
+                  streaming_status_map[pvID] = "Successfully initialized and streaming data";
+                }
+                else
+                {
+                  streaming_status_map[pvID] = "Successfully initialized but no data in buffer";
+                }
                 //std::cout << "No. of words read in from the stream (after removing header and footer) : " << nWords16 << std::endl; 
 
                 doCallbacksInt16Array((epicsInt16*)(buf + 8), nWords16, waveform_param_index, 0);
@@ -191,6 +213,9 @@ void WaveformReader::streamTask(const char *streamInit = "/Stream0", std::string
                   waveformData[i] = (int16_t)buf[i];
                   //std::cout << "Value of buffer at index " << i << ": " << buf[i] << std::endl;
                 }
+
+                //std::cout << "Size of buf: " << (sizeof(buf)/sizeof(buf[0])) << std::endl;
+                //std::cout << "Size of waveformData: " << (sizeof(waveformData)/sizeof(waveformData[0])) << std::endl;
                 if (lastGot > got)
                 {
                   //Clear the the buffer of previously read data
@@ -202,6 +227,8 @@ void WaveformReader::streamTask(const char *streamInit = "/Stream0", std::string
             else
             {
                  asynPrint(pasynUserSelf, ASYN_TRACE_ERROR, "WaveformReader: Received frame too small\n");
+                 streaming_status_map[pvID] = "Successfully initialized but received frame too small";
+                 //std::cout << "Inside the else right now" << std::endl;
             }
             //std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
             //auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - begin);
@@ -216,7 +243,6 @@ void WaveformReader::streamTask(const char *streamInit = "/Stream0", std::string
         delete[] buf;
     }
     **/ 
-
     return;
 }
 
