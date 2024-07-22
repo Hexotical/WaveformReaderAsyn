@@ -346,7 +346,7 @@ static struct iocshVarDef vardefs[] = {
 int LukasWaveformReader_registerRecordDeviceDriver(DBBASE *pbase)
 {
     static int executed = 0;
-    const char *bldTop = "/afs/slac.stanford.edu/u/gu/tanisha/WaveformReaderAsyn/WaveformReaderAsyn-git";
+    const char *bldTop = "/afs/slac.stanford.edu/u/gu/tanisha/WaveformReaderAsyn";
     const char *envTop = getenv("TOP");
 
     if (envTop && strcmp(envTop, bldTop)) {
