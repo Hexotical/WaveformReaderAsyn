@@ -4,7 +4,7 @@
 #- everywhere it appears in this file
 
 < envPaths
-epicsEnvSet("FPGA_IP", "10.0.1.104")
+epicsEnvSet("FPGA_IP", "10.0.1.105")
 epicsEnvSet("YAML_DIR", "${IOC_DATA}/${IOC}/yaml")
 epicsEnvSet("YAML", "${YAML_DIR}/000TopLevel.yaml")
 epicsEnvSet("DEFAULTS_FILE", "${YAML_DIR}/config/defaults.yaml")
