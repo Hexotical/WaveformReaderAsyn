@@ -67,8 +67,7 @@ class WaveformReader : public asynPortDriver
 
     std::vector<std::string> waveform_param_indices; //order of this doesn't really matter
     std::map<std::string, int> pv_param_map; //Identifier of pv to parameter in param list
-    //std::map<std::string, std::string> initialization_status_map; // map the string identifiers to their initialization status
-    std::map<std::string, std::string> streaming_status_map; 
+    std::map<std::string, std::string> streaming_status_map; // map the string identifiers to their streaming status
     //std::map<std::string, std::string> stream_pv_map; //stream path to pv identifier
 
     //Variables to store indices of records which the asynPortDriver can talk to.

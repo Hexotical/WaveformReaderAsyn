@@ -40,7 +40,6 @@ WaveformReader::WaveformReader(const char *portName, int bufferSize, int wavefor
     std::cout << "The identifier is: " << pvIdentifier << " and the waveform_param_index is : " << waveform_param_index << std::endl;
     pv_param_map.insert(std::pair<std::string, int>(pvIdentifier, waveform_param_index));
     waveform_param_indices.push_back(pvIdentifier);
-    //initialization_status_map[pvIdentifier] = "Not initialized yet";
     streaming_status_map[pvIdentifier] = "Not initialized yet";
   }
   //TODO: Do this is a more systematic way, individually connecting isn't really aesthetic 
@@ -104,12 +103,10 @@ void WaveformReader::streamInit(std::string pv_identifier, std::string stream_pa
   if(status == asynError)
   {
     std::cout << "Unable to launch a waveform stream; " << status << std::endl;
-    //streaming_status_map[pv_identifier] = "Initialization failed";
   }
   else
   {
     std::cout << "Succesfully launched waveform stream=> " << pv_identifier << " status: " << status << std::endl;
-    //streaming_status_map[pv_identifier] = "Successfully initialized"; 
   }
   sleep(3); //Sleep so the launched thread can find the structure before it's overwritten by garbage TODO: Do this in a better way 
 }
