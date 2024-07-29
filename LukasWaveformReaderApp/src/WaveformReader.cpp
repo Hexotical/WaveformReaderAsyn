@@ -79,6 +79,108 @@ void WaveformReader::statusCheck(void)
   std::cout << "------------------------------------------------------------------------" << std::endl;
 }
 
+void WaveformReader::fft(void)
+{
+  int maxIndex = findMaxIndex();
+  int low, high;
+  findRange(low, high, maxIndex);
+  // Define the length of the complex arrays
+  int n = high - low + 1; // buffer size from waveformConfigure call in st.cmd //200000
+  // Input array
+  // IS OURS A REAL VALUED SIGNAL
+  // Dynamically allocate the array because the size can change
+  fftw_complex* x = new fftw_complex[n]; // This is equivalent to: double x[n][2];
+  // Output array
+  fftw_complex* y = new fftw_complex[n];
+  // Samping frequency
+  double sampling_frequency = 3.57142857143e8; // NEED VALUE OF SAMPLING FREQUENCY
+
+  //std::cout << "Just trying maxIndex: " << findMaxIndex() << std::endl;
+  //std::cout << "Above the first for loop" << std::endl;
+  // Fill the first array with data from waveformData
+  for (int i = 0; i < n; i++)
+  {
+      x[i][REAL] = waveformData[i + low];
+      x[i][IMAG] = 0;
+  }
+  //Plant the FFT and execute it
+  fftw_plan plan = fftw_plan_dft_1d(n, x, y, FFTW_FORWARD, FFTW_ESTIMATE);
+  fftw_execute(plan);
+  //Do some cleaning
+  fftw_destroy_plan(plan);
+  fftw_cleanup();
+  // Display the results
+  std::cout << "FFT = " << std::endl;
+  double frequency;
+  std::cout << "---------------------------------------------------------------------------------------------------------------" << std::endl;
+  std::cout << "|    No.    | FREQUENCY (in Hz) |             FFT RESULT             |     MAGNITUDE     | PHASE (in radians) |" << std::endl;
+  std::cout << "---------------------------------------------------------------------------------------------------------------" << std::endl;
+  for (int i = 0; i < n; i++)
+  {
+      frequency = (i * sampling_frequency) / n;
+      if (y[i][IMAG] < 0)
+      {
+          std::cout << "|" << std::setw(11) << i + 1 << "|" << std::setw(19) << std::right << frequency << "|" << std::setw(16) << y[i][REAL] << " - " << std::setw(16) << std::left << abs(y[i][IMAG]) << "i";
+      }
+      else
+      {
+          std::cout << "|" << std::setw(11) << i + 1 << "|" << std::setw(19) << std::right << frequency << "|" << std::setw(16) << y[i][REAL] << " + " << std::setw(16) << std::left << y[i][IMAG] << "i" ;
+      }
+      std::cout << "|" << std::setw(19) << std::right << sqrt(pow(y[i][REAL], 2) + pow((y[i][IMAG]), 2));
+      std::cout << "|" << std::setw(20) << std::right << atan2(y[i][IMAG], y[i][REAL]) << "|" << std::endl;
+      std::cout << "---------------------------------------------------------------------------------------------------------------" << std::endl;
+  }
+}
+
+int WaveformReader::findMaxIndex(void)
+{
+  int maxIndex = waveformData[0];
+
+  for (int i = 0; i < STREAM_MAX_SIZE; i++)
+  {
+    if (waveformData[i] > maxIndex) {maxIndex = i;}
+    //std::cout << "Value at index " << i << " is " << waveformData[i] << std::endl;
+  }
+  return maxIndex;
+}
+
+void WaveformReader::findRange(int& low, int& high, int maxIndex)
+{
+  const int LOWER_LIMIT = 5; // NEED THIS
+  low = maxIndex - 1;
+  high = maxIndex + 1;
+  while ((waveformData[low - 1] <= waveformData[low] || waveformData[low] > LOWER_LIMIT) && low >= 0)
+  {
+    low--;
+  } 
+  while (waveformData[high + 1] <= waveformData[high] || waveformData[high] > LOWER_LIMIT && high < STREAM_MAX_SIZE)
+  {
+    high++;
+  } 
+
+}
+
+void WaveformReader::findLocalMaxima(void)
+{
+  if (waveformData[0] > waveformData[1]) {local_maxima_indices.push_back(0);}
+
+  for(int i = 1; i < (STREAM_MAX_SIZE - 1); i++) 
+  { 
+         
+    if ((waveformData[i - 1] < waveformData[i]) and (waveformData[i] > waveformData[i + 1])) 
+    {
+      local_maxima_indices.push_back(i);
+    } 
+
+  }
+
+  if (waveformData[STREAM_MAX_SIZE - 1] > waveformData[STREAM_MAX_SIZE - 2]) 
+  {
+    local_maxima_indices.push_back(STREAM_MAX_SIZE - 1);
+  }
+ 
+}
+
 /**
  * Launch a thread to stream data to an EPICS records
  *
@@ -376,10 +478,28 @@ void printHelpRegister(void)
   iocshRegister(&helpFuncDef, helpCallFunc);
 }
 
+static void fourierTransform(void)
+{
+  bayManager->fft();
+  return;
+}
+static const iocshFuncDef fftFuncDef = {"fourierTransform", 0};
+static void fftCallFunc(const iocshArgBuf *args)
+{
+  fourierTransform();
+}
+
+void fourierTransformRegister(void)
+{
+  iocshRegister(&fftFuncDef, fftCallFunc);
+}
+
+
 extern "C" {
   epicsExportRegistrar(printHelpRegister);
   epicsExportRegistrar(waveformStatusRegister);
   epicsExportRegistrar(waveformReaderRegister);
   epicsExportRegistrar(waveformStreamRegister);
+  epicsExportRegistrar(fourierTransformRegister);
 }
 

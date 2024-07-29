@@ -18,6 +18,8 @@
 #include <unistd.h>
 #include <chrono>
 #include <iomanip>
+#include <math.h>
+#include <fftw3.h>
 
 #include <cpsw_api_user.h>
 #include <yaml-cpp/yaml.h>
@@ -31,7 +33,6 @@
 #define WAVEFORM0_BEGIN_ADDR_STRING "BEGIN_ADDR0"
 #define WAVEFORM0_BUFFER_SIZE_STRING "BUFFER_SIZE0"
 #define WAVEFORM0_BUFFER_SIZE_INIT_STRING "WAVEFORM_BUFFER_SIZE_INIT0"
-
 
 
 #define WAVEFORM1_PV_STRING "WAVEFORM:1"
@@ -49,12 +50,19 @@
 #define WAVEFORM2_BUFFER_SIZE_STRING "BUFFER_SIZE2"
 #define WAVEFORM2_BUFFER_SIZE_INIT_STRING "WAVEFORM_BUFFER_SIZE_INIT2"
 
+#define REAL 0
+#define IMAG 1
+
 class WaveformReader : public asynPortDriver
 {
   public:
     WaveformReader(const char *portName, int bufferSize, int waveformPVs);
 
     void statusCheck(void);
+    void fft(void);
+    int findMaxIndex(void);
+    void findRange(int& low, int& high, int maxIndex);
+    void findLocalMaxima(void);
 
 
     void streamTask(const char *stream, std::string pvID);// takes a path to the stream and then a pv identifier for connection
@@ -68,6 +76,7 @@ class WaveformReader : public asynPortDriver
     std::vector<std::string> waveform_param_indices; //order of this doesn't really matter
     std::map<std::string, int> pv_param_map; //Identifier of pv to parameter in param list
     std::map<std::string, std::string> streaming_status_map; // map the string identifiers to their streaming status
+    std::vector<int> local_maxima_indices;
     //std::map<std::string, std::string> stream_pv_map; //stream path to pv identifier
 
     //Variables to store indices of records which the asynPortDriver can talk to.
