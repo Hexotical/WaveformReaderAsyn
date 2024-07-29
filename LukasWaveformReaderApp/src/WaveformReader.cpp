@@ -149,11 +149,11 @@ void WaveformReader::findRange(int& low, int& high, int maxIndex)
   const int LOWER_LIMIT = 5; // NEED THIS
   low = maxIndex - 1;
   high = maxIndex + 1;
-  while ((waveformData[low - 1] <= waveformData[low] || waveformData[low] > LOWER_LIMIT) && low >= 0)
+  while ((waveformData[low - 1] <= waveformData[low] || waveformData[low] > LOWER_LIMIT) && (low > 0))
   {
     low--;
   } 
-  while (waveformData[high + 1] <= waveformData[high] || waveformData[high] > LOWER_LIMIT && high < STREAM_MAX_SIZE)
+  while ((waveformData[high + 1] <= waveformData[high] || waveformData[high] > LOWER_LIMIT) && (high < (STREAM_MAX_SIZE - 1)))
   {
     high++;
   } 
