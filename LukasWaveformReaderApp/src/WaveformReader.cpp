@@ -83,7 +83,8 @@ void WaveformReader::fft(void)
 {
   int maxIndex = findMaxIndex();
   int low, high;
-  findRange(low, high, maxIndex);
+  const int LOWER_LIMIT = 5;
+  findRange(low, high, maxIndex, LOWER_LIMIT);
   // Define the length of the complex arrays
   int n = high - low + 1; // buffer size from waveformConfigure call in st.cmd //200000
   // Input array
@@ -144,9 +145,8 @@ int WaveformReader::findMaxIndex(void)
   return maxIndex;
 }
 
-void WaveformReader::findRange(int& low, int& high, int maxIndex)
+void WaveformReader::findRange(int& low, int& high, int maxIndex, const int LOWER_LIMIT)
 {
-  const int LOWER_LIMIT = 5; // NEED THIS
   low = maxIndex - 1;
   high = maxIndex + 1;
   while ((waveformData[low - 1] <= waveformData[low] || waveformData[low] > LOWER_LIMIT) && (low > 0))

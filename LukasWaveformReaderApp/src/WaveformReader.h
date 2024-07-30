@@ -61,7 +61,7 @@ class WaveformReader : public asynPortDriver
     void statusCheck(void);
     void fft(void);
     int findMaxIndex(void);
-    void findRange(int& low, int& high, int maxIndex);
+    void findRange(int& low, int& high, int maxIndex, const int LOWER_LIMIT);
     void findLocalMaxima(void);
 
 
