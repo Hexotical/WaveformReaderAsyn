@@ -116,7 +116,7 @@ void WaveformReader::fft(void)
   // Display the results
   int choice;
   std::string extra;
-  std::cout << "Would you like to: \n1) Display the results of the fast fourier transform\n2) Display a graph of the results" << std::endl;
+  std::cout << "Would you like to: \n1) Display the results of the fast fourier transform\n2) Output the results to a csv and display a graph of the same" << std::endl;
   while (true)
   {
     std::cout << "Enter choice (1 or 2): ";

@@ -32,12 +32,13 @@ for line in lines[start_index + 1:]:
 if not csv_data:
     raise ValueError("No CSV data found after the most recent 'fourierTransform' command.")
 
-print("Plotting csv data now")
 
 # Write the extracted CSV data to a file with header
 with open(csv_output_path, 'w') as file:
     file.write('Frequency,Magnitude\n')  # Add header
     file.write('\n'.join(csv_data))
+
+print("Added csv data to output.csv. Plotting graph now.")
 
 # Load the CSV data into a DataFrame
 df = pd.read_csv(csv_output_path)
