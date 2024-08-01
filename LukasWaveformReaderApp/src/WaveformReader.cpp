@@ -79,6 +79,11 @@ void WaveformReader::statusCheck(void)
   std::cout << "------------------------------------------------------------------------" << std::endl;
 }
 
+/**
+ * Computes and displays the results of a fast fourier transform on a section of the waveform data 
+ * that contains the peak value
+ * Uses the fftw library (https://www.fftw.org/)
+ */
 void WaveformReader::fft(void)
 {
   int maxIndex = findMaxIndex();
@@ -86,18 +91,15 @@ void WaveformReader::fft(void)
   const int LOWER_LIMIT = 5;
   findRange(low, high, maxIndex, LOWER_LIMIT);
   // Define the length of the complex arrays
-  int n = high - low + 1; // buffer size from waveformConfigure call in st.cmd //200000
-  // Input array
-  // IS OURS A REAL VALUED SIGNAL
+  int n = high - low + 1;
   // Dynamically allocate the array because the size can change
+  // Input array
   fftw_complex* x = new fftw_complex[n]; // This is equivalent to: double x[n][2];
   // Output array
   fftw_complex* y = new fftw_complex[n];
   // Samping frequency
-  double sampling_frequency = 3.57142857143e8; // NEED VALUE OF SAMPLING FREQUENCY
+  double sampling_frequency = 3.57142857143e8; 
 
-  //std::cout << "Just trying maxIndex: " << findMaxIndex() << std::endl;
-  //std::cout << "Above the first for loop" << std::endl;
   // Fill the first array with data from waveformData
   for (int i = 0; i < n; i++)
   {
@@ -110,29 +112,74 @@ void WaveformReader::fft(void)
   //Do some cleaning
   fftw_destroy_plan(plan);
   fftw_cleanup();
+
   // Display the results
-  std::cout << "FFT = " << std::endl;
-  double frequency;
-  std::cout << "---------------------------------------------------------------------------------------------------------------" << std::endl;
-  std::cout << "|    No.    | FREQUENCY (in Hz) |             FFT RESULT             |     MAGNITUDE     | PHASE (in radians) |" << std::endl;
-  std::cout << "---------------------------------------------------------------------------------------------------------------" << std::endl;
-  for (int i = 0; i < n; i++)
+  int choice;
+  std::string extra;
+  std::cout << "Would you like to: \n1) Display the results of the fast fourier transform\n2) Display a graph of the results" << std::endl;
+  while (true)
   {
-      frequency = (i * sampling_frequency) / n;
-      if (y[i][IMAG] < 0)
-      {
-          std::cout << "|" << std::setw(11) << i + 1 << "|" << std::setw(19) << std::right << frequency << "|" << std::setw(16) << y[i][REAL] << " - " << std::setw(16) << std::left << abs(y[i][IMAG]) << "i";
-      }
-      else
-      {
-          std::cout << "|" << std::setw(11) << i + 1 << "|" << std::setw(19) << std::right << frequency << "|" << std::setw(16) << y[i][REAL] << " + " << std::setw(16) << std::left << y[i][IMAG] << "i" ;
-      }
-      std::cout << "|" << std::setw(19) << std::right << sqrt(pow(y[i][REAL], 2) + pow((y[i][IMAG]), 2));
-      std::cout << "|" << std::setw(20) << std::right << atan2(y[i][IMAG], y[i][REAL]) << "|" << std::endl;
+    std::cout << "Enter choice (1 or 2): ";
+    std::cin >> choice;
+
+    if (std::cin.fail())
+    {
+      std::cout << "Invalid choice, try again." << std::endl;
+      std::cin.clear();
+      std::cin.ignore();
+      std::getline(std::cin, extra); 
+    }
+
+    else if (choice == 1)
+    {
+      std::cout << "FFT = " << std::endl;
+      double frequency;
       std::cout << "---------------------------------------------------------------------------------------------------------------" << std::endl;
+      std::cout << "|    No.    | FREQUENCY (in Hz) |             FFT RESULT             |     MAGNITUDE     | PHASE (in radians) |" << std::endl;
+      std::cout << "---------------------------------------------------------------------------------------------------------------" << std::endl;
+      for (int i = 0; i < n; i++)
+      {
+          frequency = (i * sampling_frequency) / n;
+          if (y[i][IMAG] < 0)
+          {
+            std::cout << "|" << std::setw(11) << i + 1 << "|" << std::setw(19) << std::right << frequency << "|" << std::setw(16) << y[i][REAL] << " - " << std::setw(16) << std::left << abs(y[i][IMAG]) << "i";
+          }
+          else
+          {
+            std::cout << "|" << std::setw(11) << i + 1 << "|" << std::setw(19) << std::right << frequency << "|" << std::setw(16) << y[i][REAL] << " + " << std::setw(16) << std::left << y[i][IMAG] << "i" ;
+          }
+          std::cout << "|" << std::setw(19) << std::right << sqrt(pow(y[i][REAL], 2) + pow((y[i][IMAG]), 2));
+          std::cout << "|" << std::setw(20) << std::right << atan2(y[i][IMAG], y[i][REAL]) << "|" << std::endl;
+          std::cout << "---------------------------------------------------------------------------------------------------------------" << std::endl;
+      }
+      break;
+    }
+
+    else if (choice == 2)
+    {
+      double frequency;
+      for (int i = 0; i < n; i++)
+      {
+        frequency = (i * sampling_frequency) / n;
+        std::cout << frequency << "," << sqrt(pow(y[i][REAL], 2) + pow((y[i][IMAG]), 2)) << "\n";
+      }
+      std::cout << "\nRun the plot.py script to generate the graph.\n" << std::endl;
+      break;
+    }
+    else 
+    {
+      std::cout << "Invalid choice, try again." << std::endl;
+      std::cin.clear();
+      std::cin.ignore();
+    }  
   }
 }
 
+/**
+ * Finds the index of the peak or global maximum value in waveformData
+ * 
+ * @return the index of the peak value
+ */
 int WaveformReader::findMaxIndex(void)
 {
   int maxIndex = waveformData[0];
@@ -140,11 +187,18 @@ int WaveformReader::findMaxIndex(void)
   for (int i = 0; i < STREAM_MAX_SIZE; i++)
   {
     if (waveformData[i] > maxIndex) {maxIndex = i;}
-    //std::cout << "Value at index " << i << " is " << waveformData[i] << std::endl;
   }
   return maxIndex;
 }
 
+/**
+ * Determines the relevant window from the entire waveform data on which data analysis is to be perfomed
+ * 
+ * @param low the starting point of the window
+ * @param high the ending point of the window
+ * @param maxIndex the index of the peak value of the waveform data
+ * @param LOWER_LIMIT the smallest value of a local maxima that the window will include
+ */
 void WaveformReader::findRange(int& low, int& high, int maxIndex, const int LOWER_LIMIT)
 {
   low = maxIndex - 1;
@@ -160,6 +214,9 @@ void WaveformReader::findRange(int& low, int& high, int maxIndex, const int LOWE
 
 }
 
+/**
+ * Finds the indices of all the local maxima of the waveform data and stores them in local_maxima_indices
+ */
 void WaveformReader::findLocalMaxima(void)
 {
   if (waveformData[0] > waveformData[1]) {local_maxima_indices.push_back(0);}
@@ -167,7 +224,7 @@ void WaveformReader::findLocalMaxima(void)
   for(int i = 1; i < (STREAM_MAX_SIZE - 1); i++) 
   { 
          
-    if ((waveformData[i - 1] < waveformData[i]) and (waveformData[i] > waveformData[i + 1])) 
+    if ((waveformData[i - 1] < waveformData[i]) && (waveformData[i] > waveformData[i + 1])) 
     {
       local_maxima_indices.push_back(i);
     } 
