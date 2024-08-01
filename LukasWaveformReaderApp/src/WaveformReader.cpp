@@ -466,7 +466,7 @@ int waveformReaderConfigure(const char* portName, int bufferSize, int waveformPV
 static const iocshArg initArg0 = {"portName", iocshArgString};
 static const iocshArg initArg1 = {"bufferSize", iocshArgInt};
 static const iocshArg initArg2 = {"waveformPVs", iocshArgInt};
-static const iocshArg * const initArgs[] = {&initArg0, &initArg1, &initArg1};
+static const iocshArg * const initArgs[] = {&initArg0, &initArg1, &initArg2};
 static const iocshFuncDef initFuncDef = {"waveformReaderConfigure", 3, initArgs};
 static void initCallFunc(const iocshArgBuf *args)
 {
