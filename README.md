@@ -14,3 +14,10 @@ Usage: **waveformStatus**
 
 Currently doesn't really do anything will eventually tell you what streams have been initialized, what they're connected to and will provide a health check
 
+### fourierTransform
+Usage: **fourierTransform**
+
+This command computes the fast fourier transform on a window of data from the buffer that contains the global maximum value. It gives the user the option to either output the data to the console or write it to a csv file titled output.csv and generate a graph from the csv data using a python script (plot.py).
+In order to generate the graph the user must run the python script after running the fourierTransform command and selecting the option to display the graph (option 2).
+
+NOTE: The output.csv file reads data directly from screenlog.0 which records all the keystrokes of the user. To successfully create the graph, fourierTransform must be typed without making any errors or using backspaces on the console.

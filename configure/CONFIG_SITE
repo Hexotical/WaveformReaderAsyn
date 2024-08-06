@@ -69,6 +69,10 @@ ifdef T_A
 PKG_ARCH=$(T_A)
 endif
 
+#fftw
+FFTW_LIB					= /afs/slac/u/gu/tanisha/Downloads/fftw-3.3.10/lib
+FFTW_INCLUDE				= /afs/slac/u/gu/tanisha/Downloads/fftw-3.3.10/include
+
 # CPSW
 CPSW_FRAMEWORK_PACKAGE_NAME = cpsw/framework
 CPSW_FRAMEWORK_VERSION      = R4.4.1

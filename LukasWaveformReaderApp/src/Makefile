@@ -17,6 +17,7 @@ USR_INCLUDES += -I$(CPSW_FRAMEWORK_INCLUDE)
 USR_INCLUDES += -I$(YAML_INCLUDE)
 USR_INCLUDES += -I$(YAMLREADER_INCLUDE)
 USR_INCLUDES += -I$(DEVICELIB_INCLUDE)
+USR_INCLUDES += -I$(FFTW_INCLUDE)
 
 # =====================================================
 
@@ -28,6 +29,7 @@ yaml-cpp_DIR     = $(YAML_LIB)
 deviceLib_DIR    = $(DEVICELIB_LIB)
 yamlReader_DIR   = $(YAMLREADER_LIB)
 boost_system_DIR = $(BOOST_LIB)
+fftw_DIR		 = $(FFTW_LIB)
 # ======================================================
 
 # ======================================================
@@ -39,6 +41,7 @@ USR_LIBS_Linux += boost_system
 USR_LIBS_Linux += yaml-cpp
 USR_LIBS_Linux += yamlReader 
 USR_LIBS_Linux += deviceLib
+USR_LIBS_Linux += fftw3
 
 
 # ======================================================
