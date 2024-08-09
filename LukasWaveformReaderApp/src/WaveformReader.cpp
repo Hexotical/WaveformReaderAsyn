@@ -182,11 +182,14 @@ void WaveformReader::fft(void)
  */
 int WaveformReader::findMaxIndex(void)
 {
-  int maxIndex = waveformData[0];
+  int maxIndex = 0;
 
-  for (int i = 0; i < STREAM_MAX_SIZE; i++)
+  for (int i = 1; i < MAX_BUFFER_SIZE; i++)
   {
-    if (waveformData[i] > maxIndex) {maxIndex = i;}
+    if (waveformData[i] > waveformData[maxIndex]) 
+    {
+      maxIndex = i;
+    }
   }
   return maxIndex;
 }
@@ -221,7 +224,7 @@ void WaveformReader::findLocalMaxima(void)
 {
   if (waveformData[0] > waveformData[1]) {local_maxima_indices.push_back(0);}
 
-  for(int i = 1; i < (STREAM_MAX_SIZE - 1); i++) 
+  for(int i = 1; i < (MAX_BUFFER_SIZE - 1); i++) 
   { 
          
     if ((waveformData[i - 1] < waveformData[i]) && (waveformData[i] > waveformData[i + 1])) 
@@ -231,12 +234,31 @@ void WaveformReader::findLocalMaxima(void)
 
   }
 
-  if (waveformData[STREAM_MAX_SIZE - 1] > waveformData[STREAM_MAX_SIZE - 2]) 
+  if (waveformData[MAX_BUFFER_SIZE - 1] > waveformData[MAX_BUFFER_SIZE - 2]) 
   {
-    local_maxima_indices.push_back(STREAM_MAX_SIZE - 1);
+    local_maxima_indices.push_back(MAX_BUFFER_SIZE - 1);
   }
  
 }
+
+/**
+ * Computes and displays the location of the maximum beam loss detected by the monitor
+ * 
+ * @param startingPosition the starting position of the beam loss monitor (BLM)
+ * @param endingPosition the ending position of the beam loss monitor (BLM)
+ * @param bufferSize size of the buffer read by the sensors in the BLM
+ */
+void WaveformReader::maxBeamLoss(double startingPosition, double endingPosition, int bufferSize)
+{
+  double lengthOfMonitor = endingPosition - startingPosition;
+  double locationOfMaxIndex;
+
+  int maxIndex = findMaxIndex();
+
+  locationOfMaxIndex = (maxIndex * (lengthOfMonitor / bufferSize)) + startingPosition;
+  std::cout << "The location of maximum beam loss is " << locationOfMaxIndex << std::endl;
+}
+
 
 /**
  * Launch a thread to stream data to an EPICS records
@@ -551,6 +573,25 @@ void fourierTransformRegister(void)
   iocshRegister(&fftFuncDef, fftCallFunc);
 }
 
+static void maxBeamLossLocation(double startingPosition, double endingPosition, int bufferSize) {
+  bayManager->maxBeamLoss(startingPosition, endingPosition, bufferSize);
+  return;
+}
+
+static const iocshArg lossArg0 = {"startingPosition", iocshArgDouble};
+static const iocshArg lossArg1 = {"endingPosition", iocshArgDouble};
+static const iocshArg lossArg2 = {"bufferSize", iocshArgInt};
+static const iocshArg * const lossArgs[] = {&lossArg0, &lossArg1, &lossArg2};
+static const iocshFuncDef lossFuncDef = {"maxBeamLossLocation", 3, lossArgs};
+static void lossCallFunc(const iocshArgBuf *args)
+{
+  maxBeamLossLocation(args[0].dval, args[1].dval, args[2].ival);
+}
+void maxBeamLossLocationRegister(void)
+{
+  iocshRegister(&lossFuncDef, lossCallFunc);
+}
+
 
 extern "C" {
   epicsExportRegistrar(printHelpRegister);
@@ -558,5 +599,6 @@ extern "C" {
   epicsExportRegistrar(waveformReaderRegister);
   epicsExportRegistrar(waveformStreamRegister);
   epicsExportRegistrar(fourierTransformRegister);
+  epicsExportRegistrar(maxBeamLossLocationRegister);
 }
 
