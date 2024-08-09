@@ -27,8 +27,9 @@
 #include <cpsw_api_builder.h>
 #include <yamlLoader.h>
 #define STREAM_MAX_SIZE 200UL*1024ULL*1024ULL
-#define WAVEFORM0_PV_STRING "WAVEFORM:0"
 #define WAVEFORM_RUN_STRING "RUN"
+
+#define WAVEFORM0_PV_STRING "WAVEFORM:0"
 #define WAVEFORM0_INITIALIZE_STRING "INITIALIZE0"
 #define WAVEFORM0_END_ADDR_STRING "END_ADDR0"
 #define WAVEFORM0_BEGIN_ADDR_STRING "BEGIN_ADDR0"
@@ -53,6 +54,7 @@
 
 #define REAL 0
 #define IMAG 1
+#define NUMBER_OF_WAVEFORM_RECORDS 3
 
 class WaveformReader : public asynPortDriver
 {
@@ -83,11 +85,29 @@ class WaveformReader : public asynPortDriver
 
     //Variables to store indices of records which the asynPortDriver can talk to.
     int waveform_run_index;
-    int waveform_init_index;
-    int waveform_beginAddr_index;
-    int waveform_endAddr_index;
-    int waveform_buffer_size_index;
     int MAX_BUFFER_SIZE;
+
+    int waveform0_init_index;
+    int waveform0_beginAddr_index;
+    int waveform0_endAddr_index;
+    int waveform0_buffer_size_index;
+    
+    int waveform1_init_index;
+    int waveform1_beginAddr_index;
+    int waveform1_endAddr_index;
+    int waveform1_buffer_size_index;
+    
+    int waveform2_init_index;
+    int waveform2_beginAddr_index;
+    int waveform2_endAddr_index;
+    int waveform2_buffer_size_index;
+    
+    // the indices of the arrays, 0, 1, and 2, refer to WAVEFORM:0, WAVEFORM:1, and WAVEFORM:2, respectively
+    int* init_indices[NUMBER_OF_WAVEFORM_RECORDS] = {&waveform0_init_index, &waveform1_init_index, &waveform2_init_index};
+    int* beginAddr_indices[NUMBER_OF_WAVEFORM_RECORDS] = {&waveform0_beginAddr_index, &waveform1_beginAddr_index, &waveform2_beginAddr_index};
+    int* endAddr_indices[NUMBER_OF_WAVEFORM_RECORDS] = {&waveform0_endAddr_index, &waveform1_endAddr_index, &waveform2_endAddr_index};
+    int* buffer_size_indices[NUMBER_OF_WAVEFORM_RECORDS] = {&waveform0_buffer_size_index, &waveform1_buffer_size_index, &waveform2_buffer_size_index};
+
 
     //Hardware interfaces
   protected:
@@ -97,6 +117,16 @@ class WaveformReader : public asynPortDriver
     ScalVal _Web0StartAddr;
     ScalVal _Web0EndAddr;
     Command _Web0Init;
+
+    ScalVal _Web1StartAddr;
+    ScalVal _Web1EndAddr;
+    ScalVal _Web2StartAddr;
+    ScalVal _Web2EndAddr;
+
+    ScalVal start_addresses[NUMBER_OF_WAVEFORM_RECORDS] = {_Web0StartAddr, _Web1StartAddr, _Web2StartAddr};
+    ScalVal end_addresses[NUMBER_OF_WAVEFORM_RECORDS] = {_Web0EndAddr, _Web1EndAddr, _Web2EndAddr};
+
+
   private:
     epicsInt16 *waveformData; //Not really necessary atm I want to use this when I do data modification things
 
