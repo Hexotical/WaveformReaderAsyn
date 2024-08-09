@@ -41,13 +41,14 @@ WaveformReader::WaveformReader(const char *portName, int bufferSize, int wavefor
     pv_param_map.insert(std::pair<std::string, int>(pvIdentifier, waveform_param_index));
     waveform_param_indices.push_back(pvIdentifier);
     streaming_status_map[pvIdentifier] = "Not initialized yet";
+    // connect to the PVs that represent parameters of each waveform record using corresponding arrays
+    createParam(("INITIALIZE" + std::to_string(pvID)).c_str(), asynParamUInt32Digital, init_indices[pvID]);
+    createParam(("END_ADDR" + std::to_string(pvID)).c_str(), asynParamInt32, beginAddr_indices[pvID]);
+    createParam(("BEGIN_ADDR" + std::to_string(pvID)).c_str(), asynParamInt32, endAddr_indices[pvID]);
+    createParam(("BUFFER_SIZE" + std::to_string(pvID)).c_str(), asynParamInt32, buffer_size_indices[pvID]);
   }
   //TODO: Do this is a more systematic way, individually connecting isn't really aesthetic 
   createParam(WAVEFORM_RUN_STRING, asynParamUInt32Digital, &waveform_run_index);
-  createParam(WAVEFORM0_INITIALIZE_STRING, asynParamUInt32Digital, &waveform_init_index);
-  createParam(WAVEFORM0_END_ADDR_STRING, asynParamInt32, &waveform_endAddr_index);
-  createParam(WAVEFORM0_BEGIN_ADDR_STRING, asynParamInt32, &waveform_beginAddr_index);
-  createParam(WAVEFORM0_BUFFER_SIZE_STRING, asynParamInt32, &waveform_buffer_size_index);
   
   MAX_BUFFER_SIZE = bufferSize; //One of the parameters we pass to our port driver is the bufferSize, which is essentially how many words of information we want at a time
 
@@ -58,10 +59,14 @@ WaveformReader::WaveformReader(const char *portName, int bufferSize, int wavefor
   _TriggerHwAutoRearm = IScalVal::create(p->findByName("/mmio/AppTop/DaqMuxV2[0]/TriggerHwAutoRearm"));
   _DataBufferSize = IScalVal::create(p->findByName("/mmio/AppTop/DaqMuxV2[0]/DataBufferSize"));
   _TrigCount = IScalVal_RO::create(p->findByName("/mmio/AppTop/DaqMuxV2[0]/TrigCount"));
+  _Web0Init = ICommand::create(p->findByName("/mmio/AmcCarrierCore/AmcCarrierBsa/BsaWaveformEngine[0]/WaveformEngineBuffers/Initialize"));
   //TODO: Do these for the other hardware addresses that are useful
   _Web0StartAddr = IScalVal::create(p->findByName("/mmio/AmcCarrierCore/AmcCarrierBsa/BsaWaveformEngine[0]/WaveformEngineBuffers/StartAddr[0]"));
   _Web0EndAddr = IScalVal::create(p->findByName("/mmio/AmcCarrierCore/AmcCarrierBsa/BsaWaveformEngine[0]/WaveformEngineBuffers/EndAddr[0]"));
-  _Web0Init = ICommand::create(p->findByName("/mmio/AmcCarrierCore/AmcCarrierBsa/BsaWaveformEngine[0]/WaveformEngineBuffers/Initialize")); 
+  _Web1StartAddr = IScalVal::create(p->findByName("/mmio/AmcCarrierCore/AmcCarrierBsa/BsaWaveformEngine[0]/WaveformEngineBuffers/StartAddr[1]"));
+  _Web1EndAddr = IScalVal::create(p->findByName("/mmio/AmcCarrierCore/AmcCarrierBsa/BsaWaveformEngine[0]/WaveformEngineBuffers/EndAddr[1]"));
+  _Web2StartAddr = IScalVal::create(p->findByName("/mmio/AmcCarrierCore/AmcCarrierBsa/BsaWaveformEngine[0]/WaveformEngineBuffers/StartAddr[2]"));
+  _Web2EndAddr = IScalVal::create(p->findByName("/mmio/AmcCarrierCore/AmcCarrierBsa/BsaWaveformEngine[0]/WaveformEngineBuffers/EndAddr[2]"));
 }
 
 //TODO Make this actually useful, tell us what streams are currently connected and meant to be streaming, if they're doing that successfully or not
@@ -418,7 +423,7 @@ asynStatus WaveformReader::writeUInt32Digital(asynUser *pasynUser, epicsUInt32 v
     //Essentially just using my ScalVal interface to tell the address to turn on or off, should be that simple according to Jeremy
     _TriggerHwAutoRearm->setVal((int64_t)value);
   }
-  if(pasynUser->reason == waveform_init_index)
+  if((pasynUser->reason == waveform0_init_index) || (pasynUser->reason == waveform1_init_index) || (pasynUser->reason == waveform2_init_index))
   {
     _Web0Init->execute();
   }
@@ -435,20 +440,29 @@ asynStatus WaveformReader::writeInt32(asynUser *pasynUser, epicsInt32 value)
   printf("Driver calls write Int32\n");
   asynStatus status = setIntegerParam(pasynUser->reason, value);
   callParamCallbacks();
-  if(pasynUser->reason == waveform_endAddr_index)
+
+  // execute instructions at hardware addresses based on which parameter of which waveform record
+  // pasynUser matches with
+  for (int i = 0; i < NUMBER_OF_WAVEFORM_RECORDS; i++)
   {
-    _Web0EndAddr->setVal((int64_t)value);
-    _Web0Init->execute();
+    if(pasynUser->reason == (*endAddr_indices[i]))
+    {
+      (end_addresses[i])->setVal((int64_t)value);
+      _Web0Init->execute();
+    }
+
+    if(pasynUser->reason == (*beginAddr_indices[i]))
+    {
+      (start_addresses[i])->setVal((int64_t)value);
+    }
+
+    if(pasynUser->reason == (*buffer_size_indices[i]))
+    {
+      _DataBufferSize->setVal((int64_t)value);
+      MAX_BUFFER_SIZE = 4 * value ;
+    }
   }
-  if(pasynUser->reason == waveform_beginAddr_index)
-  {
-    _Web0StartAddr->setVal((int64_t)value);
-  }
-  if(pasynUser->reason == waveform_buffer_size_index)
-  {
-    _DataBufferSize->setVal((int64_t)value);
-    MAX_BUFFER_SIZE = 4 * value ;
-  }
+
   return status;
 }
 
