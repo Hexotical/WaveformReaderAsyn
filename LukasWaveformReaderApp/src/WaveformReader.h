@@ -37,6 +37,17 @@
 #define WAVEFORM0_BUFFER_SIZE_INIT_STRING "WAVEFORM_BUFFER_SIZE_INIT0"
 
 
+#define WAVEFORM0_STARTING_LOCATION_STRING "START_LOC0"
+#define WAVEFORM0_ENDING_LOCATION_STRING "END_LOC0"
+#define WAVEFORM1_STARTING_LOCATION_STRING "START_LOC1"
+#define WAVEFORM1_ENDING_LOCATION_STRING "END_LOC1"
+#define WAVEFORM2_STARTING_LOCATION_STRING "START_LOC2"
+#define WAVEFORM2_ENDING_LOCATION_STRING "END_LOC2"
+#define WAVEFORM0_BEAM_LOSS_LOCATION_STRING "BEAM_LOSS_LOC0"
+#define WAVEFORM1_BEAM_LOSS_LOCATION_STRING "BEAM_LOSS_LOC1"
+#define WAVEFORM2_BEAM_LOSS_LOCATION_STRING "BEAM_LOSS_LOC2"
+
+
 #define WAVEFORM1_PV_STRING "WAVEFORM:1"
 #define WAVEFORM1_INITIALIZE_STRING "INITIALIZE1"
 #define WAVEFORM1_END_ADDR_STRING "END_ADDR1"
@@ -66,13 +77,14 @@ class WaveformReader : public asynPortDriver
     int findMaxIndex(void);
     void findRange(int& low, int& high, int maxIndex, const int LOWER_LIMIT);
     void findLocalMaxima(void);
-    void maxBeamLoss(double startingPosition, double endingPosition, int bufferSize);
+    void maxBeamLoss(int bufferSize);
 
 
     void streamTask(const char *stream, std::string pvID);// takes a path to the stream and then a pv identifier for connection
     void streamInit(std::string pv_identifier, std::string stream_path);
     virtual asynStatus writeUInt32Digital(asynUser *pasynUser, epicsUInt32 value, epicsUInt32 mask);
     virtual asynStatus writeInt32(asynUser *pasynUser, epicsInt32 value);
+    //virtual asynStatus writeFloat64(asynUser *pasynUser, epicsFloat64 value){};
 
     //Parameter list indices, should never be written to but need to be read, I really don't want to deal with encapsulation
     //TODO find a way to make these read only without having to write a weird get or set method
@@ -91,7 +103,19 @@ class WaveformReader : public asynPortDriver
     int waveform0_beginAddr_index;
     int waveform0_endAddr_index;
     int waveform0_buffer_size_index;
+
+
+    int waveform0_start_loc_index;
+    int waveform0_end_loc_index;
+    int waveform1_start_loc_index;
+    int waveform1_end_loc_index;
+    int waveform2_start_loc_index;
+    int waveform2_end_loc_index;
+    int waveform0_beam_loss_loc_index;
+    int waveform1_beam_loss_loc_index;
+    int waveform2_beam_loss_loc_index;
     
+
     int waveform1_init_index;
     int waveform1_beginAddr_index;
     int waveform1_endAddr_index;
@@ -107,7 +131,10 @@ class WaveformReader : public asynPortDriver
     int* beginAddr_indices[NUMBER_OF_WAVEFORM_RECORDS] = {&waveform0_beginAddr_index, &waveform1_beginAddr_index, &waveform2_beginAddr_index};
     int* endAddr_indices[NUMBER_OF_WAVEFORM_RECORDS] = {&waveform0_endAddr_index, &waveform1_endAddr_index, &waveform2_endAddr_index};
     int* buffer_size_indices[NUMBER_OF_WAVEFORM_RECORDS] = {&waveform0_buffer_size_index, &waveform1_buffer_size_index, &waveform2_buffer_size_index};
-
+    
+    int* start_loc_indices[NUMBER_OF_WAVEFORM_RECORDS] = {&waveform0_start_loc_index, &waveform1_start_loc_index, &waveform2_start_loc_index};
+    int* end_loc_indices[NUMBER_OF_WAVEFORM_RECORDS] = {&waveform0_end_loc_index, &waveform1_end_loc_index, &waveform2_end_loc_index};
+    int* beam_loss_loc_indices[NUMBER_OF_WAVEFORM_RECORDS] = {&waveform0_beam_loss_loc_index, &waveform1_beam_loss_loc_index, &waveform2_beam_loss_loc_index};
 
     //Hardware interfaces
   protected:
