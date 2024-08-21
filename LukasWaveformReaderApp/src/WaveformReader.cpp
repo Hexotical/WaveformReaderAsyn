@@ -19,8 +19,8 @@ WaveformReader::WaveformReader(const char *portName, int bufferSize, int wavefor
                                                        (
                                                         portName,
                                                         1,//Max Signals?
-                                                        asynDrvUserMask | asynInt32ArrayMask | asynInt16ArrayMask | asynUInt32DigitalMask | asynInt32Mask ,
-                                                        asynInt32ArrayMask | asynInt16ArrayMask | asynInt32Mask | asynUInt32DigitalMask,
+                                                        asynDrvUserMask | asynInt32ArrayMask | asynInt16ArrayMask | asynUInt32DigitalMask | asynInt32Mask | asynFloat64Mask,
+                                                        asynInt32ArrayMask | asynInt16ArrayMask | asynInt32Mask | asynUInt32DigitalMask | asynFloat64Mask,
                                                         ASYN_MULTIDEVICE | ASYN_CANBLOCK,
                                                         1,
                                                         0,
@@ -46,9 +46,21 @@ WaveformReader::WaveformReader(const char *portName, int bufferSize, int wavefor
     createParam(("END_ADDR" + std::to_string(pvID)).c_str(), asynParamInt32, beginAddr_indices[pvID]);
     createParam(("BEGIN_ADDR" + std::to_string(pvID)).c_str(), asynParamInt32, endAddr_indices[pvID]);
     createParam(("BUFFER_SIZE" + std::to_string(pvID)).c_str(), asynParamInt32, buffer_size_indices[pvID]);
+    
+    createParam(("START_LOC" + std::to_string(pvID)).c_str(), asynParamFloat64, start_loc_indices[pvID]);
+    createParam(("END_LOC" + std::to_string(pvID)).c_str(), asynParamFloat64, end_loc_indices[pvID]);
+
+    createParam(("BEAM_LOSS_LOC" + std::to_string(pvID)).c_str(), asynParamFloat64, beam_loss_loc_indices[pvID]);
   }
   //TODO: Do this is a more systematic way, individually connecting isn't really aesthetic 
   createParam(WAVEFORM_RUN_STRING, asynParamUInt32Digital, &waveform_run_index);
+
+  // createParam(WAVEFORM0_STARTING_LOCATION_STRING, asynParamInt32, &waveform0_start_loc_index);
+  // createParam(WAVEFORM0_ENDING_LOCATION_STRING, asynParamInt32, &waveform0_end_loc_index);
+  // createParam(WAVEFORM1_STARTING_LOCATION_STRING, asynParamInt32, &waveform1_start_loc_index);
+  // createParam(WAVEFORM1_ENDING_LOCATION_STRING, asynParamInt32, &waveform1_end_loc_index);
+  // createParam(WAVEFORM2_STARTING_LOCATION_STRING, asynParamInt32, &waveform2_start_loc_index);
+  // createParam(WAVEFORM2_ENDING_LOCATION_STRING, asynParamInt32, &waveform2_end_loc_index);
   
   MAX_BUFFER_SIZE = bufferSize; //One of the parameters we pass to our port driver is the bufferSize, which is essentially how many words of information we want at a time
 
@@ -187,11 +199,14 @@ void WaveformReader::fft(void)
  */
 int WaveformReader::findMaxIndex(void)
 {
-  int maxIndex = waveformData[0];
+  int maxIndex = 0;
 
-  for (int i = 0; i < STREAM_MAX_SIZE; i++)
+  for (int i = 1; i < MAX_BUFFER_SIZE; i++)
   {
-    if (waveformData[i] > maxIndex) {maxIndex = i;}
+    if (waveformData[i] > waveformData[maxIndex]) 
+    {
+      maxIndex = i;
+    }
   }
   return maxIndex;
 }
@@ -226,7 +241,7 @@ void WaveformReader::findLocalMaxima(void)
 {
   if (waveformData[0] > waveformData[1]) {local_maxima_indices.push_back(0);}
 
-  for(int i = 1; i < (STREAM_MAX_SIZE - 1); i++) 
+  for(int i = 1; i < (MAX_BUFFER_SIZE - 1); i++) 
   { 
          
     if ((waveformData[i - 1] < waveformData[i]) && (waveformData[i] > waveformData[i + 1])) 
@@ -236,12 +251,38 @@ void WaveformReader::findLocalMaxima(void)
 
   }
 
-  if (waveformData[STREAM_MAX_SIZE - 1] > waveformData[STREAM_MAX_SIZE - 2]) 
+  if (waveformData[MAX_BUFFER_SIZE - 1] > waveformData[MAX_BUFFER_SIZE - 2]) 
   {
-    local_maxima_indices.push_back(STREAM_MAX_SIZE - 1);
+    local_maxima_indices.push_back(MAX_BUFFER_SIZE - 1);
   }
  
 }
+
+/**
+ * Computes and displays the location of the maximum beam loss detected by the monitor
+ * 
+ * @param startingPosition the starting position of the beam loss monitor (BLM)
+ * @param endingPosition the ending position of the beam loss monitor (BLM)
+ * @param bufferSize size of the buffer read by the sensors in the BLM
+ */
+// ADD INPUT VALIDATION
+void WaveformReader::maxBeamLoss(int waveformIndex)
+{
+  double startingPosition, endingPosition;
+  getDoubleParam(*(start_loc_indices[waveformIndex]), &startingPosition);
+  getDoubleParam(*(end_loc_indices[waveformIndex]), &endingPosition);
+  std::cout << "Starting position and ending position: " << startingPosition << " " << endingPosition << std::endl;
+  double lengthOfMonitor = endingPosition - startingPosition;
+  std::cout << "Length is: " << lengthOfMonitor << std::endl;
+  double locationOfMaxIndex;
+  // UPDATE FUNCTION TO USE WAVEFORM_INDEX FOR WAVEFORM SPECIFIC COMPUTATION
+  int maxIndex = findMaxIndex();
+  // CHANGE 1 MIL TO BUFFER SIZE OF CORRESPONDING WAVEFORM
+  locationOfMaxIndex = (maxIndex * (lengthOfMonitor / 1000000)) + startingPosition;
+  std::cout << "The location of maximum beam loss is " << locationOfMaxIndex << std::endl;
+  setDoubleParam(*(beam_loss_loc_indices[waveformIndex]), locationOfMaxIndex);
+}
+
 
 /**
  * Launch a thread to stream data to an EPICS records
@@ -565,6 +606,23 @@ void fourierTransformRegister(void)
   iocshRegister(&fftFuncDef, fftCallFunc);
 }
 
+static void maxBeamLossLocation(int waveformIndex) {
+  bayManager->maxBeamLoss(waveformIndex);
+  return;
+}
+
+static const iocshArg lossArg0 = {"waveformIndex", iocshArgInt};
+static const iocshArg * const lossArgs[] = {&lossArg0};
+static const iocshFuncDef lossFuncDef = {"maxBeamLossLocation", 1, lossArgs};
+static void lossCallFunc(const iocshArgBuf *args)
+{
+  maxBeamLossLocation(args[0].ival);
+}
+void maxBeamLossLocationRegister(void)
+{
+  iocshRegister(&lossFuncDef, lossCallFunc);
+}
+
 
 extern "C" {
   epicsExportRegistrar(printHelpRegister);
@@ -572,5 +630,6 @@ extern "C" {
   epicsExportRegistrar(waveformReaderRegister);
   epicsExportRegistrar(waveformStreamRegister);
   epicsExportRegistrar(fourierTransformRegister);
+  epicsExportRegistrar(maxBeamLossLocationRegister);
 }
 

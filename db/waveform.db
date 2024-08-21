@@ -96,7 +96,53 @@ record(bo, "$(USER):RUN")
     field(ZNAM, "STOP")
     field(ONAM, "RUN")
   }
-##Template file waveform
+
+
+
+record(ao, "$(USER):STARTING:LOC:0")
+{
+    field(DTYP, "asynFloat64")
+    field(OUT, "@asyn($(PORT),$(ADDR),$(TIMEOUT))START_LOC0")
+    field(PINI, "1")
+}
+
+record(ai, "$(USER):STARTING:LOC:0:rbv")
+{
+    field(DTYP, "asynFloat64")
+    field(INP, "@asyn($(PORT),$(ADDR),$(TIMEOUT))START_LOC0")
+    field(PINI, "1")
+    field(SCAN, "I/O Intr")
+}
+
+record(ao, "$(USER):ENDING:LOC:0")
+{
+    field(DTYP, "asynFloat64")
+    field(OUT, "@asyn($(PORT),$(ADDR),$(TIMEOUT))END_LOC0")
+    field(PINI, "1")
+}
+
+record(ai, "$(USER):ENDING:LOC:0:rbv")
+{
+    field(DTYP, "asynFloat64")
+    field(INP, "@asyn($(PORT),$(ADDR),$(TIMEOUT))END_LOC0")
+    field(PINI, "1")
+    field(SCAN, "I/O Intr")
+}
+
+record(ao, "$(USER):BEAM:LOSS:LOC:0")
+{
+    field(DTYP, "asynFloat64")
+    field(OUT, "@asyn($(PORT),$(ADDR),$(TIMEOUT))BEAM_LOSS_LOC0")
+    field(PINI, "1")
+}
+
+record(ai, "$(USER):BEAM:LOSS:LOC:0:rbv")
+{
+    field(DTYP, "asynFloat64")
+    field(INP, "@asyn($(PORT),$(ADDR),$(TIMEOUT))BEAM_LOSS_LOC0")
+    field(PINI, "1")
+    field(SCAN, "I/O Intr")
+}##Template file waveform
 
 record(waveform, "$(USER):WAVEFORM:1")
 {
@@ -194,7 +240,53 @@ record(bo, "$(USER):RUN")
     field(ZNAM, "STOP")
     field(ONAM, "RUN")
   }
-##Template file waveform
+
+
+
+record(ao, "$(USER):STARTING:LOC:1")
+{
+    field(DTYP, "asynFloat64")
+    field(OUT, "@asyn($(PORT),$(ADDR),$(TIMEOUT))START_LOC1")
+    field(PINI, "1")
+}
+
+record(ai, "$(USER):STARTING:LOC:1:rbv")
+{
+    field(DTYP, "asynFloat64")
+    field(INP, "@asyn($(PORT),$(ADDR),$(TIMEOUT))START_LOC1")
+    field(PINI, "1")
+    field(SCAN, "I/O Intr")
+}
+
+record(ao, "$(USER):ENDING:LOC:1")
+{
+    field(DTYP, "asynFloat64")
+    field(OUT, "@asyn($(PORT),$(ADDR),$(TIMEOUT))END_LOC1")
+    field(PINI, "1")
+}
+
+record(ai, "$(USER):ENDING:LOC:1:rbv")
+{
+    field(DTYP, "asynFloat64")
+    field(INP, "@asyn($(PORT),$(ADDR),$(TIMEOUT))END_LOC1")
+    field(PINI, "1")
+    field(SCAN, "I/O Intr")
+}
+
+record(ao, "$(USER):BEAM:LOSS:LOC:1")
+{
+    field(DTYP, "asynFloat64")
+    field(OUT, "@asyn($(PORT),$(ADDR),$(TIMEOUT))BEAM_LOSS_LOC1")
+    field(PINI, "1")
+}
+
+record(ai, "$(USER):BEAM:LOSS:LOC:1:rbv")
+{
+    field(DTYP, "asynFloat64")
+    field(INP, "@asyn($(PORT),$(ADDR),$(TIMEOUT))BEAM_LOSS_LOC1")
+    field(PINI, "1")
+    field(SCAN, "I/O Intr")
+}##Template file waveform
 
 record(waveform, "$(USER):WAVEFORM:2")
 {
@@ -292,3 +384,50 @@ record(bo, "$(USER):RUN")
     field(ZNAM, "STOP")
     field(ONAM, "RUN")
   }
+
+
+
+record(ao, "$(USER):STARTING:LOC:2")
+{
+    field(DTYP, "asynFloat64")
+    field(OUT, "@asyn($(PORT),$(ADDR),$(TIMEOUT))START_LOC2")
+    field(PINI, "1")
+}
+
+record(ai, "$(USER):STARTING:LOC:2:rbv")
+{
+    field(DTYP, "asynFloat64")
+    field(INP, "@asyn($(PORT),$(ADDR),$(TIMEOUT))START_LOC2")
+    field(PINI, "1")
+    field(SCAN, "I/O Intr")
+}
+
+record(ao, "$(USER):ENDING:LOC:2")
+{
+    field(DTYP, "asynFloat64")
+    field(OUT, "@asyn($(PORT),$(ADDR),$(TIMEOUT))END_LOC2")
+    field(PINI, "1")
+}
+
+record(ai, "$(USER):ENDING:LOC:2:rbv")
+{
+    field(DTYP, "asynFloat64")
+    field(INP, "@asyn($(PORT),$(ADDR),$(TIMEOUT))END_LOC2")
+    field(PINI, "1")
+    field(SCAN, "I/O Intr")
+}
+
+record(ao, "$(USER):BEAM:LOSS:LOC:2")
+{
+    field(DTYP, "asynFloat64")
+    field(OUT, "@asyn($(PORT),$(ADDR),$(TIMEOUT))BEAM_LOSS_LOC2")
+    field(PINI, "1")
+}
+
+record(ai, "$(USER):BEAM:LOSS:LOC:2:rbv")
+{
+    field(DTYP, "asynFloat64")
+    field(INP, "@asyn($(PORT),$(ADDR),$(TIMEOUT))BEAM_LOSS_LOC2")
+    field(PINI, "1")
+    field(SCAN, "I/O Intr")
+}

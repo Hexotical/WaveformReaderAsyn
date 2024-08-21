@@ -21,3 +21,10 @@ This command computes the fast fourier transform on a window of data from the bu
 In order to generate the graph the user must run the python script after running the fourierTransform command and selecting the option to display the graph (option 2).
 
 NOTE: The output.csv file reads data directly from screenlog.0 which records all the keystrokes of the user. To successfully create the graph, fourierTransform must be typed without making any errors or using backspaces on the console.
+
+### maxBeamLossLocation
+Usage: **maxBeamLossLocation** <Starting Position> <Ending Position> <Size of buffer>
+
+E.g. **maxBeamLossLocation** 0 100 1000000
+
+This command computes and displays the physical location where the maximum beam loss is detected by a beam loss monitor based on values of the starting and ending positions of the monitor specified by the user as well as the size of the buffer or data that the beam loss monitor reads.

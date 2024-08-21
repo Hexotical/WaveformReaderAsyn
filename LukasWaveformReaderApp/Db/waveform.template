@@ -96,3 +96,50 @@ record(bo, "$(USER):RUN")
     field(ZNAM, "STOP")
     field(ONAM, "RUN")
   }
+
+
+
+record(ao, "$(USER):STARTING:LOC:${channel}")
+{
+    field(DTYP, "asynFloat64")
+    field(OUT, "@asyn($(PORT),$(ADDR),$(TIMEOUT))START_LOC${channel}")
+    field(PINI, "1")
+}
+
+record(ai, "$(USER):STARTING:LOC:${channel}:rbv")
+{
+    field(DTYP, "asynFloat64")
+    field(INP, "@asyn($(PORT),$(ADDR),$(TIMEOUT))START_LOC${channel}")
+    field(PINI, "1")
+    field(SCAN, "I/O Intr")
+}
+
+record(ao, "$(USER):ENDING:LOC:${channel}")
+{
+    field(DTYP, "asynFloat64")
+    field(OUT, "@asyn($(PORT),$(ADDR),$(TIMEOUT))END_LOC${channel}")
+    field(PINI, "1")
+}
+
+record(ai, "$(USER):ENDING:LOC:${channel}:rbv")
+{
+    field(DTYP, "asynFloat64")
+    field(INP, "@asyn($(PORT),$(ADDR),$(TIMEOUT))END_LOC${channel}")
+    field(PINI, "1")
+    field(SCAN, "I/O Intr")
+}
+
+record(ao, "$(USER):BEAM:LOSS:LOC:${channel}")
+{
+    field(DTYP, "asynFloat64")
+    field(OUT, "@asyn($(PORT),$(ADDR),$(TIMEOUT))BEAM_LOSS_LOC${channel}")
+    field(PINI, "1")
+}
+
+record(ai, "$(USER):BEAM:LOSS:LOC:${channel}:rbv")
+{
+    field(DTYP, "asynFloat64")
+    field(INP, "@asyn($(PORT),$(ADDR),$(TIMEOUT))BEAM_LOSS_LOC${channel}")
+    field(PINI, "1")
+    field(SCAN, "I/O Intr")
+}
