@@ -18,6 +18,7 @@ record(subArray, "$(USER):SUBARRAY:0")
   field(MALM, "$(WAVEFORM_SIZE)")
   field(NELM, "25000")
   field(INDX, "0")
+  field(SCAN, "Passive")
   }
 
 record(bo, "$(USER):WEB:INIT:0")
@@ -29,25 +30,43 @@ record(bo, "$(USER):WEB:INIT:0")
     field(ONAM, "INIT")
   }
 
-record(longin, "$(USER):BEGIN:ADDR:0")
-{
-    field(DTYP, asynInt32)
-    field(SCAN, "I/O Intr")
-    field(INP, "@asyn($(PORT)BEGIN_ADDR0)")
-  }
-
-record(longin, "$(USER):END:ADDR:0")
+record(longin, "$(USER):BEGIN:ADDR:0:rbv")
 {
     field(DTYP, "asynInt32")
     field(SCAN, "I/O Intr")
-    field(INP, "@asyn($(PORT), $(ADDR), $(TIMEOUT))END_ADDR0)")
+    field(INP, "@asyn($(PORT), $(ADDR), $(TIMEOUT))BEGIN_ADDR0")
+  }
+
+record(longout, "$(USER):BEGIN:ADDR:0")
+{
+    field(DTYP, "asynInt32")
+    field(SCAN, "Passive")
+    field(OUT, "@asyn($(PORT), $(ADDR), $(TIMEOUT))BEGIN_ADDR0")
+    field(OMSL, "closed_loop")
+    field(DOL, "$(USER):BEGIN:ADDR:0:rbv CPP")
+  }
+
+record(longin, "$(USER):END:ADDR:0:rbv")
+{
+    field(DTYP, "asynInt32")
+    field(INP, "@asyn($(PORT), $(ADDR), $(TIMEOUT))END_ADDR0")
+    field(SCAN, "I/O Intr")
+  }
+
+  record(longout, "$(USER):END:ADDR:0")
+{
+    field(DTYP, "asynInt32")
+    field(SCAN, "Passive")
+    field(OUT, "@asyn($(PORT), $(ADDR), $(TIMEOUT))END_ADDR0")
+    field(OMSL, "closed_loop")
+    field(DOL, "$(USER):END:ADDR:0:rbv CPP")
   }
 
 record(longout, "$(USER):BUFFER:SIZE")
 {
     field(DTYP, "asynInt32")
     field(SCAN, "Passive")
-    field(OUT, "@asyn($(PORT), $(ADDR), $(TIMEOUT))BUFFER_SIZE")
+    field(OUT, "@asyn($(PORT), $(ADDR), $(TIMEOUT))BUFFER_SIZE0")
   }
 
 record(ao, "$(USER):WORD:COUNT:0")
@@ -95,7 +114,30 @@ record(bo, "$(USER):RUN")
     #field(PINI, "1")
     field(ZNAM, "STOP")
     field(ONAM, "RUN")
-  }##Template file waveform
+  }
+
+
+## This in the number of words from the user (N) ##
+record(ao, "$(USER):NO:OF:WORDS") 
+{
+  field(DTYP, asynInt32)
+  field(SCAN, "Passive")
+  field(DESC, "Buffer size (16-bit words)")
+  field(EGU,  "words")
+  field(PINI, "NO")
+  field(OUT,  "@asyn($(PORT), $(ADDR), $(TIMEOUT))NO_OF_WORDS")
+  field(FLNK, "$(USER):UPDATE:NELM:SUBARRAY:0 PP")
+  info(autosaveFields, "VAL")
+}
+
+record(calcout, "$(USER):UPDATE:NELM:SUBARRAY:0")
+{
+    field(INPA, "$(USER):NO:OF:WORDS")
+    field(CALC, "A")  # Pass the value of the longout record
+    field(OUT,  "$(USER):SUBARRAY:0.NELM PP")  # Update NELM field of subArray
+    field(SCAN, "Passive")
+}
+##Template file waveform
 
 record(waveform, "$(USER):WAVEFORM:1")
 {
@@ -115,6 +157,7 @@ record(subArray, "$(USER):SUBARRAY:1")
   field(MALM, "$(WAVEFORM_SIZE)")
   field(NELM, "25000")
   field(INDX, "0")
+  field(SCAN, "Passive")
   }
 
 record(bo, "$(USER):WEB:INIT:1")
@@ -126,25 +169,43 @@ record(bo, "$(USER):WEB:INIT:1")
     field(ONAM, "INIT")
   }
 
-record(longin, "$(USER):BEGIN:ADDR:1")
-{
-    field(DTYP, asynInt32)
-    field(SCAN, "I/O Intr")
-    field(INP, "@asyn($(PORT)BEGIN_ADDR1)")
-  }
-
-record(longin, "$(USER):END:ADDR:1")
+record(longin, "$(USER):BEGIN:ADDR:1:rbv")
 {
     field(DTYP, "asynInt32")
     field(SCAN, "I/O Intr")
-    field(INP, "@asyn($(PORT), $(ADDR), $(TIMEOUT))END_ADDR1)")
+    field(INP, "@asyn($(PORT), $(ADDR), $(TIMEOUT))BEGIN_ADDR1")
+  }
+
+record(longout, "$(USER):BEGIN:ADDR:1")
+{
+    field(DTYP, "asynInt32")
+    field(SCAN, "Passive")
+    field(OUT, "@asyn($(PORT), $(ADDR), $(TIMEOUT))BEGIN_ADDR1")
+    field(OMSL, "closed_loop")
+    field(DOL, "$(USER):BEGIN:ADDR:1:rbv CPP")
+  }
+
+record(longin, "$(USER):END:ADDR:1:rbv")
+{
+    field(DTYP, "asynInt32")
+    field(INP, "@asyn($(PORT), $(ADDR), $(TIMEOUT))END_ADDR1")
+    field(SCAN, "I/O Intr")
+  }
+
+  record(longout, "$(USER):END:ADDR:1")
+{
+    field(DTYP, "asynInt32")
+    field(SCAN, "Passive")
+    field(OUT, "@asyn($(PORT), $(ADDR), $(TIMEOUT))END_ADDR1")
+    field(OMSL, "closed_loop")
+    field(DOL, "$(USER):END:ADDR:1:rbv CPP")
   }
 
 record(longout, "$(USER):BUFFER:SIZE")
 {
     field(DTYP, "asynInt32")
     field(SCAN, "Passive")
-    field(OUT, "@asyn($(PORT), $(ADDR), $(TIMEOUT))BUFFER_SIZE")
+    field(OUT, "@asyn($(PORT), $(ADDR), $(TIMEOUT))BUFFER_SIZE1")
   }
 
 record(ao, "$(USER):WORD:COUNT:1")
@@ -192,7 +253,30 @@ record(bo, "$(USER):RUN")
     #field(PINI, "1")
     field(ZNAM, "STOP")
     field(ONAM, "RUN")
-  }##Template file waveform
+  }
+
+
+## This in the number of words from the user (N) ##
+record(ao, "$(USER):NO:OF:WORDS") 
+{
+  field(DTYP, asynInt32)
+  field(SCAN, "Passive")
+  field(DESC, "Buffer size (16-bit words)")
+  field(EGU,  "words")
+  field(PINI, "NO")
+  field(OUT,  "@asyn($(PORT), $(ADDR), $(TIMEOUT))NO_OF_WORDS")
+  field(FLNK, "$(USER):UPDATE:NELM:SUBARRAY:0 PP")
+  info(autosaveFields, "VAL")
+}
+
+record(calcout, "$(USER):UPDATE:NELM:SUBARRAY:0")
+{
+    field(INPA, "$(USER):NO:OF:WORDS")
+    field(CALC, "A")  # Pass the value of the longout record
+    field(OUT,  "$(USER):SUBARRAY:0.NELM PP")  # Update NELM field of subArray
+    field(SCAN, "Passive")
+}
+##Template file waveform
 
 record(waveform, "$(USER):WAVEFORM:2")
 {
@@ -212,6 +296,7 @@ record(subArray, "$(USER):SUBARRAY:2")
   field(MALM, "$(WAVEFORM_SIZE)")
   field(NELM, "25000")
   field(INDX, "0")
+  field(SCAN, "Passive")
   }
 
 record(bo, "$(USER):WEB:INIT:2")
@@ -223,25 +308,43 @@ record(bo, "$(USER):WEB:INIT:2")
     field(ONAM, "INIT")
   }
 
-record(longin, "$(USER):BEGIN:ADDR:2")
-{
-    field(DTYP, asynInt32)
-    field(SCAN, "I/O Intr")
-    field(INP, "@asyn($(PORT)BEGIN_ADDR2)")
-  }
-
-record(longin, "$(USER):END:ADDR:2")
+record(longin, "$(USER):BEGIN:ADDR:2:rbv")
 {
     field(DTYP, "asynInt32")
     field(SCAN, "I/O Intr")
-    field(INP, "@asyn($(PORT), $(ADDR), $(TIMEOUT))END_ADDR2)")
+    field(INP, "@asyn($(PORT), $(ADDR), $(TIMEOUT))BEGIN_ADDR2")
+  }
+
+record(longout, "$(USER):BEGIN:ADDR:2")
+{
+    field(DTYP, "asynInt32")
+    field(SCAN, "Passive")
+    field(OUT, "@asyn($(PORT), $(ADDR), $(TIMEOUT))BEGIN_ADDR2")
+    field(OMSL, "closed_loop")
+    field(DOL, "$(USER):BEGIN:ADDR:2:rbv CPP")
+  }
+
+record(longin, "$(USER):END:ADDR:2:rbv")
+{
+    field(DTYP, "asynInt32")
+    field(INP, "@asyn($(PORT), $(ADDR), $(TIMEOUT))END_ADDR2")
+    field(SCAN, "I/O Intr")
+  }
+
+  record(longout, "$(USER):END:ADDR:2")
+{
+    field(DTYP, "asynInt32")
+    field(SCAN, "Passive")
+    field(OUT, "@asyn($(PORT), $(ADDR), $(TIMEOUT))END_ADDR2")
+    field(OMSL, "closed_loop")
+    field(DOL, "$(USER):END:ADDR:2:rbv CPP")
   }
 
 record(longout, "$(USER):BUFFER:SIZE")
 {
     field(DTYP, "asynInt32")
     field(SCAN, "Passive")
-    field(OUT, "@asyn($(PORT), $(ADDR), $(TIMEOUT))BUFFER_SIZE")
+    field(OUT, "@asyn($(PORT), $(ADDR), $(TIMEOUT))BUFFER_SIZE2")
   }
 
 record(ao, "$(USER):WORD:COUNT:2")
@@ -290,3 +393,25 @@ record(bo, "$(USER):RUN")
     field(ZNAM, "STOP")
     field(ONAM, "RUN")
   }
+
+
+## This in the number of words from the user (N) ##
+record(ao, "$(USER):NO:OF:WORDS") 
+{
+  field(DTYP, asynInt32)
+  field(SCAN, "Passive")
+  field(DESC, "Buffer size (16-bit words)")
+  field(EGU,  "words")
+  field(PINI, "NO")
+  field(OUT,  "@asyn($(PORT), $(ADDR), $(TIMEOUT))NO_OF_WORDS")
+  field(FLNK, "$(USER):UPDATE:NELM:SUBARRAY:0 PP")
+  info(autosaveFields, "VAL")
+}
+
+record(calcout, "$(USER):UPDATE:NELM:SUBARRAY:0")
+{
+    field(INPA, "$(USER):NO:OF:WORDS")
+    field(CALC, "A")  # Pass the value of the longout record
+    field(OUT,  "$(USER):SUBARRAY:0.NELM PP")  # Update NELM field of subArray
+    field(SCAN, "Passive")
+}
