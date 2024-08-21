@@ -286,8 +286,7 @@ epicsShareExtern reg_func pvar_func_arrInitialize, pvar_func_asSub,
     pvar_func_asynInterposeEosRegister,
     pvar_func_asynInterposeFlushRegister, pvar_func_asynRegister,
     pvar_func_dbndInitialize, pvar_func_decInitialize,
-    pvar_func_drvYamlDownloaderRegister,
-    pvar_func_fourierTransformRegister, pvar_func_printHelpRegister,
+    pvar_func_drvYamlDownloaderRegister, pvar_func_printHelpRegister,
     pvar_func_rsrvRegistrar, pvar_func_syncInitialize,
     pvar_func_tsInitialize, pvar_func_waveformReaderRegister,
     pvar_func_waveformStatusRegister, pvar_func_waveformStreamRegister,
@@ -380,7 +379,6 @@ int LukasWaveformReader_registerRecordDeviceDriver(DBBASE *pbase)
     pvar_func_dbndInitialize();
     pvar_func_decInitialize();
     pvar_func_drvYamlDownloaderRegister();
-    pvar_func_fourierTransformRegister();
     pvar_func_printHelpRegister();
     pvar_func_rsrvRegistrar();
     pvar_func_syncInitialize();

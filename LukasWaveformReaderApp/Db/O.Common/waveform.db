@@ -33,21 +33,21 @@ record(longin, "$(USER):BEGIN:ADDR:0")
 {
     field(DTYP, asynInt32)
     field(SCAN, "I/O Intr")
-    field(INP, "@asyn($(PORT), $(ADDR), $(TIMEOUT))BEGIN_ADDR0")
+    field(INP, "@asyn($(PORT)BEGIN_ADDR0)")
   }
 
 record(longin, "$(USER):END:ADDR:0")
 {
     field(DTYP, "asynInt32")
     field(SCAN, "I/O Intr")
-    field(INP, "@asyn($(PORT), $(ADDR), $(TIMEOUT))END_ADDR0")
+    field(INP, "@asyn($(PORT), $(ADDR), $(TIMEOUT))END_ADDR0)")
   }
 
 record(longout, "$(USER):BUFFER:SIZE")
 {
     field(DTYP, "asynInt32")
     field(SCAN, "Passive")
-    field(OUT, "@asyn($(PORT), $(ADDR), $(TIMEOUT))BUFFER_SIZE0")
+    field(OUT, "@asyn($(PORT), $(ADDR), $(TIMEOUT))BUFFER_SIZE")
   }
 
 record(ao, "$(USER):WORD:COUNT:0")
@@ -95,8 +95,7 @@ record(bo, "$(USER):RUN")
     #field(PINI, "1")
     field(ZNAM, "STOP")
     field(ONAM, "RUN")
-  }
-##Template file waveform
+  }##Template file waveform
 
 record(waveform, "$(USER):WAVEFORM:1")
 {
@@ -131,21 +130,21 @@ record(longin, "$(USER):BEGIN:ADDR:1")
 {
     field(DTYP, asynInt32)
     field(SCAN, "I/O Intr")
-    field(INP, "@asyn($(PORT), $(ADDR), $(TIMEOUT))BEGIN_ADDR1")
+    field(INP, "@asyn($(PORT)BEGIN_ADDR1)")
   }
 
 record(longin, "$(USER):END:ADDR:1")
 {
     field(DTYP, "asynInt32")
     field(SCAN, "I/O Intr")
-    field(INP, "@asyn($(PORT), $(ADDR), $(TIMEOUT))END_ADDR1")
+    field(INP, "@asyn($(PORT), $(ADDR), $(TIMEOUT))END_ADDR1)")
   }
 
 record(longout, "$(USER):BUFFER:SIZE")
 {
     field(DTYP, "asynInt32")
     field(SCAN, "Passive")
-    field(OUT, "@asyn($(PORT), $(ADDR), $(TIMEOUT))BUFFER_SIZE1")
+    field(OUT, "@asyn($(PORT), $(ADDR), $(TIMEOUT))BUFFER_SIZE")
   }
 
 record(ao, "$(USER):WORD:COUNT:1")
@@ -193,8 +192,7 @@ record(bo, "$(USER):RUN")
     #field(PINI, "1")
     field(ZNAM, "STOP")
     field(ONAM, "RUN")
-  }
-##Template file waveform
+  }##Template file waveform
 
 record(waveform, "$(USER):WAVEFORM:2")
 {
@@ -229,21 +227,21 @@ record(longin, "$(USER):BEGIN:ADDR:2")
 {
     field(DTYP, asynInt32)
     field(SCAN, "I/O Intr")
-    field(INP, "@asyn($(PORT), $(ADDR), $(TIMEOUT))BEGIN_ADDR2")
+    field(INP, "@asyn($(PORT)BEGIN_ADDR2)")
   }
 
 record(longin, "$(USER):END:ADDR:2")
 {
     field(DTYP, "asynInt32")
     field(SCAN, "I/O Intr")
-    field(INP, "@asyn($(PORT), $(ADDR), $(TIMEOUT))END_ADDR2")
+    field(INP, "@asyn($(PORT), $(ADDR), $(TIMEOUT))END_ADDR2)")
   }
 
 record(longout, "$(USER):BUFFER:SIZE")
 {
     field(DTYP, "asynInt32")
     field(SCAN, "Passive")
-    field(OUT, "@asyn($(PORT), $(ADDR), $(TIMEOUT))BUFFER_SIZE2")
+    field(OUT, "@asyn($(PORT), $(ADDR), $(TIMEOUT))BUFFER_SIZE")
   }
 
 record(ao, "$(USER):WORD:COUNT:2")
