@@ -21,53 +21,39 @@ record(subArray, "$(USER):SUBARRAY:${channel}")
   field(SCAN, "Passive")
   }
 
-record(bo, "$(USER):WEB:INIT:${channel}")
+record(bo, "$(USER):WEB:INIT")
 {
     field(DTYP, "asynUInt32Digital")
     field(SCAN, "Passive")
-    field(OUT, "@asynMask($(PORT), $(ADDR), 1, $(TIMEOUT))INITIALIZE${channel}")
+    field(OUT, "@asynMask($(PORT), $(ADDR), 1, $(TIMEOUT))INITIALIZE")
     field(ZNAM, "Why")
     field(ONAM, "INIT")
   }
 
-record(longin, "$(USER):BEGIN:ADDR:${channel}:rbv")
+record(longin, "$(USER):BEGIN:ADDR:${channel}")
 {
     field(DTYP, "asynInt32")
-    field(SCAN, "I/O Intr")
     field(INP, "@asyn($(PORT), $(ADDR), $(TIMEOUT))BEGIN_ADDR${channel}")
+    field(SCAN, "I/O Intr")
   }
 
-record(longout, "$(USER):BEGIN:ADDR:${channel}")
-{
-    field(DTYP, "asynInt32")
-    field(SCAN, "Passive")
-    field(OUT, "@asyn($(PORT), $(ADDR), $(TIMEOUT))BEGIN_ADDR${channel}")
-    field(OMSL, "closed_loop")
-    field(DOL, "$(USER):BEGIN:ADDR:${channel}:rbv CPP")
-  }
 
-record(longin, "$(USER):END:ADDR:${channel}:rbv")
+record(longin, "$(USER):END:ADDR:${channel}")
 {
     field(DTYP, "asynInt32")
     field(INP, "@asyn($(PORT), $(ADDR), $(TIMEOUT))END_ADDR${channel}")
     field(SCAN, "I/O Intr")
   }
 
-  record(longout, "$(USER):END:ADDR:${channel}")
+
+# The DaqMuxV2/DataBufferSize is set to NO:OF:WORDS/2 (as this is expressed in 32-bit words)
+record(longin, "$(USER):BUFFER:SIZE")
 {
     field(DTYP, "asynInt32")
-    field(SCAN, "Passive")
-    field(OUT, "@asyn($(PORT), $(ADDR), $(TIMEOUT))END_ADDR${channel}")
-    field(OMSL, "closed_loop")
-    field(DOL, "$(USER):END:ADDR:${channel}:rbv CPP")
+    field(SCAN, "I/O Intr")
+    field(INP, "@asyn($(PORT), $(ADDR), $(TIMEOUT))BUFFER_SIZE")
   }
 
-record(longout, "$(USER):BUFFER:SIZE")
-{
-    field(DTYP, "asynInt32")
-    field(SCAN, "Passive")
-    field(OUT, "@asyn($(PORT), $(ADDR), $(TIMEOUT))BUFFER_SIZE${channel}")
-  }
 
 record(ao, "$(USER):WORD:COUNT:${channel}")
 {
@@ -120,15 +106,19 @@ record(bo, "$(USER):RUN")
 ## This in the number of words from the user (N) ##
 record(ao, "$(USER):NO:OF:WORDS") 
 {
-  field(DTYP, asynInt32)
+  field(DTYP, "asynInt32")
   field(SCAN, "Passive")
   field(DESC, "Buffer size (16-bit words)")
   field(EGU,  "words")
-  field(PINI, "NO")
+  field(PINI, "YES")
+  field(VAL, "$(WAVEFORM_SIZE)")
   field(OUT,  "@asyn($(PORT), $(ADDR), $(TIMEOUT))NO_OF_WORDS")
   field(FLNK, "$(USER):UPDATE:NELM:SUBARRAY:0 PP")
+  #field(OMSL, "closed_loop")
+  #field(DOL, "$(USER):NO:OF:WORDS:rbv CPP")
   info(autosaveFields, "VAL")
 }
+
 
 record(calcout, "$(USER):UPDATE:NELM:SUBARRAY:0")
 {

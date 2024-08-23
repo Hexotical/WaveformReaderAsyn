@@ -27,30 +27,33 @@
 #include <cpsw_api_builder.h>
 #include <yamlLoader.h>
 #define STREAM_MAX_SIZE 200UL*1024ULL*1024ULL
+
 #define WAVEFORM_RUN_STRING "RUN"
 #define NO_OF_WORDS_STRING "NO_OF_WORDS"
+#define WAVEFORM_BUFFER_SIZE_STRING "BUFFER_SIZE"
+#define WAVEFORM_INITIALIZE_STRING "INITIALIZE"
 
 #define WAVEFORM0_PV_STRING "WAVEFORM:0"
-#define WAVEFORM0_INITIALIZE_STRING "INITIALIZE0"
+//#define WAVEFORM0_INITIALIZE_STRING "INITIALIZE0"
 #define WAVEFORM0_END_ADDR_STRING "END_ADDR0"
 #define WAVEFORM0_BEGIN_ADDR_STRING "BEGIN_ADDR0"
-#define WAVEFORM0_BUFFER_SIZE_STRING "BUFFER_SIZE0"
+//#define WAVEFORM0_BUFFER_SIZE_STRING "BUFFER_SIZE0"
 #define WAVEFORM0_BUFFER_SIZE_INIT_STRING "WAVEFORM_BUFFER_SIZE_INIT0"
 
 
 #define WAVEFORM1_PV_STRING "WAVEFORM:1"
-#define WAVEFORM1_INITIALIZE_STRING "INITIALIZE1"
+//#define WAVEFORM1_INITIALIZE_STRING "INITIALIZE1"
 #define WAVEFORM1_END_ADDR_STRING "END_ADDR1"
 #define WAVEFORM1_BEGIN_ADDR_STRING "BEGIN_ADDR1"
-#define WAVEFORM1_BUFFER_SIZE_STRING "BUFFER_SIZE1"
+//#define WAVEFORM1_BUFFER_SIZE_STRING "BUFFER_SIZE1"
 #define WAVEFORM1_BUFFER_SIZE_INIT_STRING "WAVEFORM_BUFFER_SIZE_INIT1"
 
 
 #define WAVEFORM2_PV_STRING "WAVEFORM:2"
-#define WAVEFORM2_INITIALIZE_STRING "INITIALIZE2"
+//#define WAVEFORM2_INITIALIZE_STRING "INITIALIZE2"
 #define WAVEFORM2_END_ADDR_STRING "END_ADDR2"
 #define WAVEFORM2_BEGIN_ADDR_STRING "BEGIN_ADDR2"
-#define WAVEFORM2_BUFFER_SIZE_STRING "BUFFER_SIZE2"
+//#define WAVEFORM2_BUFFER_SIZE_STRING "BUFFER_SIZE2"
 #define WAVEFORM2_BUFFER_SIZE_INIT_STRING "WAVEFORM_BUFFER_SIZE_INIT2"
 
 #define REAL 0
@@ -86,28 +89,30 @@ class WaveformReader : public asynPortDriver
     //Variables to store indices of records which the asynPortDriver can talk to.
     int waveform_run_index;
     int number_of_words_index;
+    int waveform_buffer_size_index;
+    int waveform_init_index;
     int MAX_BUFFER_SIZE;
 
-    int waveform0_init_index;
+    //int waveform0_init_index;
     int waveform0_beginAddr_index;
     int waveform0_endAddr_index;
-    int waveform0_buffer_size_index;
+    //int waveform0_buffer_size_index;
     
-    int waveform1_init_index;
+    //int waveform1_init_index;
     int waveform1_beginAddr_index;
     int waveform1_endAddr_index;
-    int waveform1_buffer_size_index;
+    //int waveform1_buffer_size_index;
     
-    int waveform2_init_index;
+    //int waveform2_init_index;
     int waveform2_beginAddr_index;
     int waveform2_endAddr_index;
-    int waveform2_buffer_size_index;
+    //int waveform2_buffer_size_index;
     
     // the indices of the arrays, 0, 1, and 2, refer to WAVEFORM:0, WAVEFORM:1, and WAVEFORM:2, respectively
-    int* init_indices[NUMBER_OF_WAVEFORM_RECORDS] = {&waveform0_init_index, &waveform1_init_index, &waveform2_init_index};
+    //int* init_indices[NUMBER_OF_WAVEFORM_RECORDS] = {&waveform0_init_index, &waveform1_init_index, &waveform2_init_index};
     int* beginAddr_indices[NUMBER_OF_WAVEFORM_RECORDS] = {&waveform0_beginAddr_index, &waveform1_beginAddr_index, &waveform2_beginAddr_index};
     int* endAddr_indices[NUMBER_OF_WAVEFORM_RECORDS] = {&waveform0_endAddr_index, &waveform1_endAddr_index, &waveform2_endAddr_index};
-    int* buffer_size_indices[NUMBER_OF_WAVEFORM_RECORDS] = {&waveform0_buffer_size_index, &waveform1_buffer_size_index, &waveform2_buffer_size_index};
+    //int* buffer_size_indices[NUMBER_OF_WAVEFORM_RECORDS] = {&waveform0_buffer_size_index, &waveform1_buffer_size_index, &waveform2_buffer_size_index};
 
 
     //Hardware interfaces

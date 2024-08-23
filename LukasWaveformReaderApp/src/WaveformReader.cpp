@@ -49,10 +49,10 @@ WaveformReader::WaveformReader(const char *portName, int bayNumber, int bufferSi
     waveform_param_indices.push_back(pvIdentifier);
     streaming_status_map[pvIdentifier] = "Not initialized yet";
     // connect to the PVs that represent parameters of each waveform record using corresponding arrays
-    createParam(("INITIALIZE" + std::to_string(pvID)).c_str(), asynParamUInt32Digital, init_indices[pvID]);
+    //createParam(("INITIALIZE" + std::to_string(pvID)).c_str(), asynParamUInt32Digital, init_indices[pvID]);
     createParam(("END_ADDR" + std::to_string(pvID)).c_str(), asynParamInt32, endAddr_indices[pvID]);
     createParam(("BEGIN_ADDR" + std::to_string(pvID)).c_str(), asynParamInt32, beginAddr_indices[pvID]);
-    createParam(("BUFFER_SIZE" + std::to_string(pvID)).c_str(), asynParamInt32, buffer_size_indices[pvID]);
+    //createParam(("BUFFER_SIZE" + std::to_string(pvID)).c_str(), asynParamInt32, buffer_size_indices[pvID]);
   
     (*(start_addresses[pvID])) = IScalVal::create(p->findByName(("/mmio/AmcCarrierCore/AmcCarrierBsa/BsaWaveformEngine[" + std::to_string(bayNumber) + "]/WaveformEngineBuffers/StartAddr[" + std::to_string(pvID) + "]").c_str()));
     (*(end_addresses[pvID])) = IScalVal::create(p->findByName(("/mmio/AmcCarrierCore/AmcCarrierBsa/BsaWaveformEngine[" + std::to_string(bayNumber) + "]/WaveformEngineBuffers/EndAddr[" + std::to_string(pvID) + "]").c_str()));
@@ -65,7 +65,9 @@ WaveformReader::WaveformReader(const char *portName, int bayNumber, int bufferSi
     (*(end_addresses[pvID]))->getVal(&u32_end, 1);
     std::cout << "u32_end is " << u32_end << std::endl;
     setIntegerParam(*(endAddr_indices[pvID]), u32_end);
+    //setIntegerParam(waveform_buffer_size_index, 1000000);
     callParamCallbacks();
+
     //int value;
     //getIntegerParam(*(beginAddr_indices[pvID]), &value);
     //std::cout << "THe value is: " << value << std::endl;
@@ -74,7 +76,14 @@ WaveformReader::WaveformReader(const char *portName, int bayNumber, int bufferSi
   //TODO: Do this is a more systematic way, individually connecting isn't really aesthetic 
   createParam(WAVEFORM_RUN_STRING, asynParamUInt32Digital, &waveform_run_index);
   createParam(NO_OF_WORDS_STRING, asynParamInt32, &number_of_words_index);
-  MAX_BUFFER_SIZE = bufferSize; //One of the parameters we pass to our port driver is the bufferSize, which is essentially how many words of information we want at a time
+  createParam(WAVEFORM_BUFFER_SIZE_STRING, asynParamInt32, &waveform_buffer_size_index);
+  createParam(WAVEFORM_INITIALIZE_STRING, asynParamUInt32Digital, &waveform_init_index);
+  //MAX_BUFFER_SIZE = bufferSize; //One of the parameters we pass to our port driver is the bufferSize, which is essentially how many words of information we want at a time
+  //int temp = (bufferSize / 2); // no of 16-bit words
+  //std::cout << "About to set number_of_words" << std::endl;
+  //setIntegerParam(number_of_words_index, temp);
+  //callParamCallbacks();
+  //std::cout << "after setting the number_of_words" << std::endl;
 
 }
 
@@ -344,7 +353,7 @@ void WaveformReader::streamTask(const char *streamInit = "/Stream0", std::string
         int64_t lastGot = 0;
 
         std::cout << "Outside the while loop now " << std::endl;
-
+        std::cout << "MAX_BUFFER_SIZE is: " << MAX_BUFFER_SIZE << std::endl;
         while(1)
         {
             //std::cout << "Inside the while loop " << std::endl;
@@ -432,7 +441,7 @@ asynStatus WaveformReader::writeUInt32Digital(asynUser *pasynUser, epicsUInt32 v
     //Essentially just using my ScalVal interface to tell the address to turn on or off, should be that simple according to Jeremy
     _TriggerHwAutoRearm->setVal((int64_t)value);
   }
-  if((pasynUser->reason == waveform0_init_index) || (pasynUser->reason == waveform1_init_index) || (pasynUser->reason == waveform2_init_index))
+  if(pasynUser->reason == waveform_init_index)
   {
     _WebInit->execute();
   }
@@ -454,32 +463,60 @@ asynStatus WaveformReader::writeInt32(asynUser *pasynUser, epicsInt32 value)
   // pasynUser matches with
   for (int i = 0; i < NUMBER_OF_WAVEFORM_RECORDS; i++)
   {
-    if(pasynUser->reason == (*endAddr_indices[i]))
+    if(pasynUser->reason == (*(endAddr_indices[i])))
     {
       (*(end_addresses[i]))->setVal((int64_t)value);
       _WebInit->execute();
-      std::cout << "endAddr call" << std::endl;
+      std::cout << "endAddr call"  << i << std::endl;
+      int temp;
+      getIntegerParam(waveform0_endAddr_index, &temp);
+      std::cout << "Value of endAddr " << temp << std::endl;
     }
 
-    if(pasynUser->reason == (*beginAddr_indices[i]))
+    if(pasynUser->reason == (*(beginAddr_indices[i])))
     {
       (*(start_addresses[i]))->setVal((int64_t)value);
       std::cout << "startAddr call" << std::endl;
     }
 
-    if(pasynUser->reason == (*buffer_size_indices[i]))
-    {
-      _DataBufferSize->setVal((int64_t)value);
-      MAX_BUFFER_SIZE = 4 * value ;
-      std::cout << "bufferSizecall" << std::endl;
-    }
+    // if(pasynUser->reason == (*buffer_size_indices[i]))
+    // {
+    //   _DataBufferSize->setVal((int64_t)value);
+    //   MAX_BUFFER_SIZE = 4 * value ;
+    //   std::cout << "bufferSizecall" << std::endl;
+    // }
+  }
+
+  if(pasynUser->reason == waveform_buffer_size_index)
+  {
+    _DataBufferSize->setVal((int64_t)value);
+    MAX_BUFFER_SIZE = 4 * value ;
+    std::cout << "bufferSizecall" << std::endl;
   }
 
   // if the NO:OF:WORDS record updates
   if(pasynUser->reason == number_of_words_index)
   {
+    std::cout << "In number_of_words branch" << std::endl;
     int number_of_words;
     getIntegerParam(number_of_words_index, &number_of_words);
+
+    // Calculate the DaqMux Data Buffer Size (N/2)
+    // Set the DaqMuxV2/DataBufferSize to N/2 (as this is expressed in 32-bit words)
+    int daqMuxBufferSize = (number_of_words / 2);
+    // this function should call writeInt32
+    std::cout << "About to set bufferSize: " << daqMuxBufferSize << std::endl;
+    setIntegerParam(waveform_buffer_size_index, daqMuxBufferSize);
+    callParamCallbacks();
+
+    ////
+    _DataBufferSize->setVal(daqMuxBufferSize);
+    MAX_BUFFER_SIZE = 4 * daqMuxBufferSize;
+    ////
+
+    int val;
+    getIntegerParam(waveform_buffer_size_index, &val);
+    std::cout << "After setting bufferSize: " << val << std::endl;
 
     int beginAddress, endAddress;
 
@@ -491,15 +528,22 @@ asynStatus WaveformReader::writeInt32(asynUser *pasynUser, epicsInt32 value)
       endAddress = beginAddress + (2 * number_of_words);
       // this function calls writeInt32 and thus it writes to the corresponding hardware address
       setIntegerParam(*(endAddr_indices[i]), endAddress);
-
+      std::cout << "Here now" << std::endl;
       callParamCallbacks();
+      std::cout << "or here" << std::endl;
 
+      ////
       // set the value of the hardware
-      //(*(end_addresses[i]))->setVal(endAddress);
+      (*(end_addresses[i]))->setVal(endAddress);
+      ////
       
     }
+    std::cout << "out now" << std::endl;
+
+    ////
     // initialize once for the entire bay
-    //_WebInit->execute();
+    _WebInit->execute();
+    ////
   }
 
   return status;
