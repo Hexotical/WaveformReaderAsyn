@@ -17,8 +17,8 @@ WaveformReader::WaveformReader(const char *portName, int bayNumber, int bufferSi
                                                        (
                                                         portName,
                                                         1,//Max Signals?
-                                                        asynDrvUserMask | asynInt32ArrayMask | asynInt16ArrayMask | asynUInt32DigitalMask | asynInt32Mask ,
-                                                        asynInt32ArrayMask | asynInt16ArrayMask | asynInt32Mask | asynUInt32DigitalMask,
+                                                        asynDrvUserMask | asynInt32ArrayMask | asynInt16ArrayMask | asynUInt32DigitalMask | asynInt32Mask | asynFloat64Mask,
+                                                        asynInt32ArrayMask | asynInt16ArrayMask | asynInt32Mask | asynUInt32DigitalMask | asynFloat64Mask,
                                                         ASYN_MULTIDEVICE | ASYN_CANBLOCK,
                                                         1,
                                                         0,
@@ -53,7 +53,11 @@ WaveformReader::WaveformReader(const char *portName, int bayNumber, int bufferSi
     createParam(("END_ADDR" + std::to_string(pvID)).c_str(), asynParamInt32, endAddr_indices[pvID]);
     createParam(("BEGIN_ADDR" + std::to_string(pvID)).c_str(), asynParamInt32, beginAddr_indices[pvID]);
     //createParam(("BUFFER_SIZE" + std::to_string(pvID)).c_str(), asynParamInt32, buffer_size_indices[pvID]);
-  
+    createParam(("START_LOC" + std::to_string(pvID)).c_str(), asynParamFloat64, start_loc_indices[pvID]);
+    createParam(("END_LOC" + std::to_string(pvID)).c_str(), asynParamFloat64, end_loc_indices[pvID]);
+    createParam(("BEAM_LOSS_LOC" + std::to_string(pvID)).c_str(), asynParamFloat64, beam_loss_loc_indices[pvID]);
+
+
     (*(start_addresses[pvID])) = IScalVal::create(p->findByName(("/mmio/AmcCarrierCore/AmcCarrierBsa/BsaWaveformEngine[" + std::to_string(bayNumber) + "]/WaveformEngineBuffers/StartAddr[" + std::to_string(pvID) + "]").c_str()));
     (*(end_addresses[pvID])) = IScalVal::create(p->findByName(("/mmio/AmcCarrierCore/AmcCarrierBsa/BsaWaveformEngine[" + std::to_string(bayNumber) + "]/WaveformEngineBuffers/EndAddr[" + std::to_string(pvID) + "]").c_str()));
 
@@ -260,6 +264,40 @@ void WaveformReader::findLocalMaxima(void)
   }
  
 }
+
+/**
+ * Computes and displays the location of the maximum beam loss detected by the monitor
+ * 
+ * @param startingPosition the starting position of the beam loss monitor (BLM)
+ * @param endingPosition the ending position of the beam loss monitor (BLM)
+ * @param bufferSize size of the buffer read by the sensors in the BLM
+ */
+// ADD INPUT VALIDATION
+void WaveformReader::maxBeamLoss(int waveformIndex)
+{
+  double startingPosition, endingPosition;
+  // getDoubleParam(*(start_loc_indices[waveformIndex]), &startingPosition);
+  // getDoubleParam(*(end_loc_indices[waveformIndex]), &endingPosition);
+  getDoubleParam(waveform0_start_loc_index, &startingPosition);
+  getDoubleParam(waveform0_end_loc_index, &endingPosition);
+  std::cout << "Starting position and ending position: " << startingPosition << " " << endingPosition << std::endl;
+  double lengthOfMonitor = endingPosition - startingPosition;
+  std::cout << "Length is: " << lengthOfMonitor << std::endl;
+
+  // UPDATE FUNCTION TO USE WAVEFORM_INDEX FOR WAVEFORM SPECIFIC COMPUTATION
+  int maxIndex = findMaxIndex();
+  std::cout << "Max index is: " << maxIndex << std::endl;
+  // CHANGE 1 MIL TO BUFFER SIZE OF CORRESPONDING WAVEFORM
+  int bufferSize;
+  getIntegerParam(number_of_words_index, &bufferSize);
+  // convert from 16-bit word to 8-bit word
+  bufferSize *= 2;
+  std::cout << "The buffer size is: " << bufferSize << std::endl;
+  double locationOfMaxIndex = (maxIndex * (lengthOfMonitor / bufferSize)) + startingPosition;
+  std::cout << "The location of maximum beam loss is " << locationOfMaxIndex << std::endl;
+  setDoubleParam(*(beam_loss_loc_indices[waveformIndex]), locationOfMaxIndex);
+}
+
 
 /**
  * Launch a thread to stream data to an EPICS records
@@ -651,12 +689,31 @@ void fourierTransformRegister(void)
 }
 
 
+static void maxBeamLossLocation(int waveformIndex) {
+  bayManager->maxBeamLoss(waveformIndex);
+  return;
+}
+
+static const iocshArg lossArg0 = {"waveformIndex", iocshArgInt};
+static const iocshArg * const lossArgs[] = {&lossArg0};
+static const iocshFuncDef lossFuncDef = {"maxBeamLossLocation", 1, lossArgs};
+static void lossCallFunc(const iocshArgBuf *args)
+{
+  maxBeamLossLocation(args[0].ival);
+}
+void maxBeamLossLocationRegister(void)
+{
+  iocshRegister(&lossFuncDef, lossCallFunc);
+}
+
+
 extern "C" {
   epicsExportRegistrar(printHelpRegister);
   epicsExportRegistrar(waveformStatusRegister);
   epicsExportRegistrar(waveformReaderRegister);
   epicsExportRegistrar(waveformStreamRegister);
   epicsExportRegistrar(fourierTransformRegister);
+  epicsExportRegistrar(maxBeamLossLocationRegister);
 }
 
 

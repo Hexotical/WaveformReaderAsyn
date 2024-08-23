@@ -127,3 +127,27 @@ record(calcout, "$(USER):UPDATE:NELM:SUBARRAY:0")
     field(OUT,  "$(USER):SUBARRAY:0.NELM PP")  # Update NELM field of subArray
     field(SCAN, "Passive")
 }
+
+record(ao, "$(USER):STARTING:LOC:${channel}")
+{
+    field(DTYP, "asynFloat64")
+    field(OUT, "@asyn($(PORT),$(ADDR),$(TIMEOUT))START_LOC${channel}")
+    field(SCAN, "Passive")
+}
+
+
+record(ao, "$(USER):ENDING:LOC:${channel}")
+{
+    field(DTYP, "asynFloat64")
+    field(OUT, "@asyn($(PORT),$(ADDR),$(TIMEOUT))END_LOC${channel}")
+    field(SCAN, "Passive")
+}
+
+
+record(ai, "$(USER):BEAM:LOSS:LOC:${channel}")
+{
+    field(DTYP, "asynFloat64")
+    field(INP, "@asyn($(PORT),$(ADDR),$(TIMEOUT))BEAM_LOSS_LOC${channel}")
+    field(SCAN, "I/O Intr")
+}
+

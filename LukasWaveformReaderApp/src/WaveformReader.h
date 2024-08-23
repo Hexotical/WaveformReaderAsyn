@@ -56,6 +56,17 @@
 //#define WAVEFORM2_BUFFER_SIZE_STRING "BUFFER_SIZE2"
 #define WAVEFORM2_BUFFER_SIZE_INIT_STRING "WAVEFORM_BUFFER_SIZE_INIT2"
 
+
+#define WAVEFORM0_STARTING_LOCATION_STRING "START_LOC0"
+#define WAVEFORM0_ENDING_LOCATION_STRING "END_LOC0"
+#define WAVEFORM1_STARTING_LOCATION_STRING "START_LOC1"
+#define WAVEFORM1_ENDING_LOCATION_STRING "END_LOC1"
+#define WAVEFORM2_STARTING_LOCATION_STRING "START_LOC2"
+#define WAVEFORM2_ENDING_LOCATION_STRING "END_LOC2"
+#define WAVEFORM0_BEAM_LOSS_LOCATION_STRING "BEAM_LOSS_LOC0"
+#define WAVEFORM1_BEAM_LOSS_LOCATION_STRING "BEAM_LOSS_LOC1"
+#define WAVEFORM2_BEAM_LOSS_LOCATION_STRING "BEAM_LOSS_LOC2"
+
 #define REAL 0
 #define IMAG 1
 #define NUMBER_OF_WAVEFORM_RECORDS 3
@@ -70,6 +81,7 @@ class WaveformReader : public asynPortDriver
     int findMaxIndex(void);
     void findRange(int& low, int& high, int maxIndex, const int LOWER_LIMIT);
     void findLocalMaxima(void);
+    void maxBeamLoss(int bufferSize);
 
 
     void streamTask(const char *stream, std::string pvID);// takes a path to the stream and then a pv identifier for connection
@@ -107,12 +119,26 @@ class WaveformReader : public asynPortDriver
     int waveform2_beginAddr_index;
     int waveform2_endAddr_index;
     //int waveform2_buffer_size_index;
+
+    int waveform0_start_loc_index;
+    int waveform0_end_loc_index;
+    int waveform1_start_loc_index;
+    int waveform1_end_loc_index;
+    int waveform2_start_loc_index;
+    int waveform2_end_loc_index;
+    int waveform0_beam_loss_loc_index;
+    int waveform1_beam_loss_loc_index;
+    int waveform2_beam_loss_loc_index;
     
     // the indices of the arrays, 0, 1, and 2, refer to WAVEFORM:0, WAVEFORM:1, and WAVEFORM:2, respectively
     //int* init_indices[NUMBER_OF_WAVEFORM_RECORDS] = {&waveform0_init_index, &waveform1_init_index, &waveform2_init_index};
     int* beginAddr_indices[NUMBER_OF_WAVEFORM_RECORDS] = {&waveform0_beginAddr_index, &waveform1_beginAddr_index, &waveform2_beginAddr_index};
     int* endAddr_indices[NUMBER_OF_WAVEFORM_RECORDS] = {&waveform0_endAddr_index, &waveform1_endAddr_index, &waveform2_endAddr_index};
     //int* buffer_size_indices[NUMBER_OF_WAVEFORM_RECORDS] = {&waveform0_buffer_size_index, &waveform1_buffer_size_index, &waveform2_buffer_size_index};
+    int* start_loc_indices[NUMBER_OF_WAVEFORM_RECORDS] = {&waveform0_start_loc_index, &waveform1_start_loc_index, &waveform2_start_loc_index};
+    int* end_loc_indices[NUMBER_OF_WAVEFORM_RECORDS] = {&waveform0_end_loc_index, &waveform1_end_loc_index, &waveform2_end_loc_index};   
+    int* beam_loss_loc_indices[NUMBER_OF_WAVEFORM_RECORDS] = {&waveform0_beam_loss_loc_index, &waveform1_beam_loss_loc_index, &waveform2_beam_loss_loc_index};
+
 
 
     //Hardware interfaces
