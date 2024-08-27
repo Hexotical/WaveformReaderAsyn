@@ -103,7 +103,7 @@ record(bo, "$(USER):RUN")
   }
 
 
-## This in the number of words from the user (N) ##
+## This in the number of 16-bit words from the user (N) ##
 record(ao, "$(USER):NO:OF:WORDS") 
 {
   field(DTYP, "asynInt32")
