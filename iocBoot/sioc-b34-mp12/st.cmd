@@ -17,6 +17,7 @@ LukasWaveformReader_registerRecordDeviceDriver pdbbase
 ## Load record instances
 #dbLoadRecords("db/xxx.db","user=lujko")
 dbLoadRecords("db/waveform.db", "USER=lujko,PORT=lujko,ADDR=0,TIMEOUT=0, WAVEFORM_SIZE=500000")
+dbLoadRecords("db/waveformUnique.db", "USER=lujko,PORT=lujko,ADDR=0,TIMEOUT=0, WAVEFORM_SIZE=500000")
 
 # yamlDownloader
 DownloadYamlFile("${FPGA_IP}", "${YAML_DIR}")

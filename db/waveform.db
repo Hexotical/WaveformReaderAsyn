@@ -1,5 +1,6 @@
 ##Template file waveform
 
+
 record(waveform, "$(USER):WAVEFORM:0")
 {
     field(PINI, "1")
@@ -11,6 +12,7 @@ record(waveform, "$(USER):WAVEFORM:0")
     field(SCAN, "I/O Intr")
   }
 
+
 record(subArray, "$(USER):SUBARRAY:0")
 {
   field(INP, "$(USER):WAVEFORM:0.VAL")
@@ -21,14 +23,6 @@ record(subArray, "$(USER):SUBARRAY:0")
   field(SCAN, "Passive")
   }
 
-record(bo, "$(USER):WEB:INIT")
-{
-    field(DTYP, "asynUInt32Digital")
-    field(SCAN, "Passive")
-    field(OUT, "@asynMask($(PORT), $(ADDR), 1, $(TIMEOUT))INITIALIZE")
-    field(ZNAM, "Why")
-    field(ONAM, "INIT")
-  }
 
 record(longin, "$(USER):BEGIN:ADDR:0")
 {
@@ -46,20 +40,12 @@ record(longin, "$(USER):END:ADDR:0")
   }
 
 
-# The DaqMuxV2/DataBufferSize is set to NO:OF:WORDS/2 (as this is expressed in 32-bit words)
-record(longin, "$(USER):BUFFER:SIZE")
-{
-    field(DTYP, "asynInt32")
-    field(SCAN, "I/O Intr")
-    field(INP, "@asyn($(PORT), $(ADDR), $(TIMEOUT))BUFFER_SIZE")
-  }
-
-
 record(ao, "$(USER):WORD:COUNT:0")
 {
     field(SCAN, "Passive")
     field(OUT, "$(USER):INIT:SEQ:0  PP")
   }
+
 
 record(seq, "$(USER):INIT:SEQ:0")
 {
@@ -70,6 +56,7 @@ record(seq, "$(USER):INIT:SEQ:0")
     field(LNK2, "$(USER):WEB:INIT:0 PP")
   }
 
+
 record(dfanout, "$(USER):FANOUT:BUFFER:0")
 {
     field(SCAN, "Passive")
@@ -78,10 +65,12 @@ record(dfanout, "$(USER):FANOUT:BUFFER:0")
     field(OUTC, "$(USER):WEB:INIT:0.A PP")
   }
 
+
 record(ai, "$(USER):BUFFER:RBV:0")
 {
     field(SCAN, "Passive")
   }
+
 
 record(calcout, "$(USER):TO:DIV:0")
 {
@@ -90,43 +79,6 @@ record(calcout, "$(USER):TO:DIV:0")
     field(OUT, "$(USER):BUFFER:SIZE PP")
   }
 
-#Single register for all the things
-
-record(bo, "$(USER):RUN")
-{
-    field(SCAN, "Passive")
-    field(DTYP, "asynUInt32Digital")
-    field(OUT, "@asynMask($(PORT),$(ADDR), 1, $(TIMEOUT))RUN")
-    #field(PINI, "1")
-    field(ZNAM, "STOP")
-    field(ONAM, "RUN")
-  }
-
-
-## This in the number of 16-bit words from the user (N) ##
-record(ao, "$(USER):NO:OF:WORDS") 
-{
-  field(DTYP, "asynInt32")
-  field(SCAN, "Passive")
-  field(DESC, "Buffer size (16-bit words)")
-  field(EGU,  "words")
-  field(PINI, "YES")
-  field(VAL, "$(WAVEFORM_SIZE)")
-  field(OUT,  "@asyn($(PORT), $(ADDR), $(TIMEOUT))NO_OF_WORDS")
-  field(FLNK, "$(USER):UPDATE:NELM:SUBARRAY:0 PP")
-  #field(OMSL, "closed_loop")
-  #field(DOL, "$(USER):NO:OF:WORDS:rbv CPP")
-  info(autosaveFields, "VAL")
-}
-
-
-record(calcout, "$(USER):UPDATE:NELM:SUBARRAY:0")
-{
-    field(INPA, "$(USER):NO:OF:WORDS")
-    field(CALC, "A")  # Pass the value of the longout record
-    field(OUT,  "$(USER):SUBARRAY:0.NELM PP")  # Update NELM field of subArray
-    field(SCAN, "Passive")
-}
 
 record(ao, "$(USER):STARTING:LOC:0")
 {
@@ -149,9 +101,8 @@ record(ai, "$(USER):BEAM:LOSS:LOC:0")
     field(DTYP, "asynFloat64")
     field(INP, "@asyn($(PORT),$(ADDR),$(TIMEOUT))BEAM_LOSS_LOC0")
     field(SCAN, "I/O Intr")
-}
+}##Template file waveform
 
-##Template file waveform
 
 record(waveform, "$(USER):WAVEFORM:1")
 {
@@ -164,6 +115,7 @@ record(waveform, "$(USER):WAVEFORM:1")
     field(SCAN, "I/O Intr")
   }
 
+
 record(subArray, "$(USER):SUBARRAY:1")
 {
   field(INP, "$(USER):WAVEFORM:1.VAL")
@@ -174,14 +126,6 @@ record(subArray, "$(USER):SUBARRAY:1")
   field(SCAN, "Passive")
   }
 
-record(bo, "$(USER):WEB:INIT")
-{
-    field(DTYP, "asynUInt32Digital")
-    field(SCAN, "Passive")
-    field(OUT, "@asynMask($(PORT), $(ADDR), 1, $(TIMEOUT))INITIALIZE")
-    field(ZNAM, "Why")
-    field(ONAM, "INIT")
-  }
 
 record(longin, "$(USER):BEGIN:ADDR:1")
 {
@@ -199,20 +143,12 @@ record(longin, "$(USER):END:ADDR:1")
   }
 
 
-# The DaqMuxV2/DataBufferSize is set to NO:OF:WORDS/2 (as this is expressed in 32-bit words)
-record(longin, "$(USER):BUFFER:SIZE")
-{
-    field(DTYP, "asynInt32")
-    field(SCAN, "I/O Intr")
-    field(INP, "@asyn($(PORT), $(ADDR), $(TIMEOUT))BUFFER_SIZE")
-  }
-
-
 record(ao, "$(USER):WORD:COUNT:1")
 {
     field(SCAN, "Passive")
     field(OUT, "$(USER):INIT:SEQ:1  PP")
   }
+
 
 record(seq, "$(USER):INIT:SEQ:1")
 {
@@ -223,6 +159,7 @@ record(seq, "$(USER):INIT:SEQ:1")
     field(LNK2, "$(USER):WEB:INIT:1 PP")
   }
 
+
 record(dfanout, "$(USER):FANOUT:BUFFER:1")
 {
     field(SCAN, "Passive")
@@ -231,10 +168,12 @@ record(dfanout, "$(USER):FANOUT:BUFFER:1")
     field(OUTC, "$(USER):WEB:INIT:1.A PP")
   }
 
+
 record(ai, "$(USER):BUFFER:RBV:1")
 {
     field(SCAN, "Passive")
   }
+
 
 record(calcout, "$(USER):TO:DIV:1")
 {
@@ -243,43 +182,6 @@ record(calcout, "$(USER):TO:DIV:1")
     field(OUT, "$(USER):BUFFER:SIZE PP")
   }
 
-#Single register for all the things
-
-record(bo, "$(USER):RUN")
-{
-    field(SCAN, "Passive")
-    field(DTYP, "asynUInt32Digital")
-    field(OUT, "@asynMask($(PORT),$(ADDR), 1, $(TIMEOUT))RUN")
-    #field(PINI, "1")
-    field(ZNAM, "STOP")
-    field(ONAM, "RUN")
-  }
-
-
-## This in the number of 16-bit words from the user (N) ##
-record(ao, "$(USER):NO:OF:WORDS") 
-{
-  field(DTYP, "asynInt32")
-  field(SCAN, "Passive")
-  field(DESC, "Buffer size (16-bit words)")
-  field(EGU,  "words")
-  field(PINI, "YES")
-  field(VAL, "$(WAVEFORM_SIZE)")
-  field(OUT,  "@asyn($(PORT), $(ADDR), $(TIMEOUT))NO_OF_WORDS")
-  field(FLNK, "$(USER):UPDATE:NELM:SUBARRAY:0 PP")
-  #field(OMSL, "closed_loop")
-  #field(DOL, "$(USER):NO:OF:WORDS:rbv CPP")
-  info(autosaveFields, "VAL")
-}
-
-
-record(calcout, "$(USER):UPDATE:NELM:SUBARRAY:0")
-{
-    field(INPA, "$(USER):NO:OF:WORDS")
-    field(CALC, "A")  # Pass the value of the longout record
-    field(OUT,  "$(USER):SUBARRAY:0.NELM PP")  # Update NELM field of subArray
-    field(SCAN, "Passive")
-}
 
 record(ao, "$(USER):STARTING:LOC:1")
 {
@@ -302,9 +204,8 @@ record(ai, "$(USER):BEAM:LOSS:LOC:1")
     field(DTYP, "asynFloat64")
     field(INP, "@asyn($(PORT),$(ADDR),$(TIMEOUT))BEAM_LOSS_LOC1")
     field(SCAN, "I/O Intr")
-}
+}##Template file waveform
 
-##Template file waveform
 
 record(waveform, "$(USER):WAVEFORM:2")
 {
@@ -317,6 +218,7 @@ record(waveform, "$(USER):WAVEFORM:2")
     field(SCAN, "I/O Intr")
   }
 
+
 record(subArray, "$(USER):SUBARRAY:2")
 {
   field(INP, "$(USER):WAVEFORM:2.VAL")
@@ -327,14 +229,6 @@ record(subArray, "$(USER):SUBARRAY:2")
   field(SCAN, "Passive")
   }
 
-record(bo, "$(USER):WEB:INIT")
-{
-    field(DTYP, "asynUInt32Digital")
-    field(SCAN, "Passive")
-    field(OUT, "@asynMask($(PORT), $(ADDR), 1, $(TIMEOUT))INITIALIZE")
-    field(ZNAM, "Why")
-    field(ONAM, "INIT")
-  }
 
 record(longin, "$(USER):BEGIN:ADDR:2")
 {
@@ -352,20 +246,12 @@ record(longin, "$(USER):END:ADDR:2")
   }
 
 
-# The DaqMuxV2/DataBufferSize is set to NO:OF:WORDS/2 (as this is expressed in 32-bit words)
-record(longin, "$(USER):BUFFER:SIZE")
-{
-    field(DTYP, "asynInt32")
-    field(SCAN, "I/O Intr")
-    field(INP, "@asyn($(PORT), $(ADDR), $(TIMEOUT))BUFFER_SIZE")
-  }
-
-
 record(ao, "$(USER):WORD:COUNT:2")
 {
     field(SCAN, "Passive")
     field(OUT, "$(USER):INIT:SEQ:2  PP")
   }
+
 
 record(seq, "$(USER):INIT:SEQ:2")
 {
@@ -376,6 +262,7 @@ record(seq, "$(USER):INIT:SEQ:2")
     field(LNK2, "$(USER):WEB:INIT:2 PP")
   }
 
+
 record(dfanout, "$(USER):FANOUT:BUFFER:2")
 {
     field(SCAN, "Passive")
@@ -384,10 +271,12 @@ record(dfanout, "$(USER):FANOUT:BUFFER:2")
     field(OUTC, "$(USER):WEB:INIT:2.A PP")
   }
 
+
 record(ai, "$(USER):BUFFER:RBV:2")
 {
     field(SCAN, "Passive")
   }
+
 
 record(calcout, "$(USER):TO:DIV:2")
 {
@@ -396,43 +285,6 @@ record(calcout, "$(USER):TO:DIV:2")
     field(OUT, "$(USER):BUFFER:SIZE PP")
   }
 
-#Single register for all the things
-
-record(bo, "$(USER):RUN")
-{
-    field(SCAN, "Passive")
-    field(DTYP, "asynUInt32Digital")
-    field(OUT, "@asynMask($(PORT),$(ADDR), 1, $(TIMEOUT))RUN")
-    #field(PINI, "1")
-    field(ZNAM, "STOP")
-    field(ONAM, "RUN")
-  }
-
-
-## This in the number of 16-bit words from the user (N) ##
-record(ao, "$(USER):NO:OF:WORDS") 
-{
-  field(DTYP, "asynInt32")
-  field(SCAN, "Passive")
-  field(DESC, "Buffer size (16-bit words)")
-  field(EGU,  "words")
-  field(PINI, "YES")
-  field(VAL, "$(WAVEFORM_SIZE)")
-  field(OUT,  "@asyn($(PORT), $(ADDR), $(TIMEOUT))NO_OF_WORDS")
-  field(FLNK, "$(USER):UPDATE:NELM:SUBARRAY:0 PP")
-  #field(OMSL, "closed_loop")
-  #field(DOL, "$(USER):NO:OF:WORDS:rbv CPP")
-  info(autosaveFields, "VAL")
-}
-
-
-record(calcout, "$(USER):UPDATE:NELM:SUBARRAY:0")
-{
-    field(INPA, "$(USER):NO:OF:WORDS")
-    field(CALC, "A")  # Pass the value of the longout record
-    field(OUT,  "$(USER):SUBARRAY:0.NELM PP")  # Update NELM field of subArray
-    field(SCAN, "Passive")
-}
 
 record(ao, "$(USER):STARTING:LOC:2")
 {
@@ -456,4 +308,3 @@ record(ai, "$(USER):BEAM:LOSS:LOC:2")
     field(INP, "@asyn($(PORT),$(ADDR),$(TIMEOUT))BEAM_LOSS_LOC2")
     field(SCAN, "I/O Intr")
 }
-
