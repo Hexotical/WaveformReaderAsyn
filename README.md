@@ -23,8 +23,8 @@ In order to generate the graph the user must run the python script after running
 NOTE: The output.csv file reads data directly from screenlog.0 which records all the keystrokes of the user. To successfully create the graph, fourierTransform must be typed without making any errors or using backspaces on the console.
 
 ### maxBeamLossLocation
-Usage: **maxBeamLossLocation** <Starting Position> <Ending Position> <Size of buffer>
+Usage: **maxBeamLossLocation** <Waveform Index>
 
-E.g. **maxBeamLossLocation** 0 100 1000000
+E.g. **maxBeamLossLocation** 0
 
-This command computes and displays the physical location where the maximum beam loss is detected by a beam loss monitor based on values of the starting and ending positions of the monitor specified by the user as well as the size of the buffer or data that the beam loss monitor reads.
+This command computes and displays the physical location where the maximum beam loss is detected by a beam loss monitor based on values of the starting and ending positions of the monitor as well as the size of the buffer or data that the beam loss monitor reads. The user must enter the index of the waveform, i.e., 0, 1, or 2, for WAVEFORM:0, WAVEFORM:1, or WAVEFORM:2, respectively.

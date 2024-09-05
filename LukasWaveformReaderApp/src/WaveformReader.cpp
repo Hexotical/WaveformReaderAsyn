@@ -15,7 +15,7 @@ WaveformReader *bayManager; //Global pointer so iocshell commands can interact w
  * @param bufferSize amount of words to read from the buffer
  * @param waveformPVs amount of EPICS waveform records our port driver should be of
  */
-WaveformReader::WaveformReader(const char *portName, int bufferSize, int waveformPVs) : asynPortDriver
+WaveformReader::WaveformReader(const char *portName, int bayNumber, int bufferSize, int waveformPVs) : asynPortDriver
                                                        (
                                                         portName,
                                                         1,//Max Signals?
@@ -27,7 +27,15 @@ WaveformReader::WaveformReader(const char *portName, int bufferSize, int wavefor
                                                         0
                                                         )
 {
-  waveformData = (epicsInt16 *)calloc(STREAM_MAX_SIZE, sizeof(epicsInt16)); 
+
+  //We register some useful hardware interfaces our port driver could want to know
+  Path p;
+  p = cpswGetRoot();
+  
+  _TriggerHwAutoRearm = IScalVal::create(p->findByName(("/mmio/AppTop/DaqMuxV2[" + std::to_string(bayNumber) + "]/TriggerHwAutoRearm").c_str()));
+  _DataBufferSize = IScalVal::create(p->findByName(("/mmio/AppTop/DaqMuxV2[" + std::to_string(bayNumber) + "]/DataBufferSize").c_str()));
+  _TrigCount = IScalVal_RO::create(p->findByName(("/mmio/AppTop/DaqMuxV2[" + std::to_string(bayNumber) + "]/TrigCount").c_str()));
+  _WebInit = ICommand::create(p->findByName(("/mmio/AmcCarrierCore/AmcCarrierBsa/BsaWaveformEngine[" + std::to_string(bayNumber) + "]/WaveformEngineBuffers/Initialize").c_str()));
  
   //Connecting to the records our port driver will eventually need to interact with
   for(int pvID = 0; pvID < waveformPVs; pvID++)
@@ -41,44 +49,39 @@ WaveformReader::WaveformReader(const char *portName, int bufferSize, int wavefor
     pv_param_map.insert(std::pair<std::string, int>(pvIdentifier, waveform_param_index));
     waveform_param_indices.push_back(pvIdentifier);
     streaming_status_map[pvIdentifier] = "Not initialized yet";
+
+    waveform_map[pvIdentifier] = (epicsInt16 *)calloc(STREAM_MAX_SIZE, sizeof(epicsInt16)); 
+
     // connect to the PVs that represent parameters of each waveform record using corresponding arrays
-    createParam(("INITIALIZE" + std::to_string(pvID)).c_str(), asynParamUInt32Digital, init_indices[pvID]);
-    createParam(("END_ADDR" + std::to_string(pvID)).c_str(), asynParamInt32, beginAddr_indices[pvID]);
-    createParam(("BEGIN_ADDR" + std::to_string(pvID)).c_str(), asynParamInt32, endAddr_indices[pvID]);
-    createParam(("BUFFER_SIZE" + std::to_string(pvID)).c_str(), asynParamInt32, buffer_size_indices[pvID]);
-    
+    createParam(("END_ADDR" + std::to_string(pvID)).c_str(), asynParamInt32, endAddr_indices[pvID]);
+    createParam(("BEGIN_ADDR" + std::to_string(pvID)).c_str(), asynParamInt32, beginAddr_indices[pvID]);
     createParam(("START_LOC" + std::to_string(pvID)).c_str(), asynParamFloat64, start_loc_indices[pvID]);
     createParam(("END_LOC" + std::to_string(pvID)).c_str(), asynParamFloat64, end_loc_indices[pvID]);
-
     createParam(("BEAM_LOSS_LOC" + std::to_string(pvID)).c_str(), asynParamFloat64, beam_loss_loc_indices[pvID]);
+
+
+    (*(start_addresses[pvID])) = IScalVal::create(p->findByName(("/mmio/AmcCarrierCore/AmcCarrierBsa/BsaWaveformEngine[" + std::to_string(bayNumber) + "]/WaveformEngineBuffers/StartAddr[" + std::to_string(pvID) + "]").c_str()));
+    (*(end_addresses[pvID])) = IScalVal::create(p->findByName(("/mmio/AmcCarrierCore/AmcCarrierBsa/BsaWaveformEngine[" + std::to_string(bayNumber) + "]/WaveformEngineBuffers/EndAddr[" + std::to_string(pvID) + "]").c_str()));
+
+    //retrieve hardware addresses and store them into corresponding records
+    uint32_t u32_begin, u32_end;
+    (*(start_addresses[pvID]))->getVal(&u32_begin, 1);
+    //std::cout << "u32_begin is " << u32_begin << std::endl;
+    setIntegerParam(*(beginAddr_indices[pvID]), u32_begin);
+    (*(end_addresses[pvID]))->getVal(&u32_end, 1);
+    //std::cout << "u32_end is " << u32_end << std::endl;
+    setIntegerParam(*(endAddr_indices[pvID]), u32_end);
+    callParamCallbacks();
+
   }
+
   //TODO: Do this is a more systematic way, individually connecting isn't really aesthetic 
   createParam(WAVEFORM_RUN_STRING, asynParamUInt32Digital, &waveform_run_index);
+  createParam(NO_OF_WORDS_STRING, asynParamInt32, &number_of_words_index);
+  createParam(WAVEFORM_BUFFER_SIZE_STRING, asynParamInt32, &waveform_buffer_size_index);
+  createParam(WAVEFORM_INITIALIZE_STRING, asynParamUInt32Digital, &waveform_init_index);
+  //MAX_BUFFER_SIZE = bufferSize; //One of the parameters we pass to our port driver is the bufferSize, which is essentially how many words of information we want at a time
 
-  // createParam(WAVEFORM0_STARTING_LOCATION_STRING, asynParamInt32, &waveform0_start_loc_index);
-  // createParam(WAVEFORM0_ENDING_LOCATION_STRING, asynParamInt32, &waveform0_end_loc_index);
-  // createParam(WAVEFORM1_STARTING_LOCATION_STRING, asynParamInt32, &waveform1_start_loc_index);
-  // createParam(WAVEFORM1_ENDING_LOCATION_STRING, asynParamInt32, &waveform1_end_loc_index);
-  // createParam(WAVEFORM2_STARTING_LOCATION_STRING, asynParamInt32, &waveform2_start_loc_index);
-  // createParam(WAVEFORM2_ENDING_LOCATION_STRING, asynParamInt32, &waveform2_end_loc_index);
-  
-  MAX_BUFFER_SIZE = bufferSize; //One of the parameters we pass to our port driver is the bufferSize, which is essentially how many words of information we want at a time
-
-  //We register some useful hardware interfaces our port driver could want to know
-
-  Path p;
-  p = cpswGetRoot();
-  _TriggerHwAutoRearm = IScalVal::create(p->findByName("/mmio/AppTop/DaqMuxV2[0]/TriggerHwAutoRearm"));
-  _DataBufferSize = IScalVal::create(p->findByName("/mmio/AppTop/DaqMuxV2[0]/DataBufferSize"));
-  _TrigCount = IScalVal_RO::create(p->findByName("/mmio/AppTop/DaqMuxV2[0]/TrigCount"));
-  _Web0Init = ICommand::create(p->findByName("/mmio/AmcCarrierCore/AmcCarrierBsa/BsaWaveformEngine[0]/WaveformEngineBuffers/Initialize"));
-  //TODO: Do these for the other hardware addresses that are useful
-  _Web0StartAddr = IScalVal::create(p->findByName("/mmio/AmcCarrierCore/AmcCarrierBsa/BsaWaveformEngine[0]/WaveformEngineBuffers/StartAddr[0]"));
-  _Web0EndAddr = IScalVal::create(p->findByName("/mmio/AmcCarrierCore/AmcCarrierBsa/BsaWaveformEngine[0]/WaveformEngineBuffers/EndAddr[0]"));
-  _Web1StartAddr = IScalVal::create(p->findByName("/mmio/AmcCarrierCore/AmcCarrierBsa/BsaWaveformEngine[0]/WaveformEngineBuffers/StartAddr[1]"));
-  _Web1EndAddr = IScalVal::create(p->findByName("/mmio/AmcCarrierCore/AmcCarrierBsa/BsaWaveformEngine[0]/WaveformEngineBuffers/EndAddr[1]"));
-  _Web2StartAddr = IScalVal::create(p->findByName("/mmio/AmcCarrierCore/AmcCarrierBsa/BsaWaveformEngine[0]/WaveformEngineBuffers/StartAddr[2]"));
-  _Web2EndAddr = IScalVal::create(p->findByName("/mmio/AmcCarrierCore/AmcCarrierBsa/BsaWaveformEngine[0]/WaveformEngineBuffers/EndAddr[2]"));
 }
 
 //TODO Make this actually useful, tell us what streams are currently connected and meant to be streaming, if they're doing that successfully or not
@@ -100,13 +103,15 @@ void WaveformReader::statusCheck(void)
  * Computes and displays the results of a fast fourier transform on a section of the waveform data 
  * that contains the peak value
  * Uses the fftw library (https://www.fftw.org/)
+ * 
+ * @param waveformIndex index of waveform: 0, 1, and 2, for WAVEFORM:0, WAVEFORM:1, and WAVEFORM:2 respectively
  */
-void WaveformReader::fft(void)
+void WaveformReader::fft(int waveformIndex)
 {
-  int maxIndex = findMaxIndex();
+  int maxIndex = findMaxIndex(waveformIndex);
   int low, high;
   const int LOWER_LIMIT = 5;
-  findRange(low, high, maxIndex, LOWER_LIMIT);
+  findRange(low, high, maxIndex, LOWER_LIMIT, waveformIndex);
   // Define the length of the complex arrays
   int n = high - low + 1;
   // Dynamically allocate the array because the size can change
@@ -120,7 +125,7 @@ void WaveformReader::fft(void)
   // Fill the first array with data from waveformData
   for (int i = 0; i < n; i++)
   {
-      x[i][REAL] = waveformData[i + low];
+      x[i][REAL] = waveform_map[(waveform_param_indices[waveformIndex])][i + low];
       x[i][IMAG] = 0;
   }
   //Plant the FFT and execute it
@@ -195,20 +200,23 @@ void WaveformReader::fft(void)
 /**
  * Finds the index of the peak or global maximum value in waveformData
  * 
+ * @param waveformIndex index of waveform: 0, 1, and 2, for WAVEFORM:0, WAVEFORM:1, and WAVEFORM:2 respectively
  * @return the index of the peak value
  */
-int WaveformReader::findMaxIndex(void)
+int WaveformReader::findMaxIndex(int waveformIndex)
 {
   int maxIndex = 0;
+  std::string pvIdentifier = waveform_param_indices[waveformIndex];
 
   for (int i = 1; i < MAX_BUFFER_SIZE; i++)
   {
-    if (waveformData[i] > waveformData[maxIndex]) 
+    if (waveform_map[pvIdentifier][i] > waveform_map[pvIdentifier][maxIndex]) 
     {
       maxIndex = i;
     }
   }
   return maxIndex;
+
 }
 
 /**
@@ -219,15 +227,16 @@ int WaveformReader::findMaxIndex(void)
  * @param maxIndex the index of the peak value of the waveform data
  * @param LOWER_LIMIT the smallest value of a local maxima that the window will include
  */
-void WaveformReader::findRange(int& low, int& high, int maxIndex, const int LOWER_LIMIT)
+void WaveformReader::findRange(int& low, int& high, int maxIndex, const int LOWER_LIMIT, int waveformIndex)
 {
   low = maxIndex - 1;
   high = maxIndex + 1;
-  while ((waveformData[low - 1] <= waveformData[low] || waveformData[low] > LOWER_LIMIT) && (low > 0))
+  std::string pvIdentifier = waveform_param_indices[waveformIndex];
+  while ((waveform_map[pvIdentifier][low - 1] <= waveform_map[pvIdentifier][low] || waveform_map[pvIdentifier][low] > LOWER_LIMIT) && (low > 0))
   {
     low--;
   } 
-  while ((waveformData[high + 1] <= waveformData[high] || waveformData[high] > LOWER_LIMIT) && (high < (STREAM_MAX_SIZE - 1)))
+  while ((waveform_map[pvIdentifier][high + 1] <= waveform_map[pvIdentifier][high] || waveform_map[pvIdentifier][high] > LOWER_LIMIT) && (high < (STREAM_MAX_SIZE - 1)))
   {
     high++;
   } 
@@ -236,22 +245,24 @@ void WaveformReader::findRange(int& low, int& high, int maxIndex, const int LOWE
 
 /**
  * Finds the indices of all the local maxima of the waveform data and stores them in local_maxima_indices
+ * @param waveformIndex index of waveform: 0, 1, and 2, for WAVEFORM:0, WAVEFORM:1, and WAVEFORM:2 respectively
  */
-void WaveformReader::findLocalMaxima(void)
+void WaveformReader::findLocalMaxima(int waveformIndex)
 {
-  if (waveformData[0] > waveformData[1]) {local_maxima_indices.push_back(0);}
+  std::string pvIdentifier = waveform_param_indices[waveformIndex];
+  if (waveform_map[pvIdentifier][0] > waveform_map[pvIdentifier][1]) {local_maxima_indices.push_back(0);}
 
   for(int i = 1; i < (MAX_BUFFER_SIZE - 1); i++) 
   { 
          
-    if ((waveformData[i - 1] < waveformData[i]) && (waveformData[i] > waveformData[i + 1])) 
+    if ((waveform_map[pvIdentifier][i - 1] < waveform_map[pvIdentifier][i]) && (waveform_map[pvIdentifier][i] > waveform_map[pvIdentifier][i + 1])) 
     {
       local_maxima_indices.push_back(i);
     } 
 
   }
 
-  if (waveformData[MAX_BUFFER_SIZE - 1] > waveformData[MAX_BUFFER_SIZE - 2]) 
+  if (waveform_map[pvIdentifier][MAX_BUFFER_SIZE - 1] > waveform_map[pvIdentifier][MAX_BUFFER_SIZE - 2]) 
   {
     local_maxima_indices.push_back(MAX_BUFFER_SIZE - 1);
   }
@@ -261,26 +272,27 @@ void WaveformReader::findLocalMaxima(void)
 /**
  * Computes and displays the location of the maximum beam loss detected by the monitor
  * 
- * @param startingPosition the starting position of the beam loss monitor (BLM)
- * @param endingPosition the ending position of the beam loss monitor (BLM)
- * @param bufferSize size of the buffer read by the sensors in the BLM
+ * @param waveformIndex index of waveform: 0, 1, and 2, for WAVEFORM:0, WAVEFORM:1, and WAVEFORM:2 respectively
  */
-// ADD INPUT VALIDATION
 void WaveformReader::maxBeamLoss(int waveformIndex)
 {
   double startingPosition, endingPosition;
   getDoubleParam(*(start_loc_indices[waveformIndex]), &startingPosition);
   getDoubleParam(*(end_loc_indices[waveformIndex]), &endingPosition);
-  std::cout << "Starting position and ending position: " << startingPosition << " " << endingPosition << std::endl;
+
   double lengthOfMonitor = endingPosition - startingPosition;
-  std::cout << "Length is: " << lengthOfMonitor << std::endl;
-  double locationOfMaxIndex;
-  // UPDATE FUNCTION TO USE WAVEFORM_INDEX FOR WAVEFORM SPECIFIC COMPUTATION
-  int maxIndex = findMaxIndex();
-  // CHANGE 1 MIL TO BUFFER SIZE OF CORRESPONDING WAVEFORM
-  locationOfMaxIndex = (maxIndex * (lengthOfMonitor / 1000000)) + startingPosition;
+
+  int maxIndex = findMaxIndex(waveformIndex);
+
+  int bufferSize;
+  getIntegerParam(waveform_buffer_size_index, &bufferSize);
+  // size of array is (no of 32-bit words * 4) because 8-bit words are cast to 16-bit words 
+  bufferSize *= 4;
+
+  double locationOfMaxIndex = (maxIndex * (lengthOfMonitor / bufferSize)) + startingPosition;
   std::cout << "The location of maximum beam loss is " << locationOfMaxIndex << std::endl;
   setDoubleParam(*(beam_loss_loc_indices[waveformIndex]), locationOfMaxIndex);
+  callParamCallbacks();
 }
 
 
@@ -376,7 +388,7 @@ void WaveformReader::streamTask(const char *streamInit = "/Stream0", std::string
         int64_t lastGot = 0;
 
         std::cout << "Outside the while loop now " << std::endl;
-
+        std::cout << "MAX_BUFFER_SIZE is: " << MAX_BUFFER_SIZE << std::endl;
         while(1)
         {
             //std::cout << "Inside the while loop " << std::endl;
@@ -411,9 +423,7 @@ void WaveformReader::streamTask(const char *streamInit = "/Stream0", std::string
                    * Take data gathered from the stream and move it into an array we can play with
                    * TODO take options so we know how we'd want to modify the array
                    */
-
-                  waveformData[i] = (int16_t)buf[i];
-                  //std::cout << "Value of buffer at index " << i << ": " << buf[i] << std::endl;
+                  waveform_map[pvID][i] = (int16_t)buf[i];
                 }
 
                 //std::cout << "Size of buf: " << (sizeof(buf)/sizeof(buf[0])) << std::endl;
@@ -435,8 +445,8 @@ void WaveformReader::streamTask(const char *streamInit = "/Stream0", std::string
             //std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
             //auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - begin);
             //printf("Getting from the buffer required %llu milliseconds\n", duration);
-            
-        }
+
+      }
         
     //}
     /**
@@ -464,9 +474,9 @@ asynStatus WaveformReader::writeUInt32Digital(asynUser *pasynUser, epicsUInt32 v
     //Essentially just using my ScalVal interface to tell the address to turn on or off, should be that simple according to Jeremy
     _TriggerHwAutoRearm->setVal((int64_t)value);
   }
-  if((pasynUser->reason == waveform0_init_index) || (pasynUser->reason == waveform1_init_index) || (pasynUser->reason == waveform2_init_index))
+  if(pasynUser->reason == waveform_init_index)
   {
-    _Web0Init->execute();
+    _WebInit->execute();
   }
 
   return status;
@@ -486,22 +496,63 @@ asynStatus WaveformReader::writeInt32(asynUser *pasynUser, epicsInt32 value)
   // pasynUser matches with
   for (int i = 0; i < NUMBER_OF_WAVEFORM_RECORDS; i++)
   {
-    if(pasynUser->reason == (*endAddr_indices[i]))
+    if(pasynUser->reason == (*(endAddr_indices[i])))
     {
-      (end_addresses[i])->setVal((int64_t)value);
-      _Web0Init->execute();
+      (*(end_addresses[i]))->setVal((int64_t)value);
+      _WebInit->execute();
     }
 
-    if(pasynUser->reason == (*beginAddr_indices[i]))
+    if(pasynUser->reason == (*(beginAddr_indices[i])))
     {
-      (start_addresses[i])->setVal((int64_t)value);
+      (*(start_addresses[i]))->setVal((int64_t)value);
     }
+  }
 
-    if(pasynUser->reason == (*buffer_size_indices[i]))
+  if(pasynUser->reason == waveform_buffer_size_index)
+  {
+    _DataBufferSize->setVal((int64_t)value);
+    MAX_BUFFER_SIZE = 4 * value ;
+  }
+
+  // if the NO:OF:WORDS record updates
+  if(pasynUser->reason == number_of_words_index)
+  {
+    int number_of_words;
+    getIntegerParam(number_of_words_index, &number_of_words);
+
+    // round the number of words entered by the user to the closest multiple of eight
+    number_of_words = ((number_of_words + 4) / 8) * 8;
+    std::cout << "Using value: NUMBER OF WORDS = " << number_of_words << std::endl;
+
+    // Calculate the DaqMux Data Buffer Size (N/2)
+    // Set the DaqMuxV2/DataBufferSize to N/2 (as this is expressed in 32-bit words)
+    int daqMuxBufferSize = (number_of_words / 2);
+    setIntegerParam(waveform_buffer_size_index, daqMuxBufferSize);
+    callParamCallbacks();
+
+    _DataBufferSize->setVal(daqMuxBufferSize);
+    MAX_BUFFER_SIZE = 2 * number_of_words;
+    
+
+    int beginAddress, endAddress;
+
+    for (int i = 0; i < NUMBER_OF_WAVEFORM_RECORDS; i++)
     {
-      _DataBufferSize->setVal((int64_t)value);
-      MAX_BUFFER_SIZE = 4 * value ;
+      // get the beginning address of the stream
+      getIntegerParam(*(beginAddr_indices[i]), &beginAddress);
+        
+      endAddress = beginAddress + (number_of_words * 2);
+
+      setIntegerParam(*(endAddr_indices[i]), endAddress);
+      callParamCallbacks();
+
+      // set the value of the hardware
+      (*(end_addresses[i]))->setVal(endAddress);
+      
     }
+    // initialize once for the entire bay
+    _WebInit->execute();
+    
   }
 
   return status;
@@ -511,22 +562,24 @@ asynStatus WaveformReader::writeInt32(asynUser *pasynUser, epicsInt32 value)
 //IOCSH commands
 //-------------------------------------------------------------------------------------
 
-int waveformReaderConfigure(const char* portName, int bufferSize, int waveformPVs)
+int waveformReaderConfigure(const char* portName, int bayNumber, int bufferSize, int waveformPVs)
 {
-  WaveformReader *channelManager = new WaveformReader(portName, bufferSize, waveformPVs);
+  WaveformReader *channelManager = new WaveformReader(portName, bayNumber, bufferSize, waveformPVs);
   bayManager = channelManager;
 
   return asynSuccess;
 }
 static const iocshArg initArg0 = {"portName", iocshArgString};
-static const iocshArg initArg1 = {"bufferSize", iocshArgInt};
-static const iocshArg initArg2 = {"waveformPVs", iocshArgInt};
-static const iocshArg * const initArgs[] = {&initArg0, &initArg1, &initArg2};
-static const iocshFuncDef initFuncDef = {"waveformReaderConfigure", 3, initArgs};
+static const iocshArg initArg1 = {"bayNumber", iocshArgInt};
+static const iocshArg initArg2 = {"bufferSize", iocshArgInt};
+static const iocshArg initArg3 = {"waveformPVs", iocshArgInt};
+static const iocshArg * const initArgs[] = {&initArg0, &initArg1, &initArg2, &initArg3};
+static const iocshFuncDef initFuncDef = {"waveformReaderConfigure", 4, initArgs};
 static void initCallFunc(const iocshArgBuf *args)
 {
-  waveformReaderConfigure(args[0].sval, args[1].ival, args[2].ival);
+  waveformReaderConfigure(args[0].sval, args[1].ival, args[2].ival, args[3].ival);
 }
+
 void waveformReaderRegister(void)
 {
   iocshRegister(&initFuncDef, initCallFunc);
@@ -590,21 +643,25 @@ void printHelpRegister(void)
   iocshRegister(&helpFuncDef, helpCallFunc);
 }
 
-static void fourierTransform(void)
+static void fourierTransform(int waveformIndex)
 {
-  bayManager->fft();
+  bayManager->fft(waveformIndex);
   return;
 }
-static const iocshFuncDef fftFuncDef = {"fourierTransform", 0};
+
+static const iocshArg fftArg0 = {"waveformIndex", iocshArgInt};
+static const iocshArg * const fftArgs[] = {&fftArg0};
+static const iocshFuncDef fftFuncDef = {"fourierTransform", 1, fftArgs};
 static void fftCallFunc(const iocshArgBuf *args)
 {
-  fourierTransform();
+  fourierTransform(args[0].ival);
 }
 
 void fourierTransformRegister(void)
 {
   iocshRegister(&fftFuncDef, fftCallFunc);
 }
+
 
 static void maxBeamLossLocation(int waveformIndex) {
   bayManager->maxBeamLoss(waveformIndex);
@@ -632,4 +689,3 @@ extern "C" {
   epicsExportRegistrar(fourierTransformRegister);
   epicsExportRegistrar(maxBeamLossLocationRegister);
 }
-
