@@ -80,7 +80,6 @@ class WaveformReader : public asynPortDriver
 
     void streamTask(const char *stream, std::string pvID);// takes a path to the stream and then a pv identifier for connection
     void streamInit(std::string pv_identifier, std::string stream_path);
-    //void reset(int val);
     virtual asynStatus writeUInt32Digital(asynUser *pasynUser, epicsUInt32 value, epicsUInt32 mask);
     virtual asynStatus writeInt32(asynUser *pasynUser, epicsInt32 value);
 

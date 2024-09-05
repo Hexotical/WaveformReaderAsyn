@@ -1,3 +1,5 @@
+//WaveformReader.cpp
+
 #include "WaveformReader.h"
 
 void streamTask(void * driverPointer); 
@@ -127,11 +129,6 @@ void streamTask(void* streamArgs)
   WaveformReader *pPvt = (WaveformReader *) passedArgs->pPvt;
   pPvt->streamTask(passedArgs->stream_path_to_find.c_str(), passedArgs->pv_identifier);
 }
-
-/*void WaveformReader::reset(int val)
-{
-  state = val;
-}*/
 
 /**
  * Connect to a stream, write the data retrieved from the stream to the specified EPICS record
