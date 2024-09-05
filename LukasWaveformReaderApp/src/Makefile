@@ -70,6 +70,8 @@ LukasWaveformReader_SRCS += fft.cpp
 LukasWaveformReader_SRCS += findLocalMaxima.cpp
 LukasWaveformReader_SRCS += findRange.cpp
 LukasWaveformReader_SRCS += findMaxIndex.cpp
+LukasWaveformReader_SRCS += writeUInt32Digital.cpp
+LukasWaveformReader_SRCS += writeInt32.cpp
 
 # Build the main IOC entry point on workstation OSs.
 LukasWaveformReader_SRCS_DEFAULT += LukasWaveformReaderMain.cpp
