@@ -1,3 +1,5 @@
+//WaveformReader.cpp
+
 #include "WaveformReader.h"
 
 void streamTask(void * driverPointer); 
@@ -339,11 +341,6 @@ void streamTask(void* streamArgs)
   pPvt->streamTask(passedArgs->stream_path_to_find.c_str(), passedArgs->pv_identifier);
 }
 
-/*void WaveformReader::reset(int val)
-{
-  state = val;
-}*/
-
 /**
  * Connect to a stream, write the data retrieved from the stream to the specified EPICS record
  *
@@ -523,10 +520,9 @@ asynStatus WaveformReader::writeInt32(asynUser *pasynUser, epicsInt32 value)
     int number_of_words;
     getIntegerParam(number_of_words_index, &number_of_words);
 
-    /// TO BE TESTED
+    // round the number of words entered by the user to the closest multiple of eight
     number_of_words = ((number_of_words + 4) / 8) * 8;
     std::cout << "Using value: NUMBER OF WORDS = " << number_of_words << std::endl;
-    ///
 
     // Calculate the DaqMux Data Buffer Size (N/2)
     // Set the DaqMuxV2/DataBufferSize to N/2 (as this is expressed in 32-bit words)
