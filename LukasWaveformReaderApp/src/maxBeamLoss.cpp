@@ -25,3 +25,28 @@ void WaveformReader::maxBeamLoss(int waveformIndex)
   setDoubleParam(*(beam_loss_loc_indices[waveformIndex]), locationOfMaxIndex);
   callParamCallbacks();
 }
+
+//-------------------------------------------------------------------------------------
+//IOCSH command
+//-------------------------------------------------------------------------------------
+
+static void maxBeamLossLocation(int waveformIndex) {
+  bayManager->maxBeamLoss(waveformIndex);
+  return;
+}
+
+static const iocshArg lossArg0 = {"waveformIndex", iocshArgInt};
+static const iocshArg * const lossArgs[] = {&lossArg0};
+static const iocshFuncDef lossFuncDef = {"maxBeamLossLocation", 1, lossArgs};
+static void lossCallFunc(const iocshArgBuf *args)
+{
+  maxBeamLossLocation(args[0].ival);
+}
+void maxBeamLossLocationRegister(void)
+{
+  iocshRegister(&lossFuncDef, lossCallFunc);
+}
+
+extern "C" {
+  epicsExportRegistrar(maxBeamLossLocationRegister);
+}

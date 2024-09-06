@@ -14,3 +14,27 @@ void WaveformReader::statusCheck(void)
   }
   std::cout << "------------------------------------------------------------------------" << std::endl;
 }
+
+//-------------------------------------------------------------------------------------
+//IOCSH command
+//-------------------------------------------------------------------------------------
+
+static void waveformStatus(void)
+{
+  bayManager->statusCheck();
+  return;
+}
+static const iocshFuncDef statusFuncDef = {"waveformStatus", 0};
+static void statusCallFunc(const iocshArgBuf *args)
+{
+  waveformStatus();
+}
+
+void waveformStatusRegister(void)
+{
+  iocshRegister(&statusFuncDef, statusCallFunc);
+}
+
+extern "C" {
+  epicsExportRegistrar(waveformStatusRegister);
+}

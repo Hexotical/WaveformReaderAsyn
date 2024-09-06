@@ -97,3 +97,30 @@ void WaveformReader::fft(int waveformIndex)
     }  
   }
 }
+
+//-------------------------------------------------------------------------------------
+//IOCSH command
+//-------------------------------------------------------------------------------------
+
+static void fourierTransform(int waveformIndex)
+{
+  bayManager->fft(waveformIndex);
+  return;
+}
+
+static const iocshArg fftArg0 = {"waveformIndex", iocshArgInt};
+static const iocshArg * const fftArgs[] = {&fftArg0};
+static const iocshFuncDef fftFuncDef = {"fourierTransform", 1, fftArgs};
+static void fftCallFunc(const iocshArgBuf *args)
+{
+  fourierTransform(args[0].ival);
+}
+
+void fourierTransformRegister(void)
+{
+  iocshRegister(&fftFuncDef, fftCallFunc);
+}
+
+extern "C" {
+  epicsExportRegistrar(fourierTransformRegister);
+}
