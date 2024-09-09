@@ -31,6 +31,7 @@ void WaveformReader::maxBeamLoss(int waveformIndex)
 //-------------------------------------------------------------------------------------
 
 static void maxBeamLossLocation(int waveformIndex) {
+  WaveformReader* bayManager = WaveformReader::getPortDriver();
   bayManager->maxBeamLoss(waveformIndex);
   return;
 }

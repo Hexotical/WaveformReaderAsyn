@@ -6,7 +6,8 @@ void streamTask(void * driverPointer);
 void streamInit(void *driverPointer); 
 void streamInit(int channel);
 
-WaveformReader *bayManager; //Global pointer so iocshell commands can interact with our initialized port driver
+WaveformReader* WaveformReader::port_driver = nullptr;
+
 
 /**
  * Initialize an ASYN Port Driver
@@ -254,11 +255,11 @@ void WaveformReader::streamTask(const char *streamInit = "/Stream0", std::string
 
 int waveformReaderConfigure(const char* portName, int bayNumber, int bufferSize, int waveformPVs)
 {
-  WaveformReader *channelManager = new WaveformReader(portName, bayNumber, bufferSize, waveformPVs);
-  bayManager = channelManager;
-
+  WaveformReader* temp = new WaveformReader(portName, bayNumber, bufferSize, waveformPVs);
+  WaveformReader::setPortDriver(temp);
   return asynSuccess;
 }
+
 static const iocshArg initArg0 = {"portName", iocshArgString};
 static const iocshArg initArg1 = {"bayNumber", iocshArgInt};
 static const iocshArg initArg2 = {"bufferSize", iocshArgInt};
@@ -277,6 +278,7 @@ void waveformReaderRegister(void)
 
 
 static void waveformStreamInit(std::string pvID, std::string file_path) {
+  WaveformReader* bayManager = WaveformReader::getPortDriver();
   bayManager->streamInit(pvID, file_path);
   return;
 }

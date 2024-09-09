@@ -70,12 +70,16 @@ class WaveformReader : public asynPortDriver
   public:
     WaveformReader(const char *portName, int bayNumber, int bufferSize, int waveformPVs);
 
+    static WaveformReader* getPortDriver();
+    static void setPortDriver(WaveformReader* newPortDriver);
+
     void statusCheck(void);
     void fft(int waveformIndex);
     int findMaxIndex(int waveformIndex);
     void findRange(int& low, int& high, int maxIndex, const int LOWER_LIMIT, int waveformIndex);
     void findLocalMaxima(int waveformIndex);
     void maxBeamLoss(int waveformIndex);
+    WaveformReader& operator=(const WaveformReader& rhs);
 
 
     void streamTask(const char *stream, std::string pvID);// takes a path to the stream and then a pv identifier for connection
@@ -146,6 +150,7 @@ class WaveformReader : public asynPortDriver
   private:
     //epicsInt16* waveformData0; //Not really necessary atm I want to use this when I do data modification things
     std::map<std::string, epicsInt16*> waveform_map; // maps the pv Identifier to the corresponding array
+    static WaveformReader* port_driver;
 };
 
 /**

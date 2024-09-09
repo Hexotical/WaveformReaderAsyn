@@ -21,6 +21,7 @@ void WaveformReader::statusCheck(void)
 
 static void waveformStatus(void)
 {
+  WaveformReader* bayManager = WaveformReader::getPortDriver();
   bayManager->statusCheck();
   return;
 }

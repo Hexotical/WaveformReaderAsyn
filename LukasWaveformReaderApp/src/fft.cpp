@@ -104,6 +104,7 @@ void WaveformReader::fft(int waveformIndex)
 
 static void fourierTransform(int waveformIndex)
 {
+  WaveformReader* bayManager = WaveformReader::getPortDriver();
   bayManager->fft(waveformIndex);
   return;
 }
