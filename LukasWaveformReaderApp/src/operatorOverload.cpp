@@ -4,13 +4,13 @@
 /**
  * Overloaded assignment operator for WaveformReader object
  * 
- * Sets the port_driver pointer variable to rhs only if it is a nullptr
+ * Sets the port_driver pointer variable to rhs only if it is a nullptr, doesn't create a copy
  */
-WaveformReader& WaveformReader::operator=(const WaveformReader& rhs)
+WaveformReader& WaveformReader::operator=(WaveformReader& rhs)
 {
   if ((*this).port_driver == nullptr) 
   {
-    (*this).port_driver = new WaveformReader(rhs);
+    (*this).port_driver = &rhs;
   }
   return (*this);
 }

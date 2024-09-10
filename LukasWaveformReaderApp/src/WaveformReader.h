@@ -79,7 +79,7 @@ class WaveformReader : public asynPortDriver
     void findRange(int& low, int& high, int maxIndex, const int LOWER_LIMIT, int waveformIndex);
     void findLocalMaxima(int waveformIndex);
     void maxBeamLoss(int waveformIndex);
-    WaveformReader& operator=(const WaveformReader& rhs);
+    WaveformReader& operator=(WaveformReader& rhs);
 
 
     void streamTask(const char *stream, std::string pvID);// takes a path to the stream and then a pv identifier for connection
