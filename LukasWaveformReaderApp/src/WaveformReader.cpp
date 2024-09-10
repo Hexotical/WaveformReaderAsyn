@@ -6,6 +6,8 @@ void streamTask(void * driverPointer);
 void streamInit(void *driverPointer); 
 void streamInit(int channel);
 
+
+// initialize static variable
 WaveformReader* WaveformReader::port_driver = nullptr;
 
 

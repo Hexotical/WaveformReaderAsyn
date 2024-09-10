@@ -150,7 +150,7 @@ class WaveformReader : public asynPortDriver
   private:
     //epicsInt16* waveformData0; //Not really necessary atm I want to use this when I do data modification things
     std::map<std::string, epicsInt16*> waveform_map; // maps the pv Identifier to the corresponding array
-    static WaveformReader* port_driver;
+    static WaveformReader* port_driver; // stores the port driver that will be used to execute the iocsh commands
 };
 
 /**
