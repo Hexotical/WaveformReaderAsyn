@@ -63,7 +63,20 @@ LukasWaveformReader_DBD += waveform.dbd
 
 # LukasWaveformReader_registerRecordDeviceDriver.cpp derives from LukasWaveformReader.dbd
 LukasWaveformReader_SRCS += LukasWaveformReader_registerRecordDeviceDriver.cpp
+
+LukasWaveformReader_SRCS += fft.cpp
+LukasWaveformReader_SRCS += findLocalMaxima.cpp
+LukasWaveformReader_SRCS += findMaxIndex.cpp
+LukasWaveformReader_SRCS += findRange.cpp
+LukasWaveformReader_SRCS += gettersAndSetters.cpp
+LukasWaveformReader_SRCS += maxBeamLoss.cpp
+LukasWaveformReader_SRCS += operatorOverload.cpp
+LukasWaveformReader_SRCS += printHelp.cpp
+LukasWaveformReader_SRCS += statusCheck.cpp
 LukasWaveformReader_SRCS += WaveformReader.cpp
+LukasWaveformReader_SRCS += writeInt32.cpp
+LukasWaveformReader_SRCS += writeUInt32Digital.cpp
+
 
 # Build the main IOC entry point on workstation OSs.
 LukasWaveformReader_SRCS_DEFAULT += LukasWaveformReaderMain.cpp

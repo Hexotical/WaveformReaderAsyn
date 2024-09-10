@@ -42,9 +42,6 @@ record(ao, "$(USER):NO:OF:WORDS")
   field(PINI, "YES")
   field(VAL, "$(WAVEFORM_SIZE)")
   field(OUT,  "@asyn($(PORT), $(ADDR), $(TIMEOUT))NO_OF_WORDS")
-  field(FLNK, "$(USER):UPDATE:NELM:SUBARRAY:0 PP")
-  #field(OMSL, "closed_loop")
-  #field(DOL, "$(USER):NO:OF:WORDS:rbv CPP")
   info(autosaveFields, "VAL")
 }
 

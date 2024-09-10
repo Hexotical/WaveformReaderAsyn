@@ -6,7 +6,10 @@ void streamTask(void * driverPointer);
 void streamInit(void *driverPointer); 
 void streamInit(int channel);
 
-WaveformReader *bayManager; //Global pointer so iocshell commands can interact with our initialized port driver
+
+// initialize static variable
+WaveformReader* WaveformReader::port_driver = nullptr;
+
 
 /**
  * Initialize an ASYN Port Driver
@@ -82,217 +85,6 @@ WaveformReader::WaveformReader(const char *portName, int bayNumber, int bufferSi
   createParam(WAVEFORM_INITIALIZE_STRING, asynParamUInt32Digital, &waveform_init_index);
   //MAX_BUFFER_SIZE = bufferSize; //One of the parameters we pass to our port driver is the bufferSize, which is essentially how many words of information we want at a time
 
-}
-
-//TODO Make this actually useful, tell us what streams are currently connected and meant to be streaming, if they're doing that successfully or not
-/**
- * Check the health of any stream our port driver is connected to
- */
-void WaveformReader::statusCheck(void)
-{
-  std::cout << "Status of connected waveforms: " << std::endl;
-  for(std::string paramIndex:waveform_param_indices)
-  {
-    std::cout << "------------------------------------------------------------------------" << std::endl;
-    std::cout << "| " << std::setw(15) << paramIndex << " | " << std::setw(50) << streaming_status_map[paramIndex] << " |" << std::endl;
-  }
-  std::cout << "------------------------------------------------------------------------" << std::endl;
-}
-
-/**
- * Computes and displays the results of a fast fourier transform on a section of the waveform data 
- * that contains the peak value
- * Uses the fftw library (https://www.fftw.org/)
- * 
- * @param waveformIndex index of waveform: 0, 1, and 2, for WAVEFORM:0, WAVEFORM:1, and WAVEFORM:2 respectively
- */
-void WaveformReader::fft(int waveformIndex)
-{
-  int maxIndex = findMaxIndex(waveformIndex);
-  int low, high;
-  const int LOWER_LIMIT = 5;
-  findRange(low, high, maxIndex, LOWER_LIMIT, waveformIndex);
-  // Define the length of the complex arrays
-  int n = high - low + 1;
-  // Dynamically allocate the array because the size can change
-  // Input array
-  fftw_complex* x = new fftw_complex[n]; // This is equivalent to: double x[n][2];
-  // Output array
-  fftw_complex* y = new fftw_complex[n];
-  // Samping frequency
-  double sampling_frequency = 3.57142857143e8; 
-
-  // Fill the first array with data from waveformData
-  for (int i = 0; i < n; i++)
-  {
-      x[i][REAL] = waveform_map[(waveform_param_indices[waveformIndex])][i + low];
-      x[i][IMAG] = 0;
-  }
-  //Plant the FFT and execute it
-  fftw_plan plan = fftw_plan_dft_1d(n, x, y, FFTW_FORWARD, FFTW_ESTIMATE);
-  fftw_execute(plan);
-  //Do some cleaning
-  fftw_destroy_plan(plan);
-  fftw_cleanup();
-
-  // Display the results
-  int choice;
-  std::string extra;
-  std::cout << "Would you like to: \n1) Display the results of the fast fourier transform\n2) Output the results to a csv and display a graph of the same" << std::endl;
-  while (true)
-  {
-    std::cout << "Enter choice (1 or 2): ";
-    std::cin >> choice;
-
-    if (std::cin.fail())
-    {
-      std::cout << "Invalid choice, try again." << std::endl;
-      std::cin.clear();
-      std::cin.ignore();
-      std::getline(std::cin, extra); 
-    }
-
-    else if (choice == 1)
-    {
-      std::cout << "FFT = " << std::endl;
-      double frequency;
-      std::cout << "---------------------------------------------------------------------------------------------------------------" << std::endl;
-      std::cout << "|    No.    | FREQUENCY (in Hz) |             FFT RESULT             |     MAGNITUDE     | PHASE (in radians) |" << std::endl;
-      std::cout << "---------------------------------------------------------------------------------------------------------------" << std::endl;
-      for (int i = 0; i < n; i++)
-      {
-          frequency = (i * sampling_frequency) / n;
-          if (y[i][IMAG] < 0)
-          {
-            std::cout << "|" << std::setw(11) << i + 1 << "|" << std::setw(19) << std::right << frequency << "|" << std::setw(16) << y[i][REAL] << " - " << std::setw(16) << std::left << abs(y[i][IMAG]) << "i";
-          }
-          else
-          {
-            std::cout << "|" << std::setw(11) << i + 1 << "|" << std::setw(19) << std::right << frequency << "|" << std::setw(16) << y[i][REAL] << " + " << std::setw(16) << std::left << y[i][IMAG] << "i" ;
-          }
-          std::cout << "|" << std::setw(19) << std::right << sqrt(pow(y[i][REAL], 2) + pow((y[i][IMAG]), 2));
-          std::cout << "|" << std::setw(20) << std::right << atan2(y[i][IMAG], y[i][REAL]) << "|" << std::endl;
-          std::cout << "---------------------------------------------------------------------------------------------------------------" << std::endl;
-      }
-      break;
-    }
-
-    else if (choice == 2)
-    {
-      double frequency;
-      for (int i = 0; i < n; i++)
-      {
-        frequency = (i * sampling_frequency) / n;
-        std::cout << frequency << "," << sqrt(pow(y[i][REAL], 2) + pow((y[i][IMAG]), 2)) << "\n";
-      }
-      std::cout << "\nRun the plot.py script to generate the graph.\n" << std::endl;
-      break;
-    }
-    else 
-    {
-      std::cout << "Invalid choice, try again." << std::endl;
-      std::cin.clear();
-      std::cin.ignore();
-    }  
-  }
-}
-
-/**
- * Finds the index of the peak or global maximum value in waveformData
- * 
- * @param waveformIndex index of waveform: 0, 1, and 2, for WAVEFORM:0, WAVEFORM:1, and WAVEFORM:2 respectively
- * @return the index of the peak value
- */
-int WaveformReader::findMaxIndex(int waveformIndex)
-{
-  int maxIndex = 0;
-  std::string pvIdentifier = waveform_param_indices[waveformIndex];
-
-  for (int i = 1; i < MAX_BUFFER_SIZE; i++)
-  {
-    if (waveform_map[pvIdentifier][i] > waveform_map[pvIdentifier][maxIndex]) 
-    {
-      maxIndex = i;
-    }
-  }
-  return maxIndex;
-
-}
-
-/**
- * Determines the relevant window from the entire waveform data on which data analysis is to be perfomed
- * 
- * @param low the starting point of the window
- * @param high the ending point of the window
- * @param maxIndex the index of the peak value of the waveform data
- * @param LOWER_LIMIT the smallest value of a local maxima that the window will include
- */
-void WaveformReader::findRange(int& low, int& high, int maxIndex, const int LOWER_LIMIT, int waveformIndex)
-{
-  low = maxIndex - 1;
-  high = maxIndex + 1;
-  std::string pvIdentifier = waveform_param_indices[waveformIndex];
-  while ((waveform_map[pvIdentifier][low - 1] <= waveform_map[pvIdentifier][low] || waveform_map[pvIdentifier][low] > LOWER_LIMIT) && (low > 0))
-  {
-    low--;
-  } 
-  while ((waveform_map[pvIdentifier][high + 1] <= waveform_map[pvIdentifier][high] || waveform_map[pvIdentifier][high] > LOWER_LIMIT) && (high < (STREAM_MAX_SIZE - 1)))
-  {
-    high++;
-  } 
-
-}
-
-/**
- * Finds the indices of all the local maxima of the waveform data and stores them in local_maxima_indices
- * @param waveformIndex index of waveform: 0, 1, and 2, for WAVEFORM:0, WAVEFORM:1, and WAVEFORM:2 respectively
- */
-void WaveformReader::findLocalMaxima(int waveformIndex)
-{
-  std::string pvIdentifier = waveform_param_indices[waveformIndex];
-  if (waveform_map[pvIdentifier][0] > waveform_map[pvIdentifier][1]) {local_maxima_indices.push_back(0);}
-
-  for(int i = 1; i < (MAX_BUFFER_SIZE - 1); i++) 
-  { 
-         
-    if ((waveform_map[pvIdentifier][i - 1] < waveform_map[pvIdentifier][i]) && (waveform_map[pvIdentifier][i] > waveform_map[pvIdentifier][i + 1])) 
-    {
-      local_maxima_indices.push_back(i);
-    } 
-
-  }
-
-  if (waveform_map[pvIdentifier][MAX_BUFFER_SIZE - 1] > waveform_map[pvIdentifier][MAX_BUFFER_SIZE - 2]) 
-  {
-    local_maxima_indices.push_back(MAX_BUFFER_SIZE - 1);
-  }
- 
-}
-
-/**
- * Computes and displays the location of the maximum beam loss detected by the monitor
- * 
- * @param waveformIndex index of waveform: 0, 1, and 2, for WAVEFORM:0, WAVEFORM:1, and WAVEFORM:2 respectively
- */
-void WaveformReader::maxBeamLoss(int waveformIndex)
-{
-  double startingPosition, endingPosition;
-  getDoubleParam(*(start_loc_indices[waveformIndex]), &startingPosition);
-  getDoubleParam(*(end_loc_indices[waveformIndex]), &endingPosition);
-
-  double lengthOfMonitor = endingPosition - startingPosition;
-
-  int maxIndex = findMaxIndex(waveformIndex);
-
-  int bufferSize;
-  getIntegerParam(waveform_buffer_size_index, &bufferSize);
-  // size of array is (no of 32-bit words * 4) because 8-bit words are cast to 16-bit words 
-  bufferSize *= 4;
-
-  double locationOfMaxIndex = (maxIndex * (lengthOfMonitor / bufferSize)) + startingPosition;
-  std::cout << "The location of maximum beam loss is " << locationOfMaxIndex << std::endl;
-  setDoubleParam(*(beam_loss_loc_indices[waveformIndex]), locationOfMaxIndex);
-  callParamCallbacks();
 }
 
 
@@ -458,105 +250,6 @@ void WaveformReader::streamTask(const char *streamInit = "/Stream0", std::string
     return;
 }
 
-/**
- * Override of asyn port driver default writeUInt32Digital,lets us set hardware by writing to epics records
- */
-asynStatus WaveformReader::writeUInt32Digital(asynUser *pasynUser, epicsUInt32 value, epicsUInt32 mask)
-{
-  asynStatus status = setUIntDigitalParam(pasynUser->reason, value, mask);
-  callParamCallbacks();
-  printf("Driver calls write UInt32\n");
-  if(pasynUser->reason == waveform_run_index)
-  {
-    printf("Value of %d\n", value);
-    //Do a thing with the firmware here?????? I mean if I'm writing I just need to set the value don't I
-    //This is for turning on and off so this should in theory be the TriggerHardwareAutoRearm
-    //Essentially just using my ScalVal interface to tell the address to turn on or off, should be that simple according to Jeremy
-    _TriggerHwAutoRearm->setVal((int64_t)value);
-  }
-  if(pasynUser->reason == waveform_init_index)
-  {
-    _WebInit->execute();
-  }
-
-  return status;
-}
-
-
-/**
- * Override of asyn port driver default writeInt32,lets us set hardware by writing to epics records
- */
-asynStatus WaveformReader::writeInt32(asynUser *pasynUser, epicsInt32 value)
-{
-  printf("Driver calls write Int32\n");
-  asynStatus status = setIntegerParam(pasynUser->reason, value);
-  callParamCallbacks();
-
-  // execute instructions at hardware addresses based on which parameter of which waveform record
-  // pasynUser matches with
-  for (int i = 0; i < NUMBER_OF_WAVEFORM_RECORDS; i++)
-  {
-    if(pasynUser->reason == (*(endAddr_indices[i])))
-    {
-      (*(end_addresses[i]))->setVal((int64_t)value);
-      _WebInit->execute();
-    }
-
-    if(pasynUser->reason == (*(beginAddr_indices[i])))
-    {
-      (*(start_addresses[i]))->setVal((int64_t)value);
-    }
-  }
-
-  if(pasynUser->reason == waveform_buffer_size_index)
-  {
-    _DataBufferSize->setVal((int64_t)value);
-    MAX_BUFFER_SIZE = 4 * value ;
-  }
-
-  // if the NO:OF:WORDS record updates
-  if(pasynUser->reason == number_of_words_index)
-  {
-    int number_of_words;
-    getIntegerParam(number_of_words_index, &number_of_words);
-
-    // round the number of words entered by the user to the closest multiple of eight
-    number_of_words = ((number_of_words + 4) / 8) * 8;
-    std::cout << "Using value: NUMBER OF WORDS = " << number_of_words << std::endl;
-
-    // Calculate the DaqMux Data Buffer Size (N/2)
-    // Set the DaqMuxV2/DataBufferSize to N/2 (as this is expressed in 32-bit words)
-    int daqMuxBufferSize = (number_of_words / 2);
-    setIntegerParam(waveform_buffer_size_index, daqMuxBufferSize);
-    callParamCallbacks();
-
-    _DataBufferSize->setVal(daqMuxBufferSize);
-    MAX_BUFFER_SIZE = 2 * number_of_words;
-    
-
-    int beginAddress, endAddress;
-
-    for (int i = 0; i < NUMBER_OF_WAVEFORM_RECORDS; i++)
-    {
-      // get the beginning address of the stream
-      getIntegerParam(*(beginAddr_indices[i]), &beginAddress);
-        
-      endAddress = beginAddress + (number_of_words * 2);
-
-      setIntegerParam(*(endAddr_indices[i]), endAddress);
-      callParamCallbacks();
-
-      // set the value of the hardware
-      (*(end_addresses[i]))->setVal(endAddress);
-      
-    }
-    // initialize once for the entire bay
-    _WebInit->execute();
-    
-  }
-
-  return status;
-}
 
 //-------------------------------------------------------------------------------------
 //IOCSH commands
@@ -564,11 +257,11 @@ asynStatus WaveformReader::writeInt32(asynUser *pasynUser, epicsInt32 value)
 
 int waveformReaderConfigure(const char* portName, int bayNumber, int bufferSize, int waveformPVs)
 {
-  WaveformReader *channelManager = new WaveformReader(portName, bayNumber, bufferSize, waveformPVs);
-  bayManager = channelManager;
-
+  WaveformReader* temp = new WaveformReader(portName, bayNumber, bufferSize, waveformPVs);
+  WaveformReader::setPortDriver(temp);
   return asynSuccess;
 }
+
 static const iocshArg initArg0 = {"portName", iocshArgString};
 static const iocshArg initArg1 = {"bayNumber", iocshArgInt};
 static const iocshArg initArg2 = {"bufferSize", iocshArgInt};
@@ -585,7 +278,9 @@ void waveformReaderRegister(void)
   iocshRegister(&initFuncDef, initCallFunc);
 }
 
+
 static void waveformStreamInit(std::string pvID, std::string file_path) {
+  WaveformReader* bayManager = WaveformReader::getPortDriver();
   bayManager->streamInit(pvID, file_path);
   return;
 }
@@ -603,89 +298,8 @@ void waveformStreamRegister(void)
   iocshRegister(&optFuncDef, optCallFunc);
 }
 
-static void waveformStatus(void)
-{
-  bayManager->statusCheck();
-  return;
-}
-static const iocshFuncDef statusFuncDef = {"waveformStatus", 0};
-static void statusCallFunc(const iocshArgBuf *args)
-{
-  waveformStatus();
-}
-
-void waveformStatusRegister(void)
-{
-  iocshRegister(&statusFuncDef, statusCallFunc);
-}
-
-static void printHelp() 
-{
-  std::cout << "Supported waveform commands:" << std::endl
-    << "waveformStreamInit" << std::endl
-    << "Usage: waveformStreamInit [channel] [waveform pv ID]" << std::endl
-    << "[channel] is the path to the stream that cpsw can find, eg '/Stream0' " << std::endl
-    << "[waveform pv ID] refers to the asyn string identifier for a given record, generally located in OUT or INP field" <<std::endl
-    << std::endl
-    << "waveformStatus" << std::endl
-    << "Usage: waveformStatus" << std::endl
-    << "Health check of initialized streams." << std::endl;
-}
-
-static const iocshFuncDef helpFuncDef = {"printHelp", 0};
-static void helpCallFunc(const iocshArgBuf *args)
-{
-  printHelp();
-}
-
-void printHelpRegister(void)
-{
-  iocshRegister(&helpFuncDef, helpCallFunc);
-}
-
-static void fourierTransform(int waveformIndex)
-{
-  bayManager->fft(waveformIndex);
-  return;
-}
-
-static const iocshArg fftArg0 = {"waveformIndex", iocshArgInt};
-static const iocshArg * const fftArgs[] = {&fftArg0};
-static const iocshFuncDef fftFuncDef = {"fourierTransform", 1, fftArgs};
-static void fftCallFunc(const iocshArgBuf *args)
-{
-  fourierTransform(args[0].ival);
-}
-
-void fourierTransformRegister(void)
-{
-  iocshRegister(&fftFuncDef, fftCallFunc);
-}
-
-
-static void maxBeamLossLocation(int waveformIndex) {
-  bayManager->maxBeamLoss(waveformIndex);
-  return;
-}
-
-static const iocshArg lossArg0 = {"waveformIndex", iocshArgInt};
-static const iocshArg * const lossArgs[] = {&lossArg0};
-static const iocshFuncDef lossFuncDef = {"maxBeamLossLocation", 1, lossArgs};
-static void lossCallFunc(const iocshArgBuf *args)
-{
-  maxBeamLossLocation(args[0].ival);
-}
-void maxBeamLossLocationRegister(void)
-{
-  iocshRegister(&lossFuncDef, lossCallFunc);
-}
-
 
 extern "C" {
-  epicsExportRegistrar(printHelpRegister);
-  epicsExportRegistrar(waveformStatusRegister);
   epicsExportRegistrar(waveformReaderRegister);
   epicsExportRegistrar(waveformStreamRegister);
-  epicsExportRegistrar(fourierTransformRegister);
-  epicsExportRegistrar(maxBeamLossLocationRegister);
 }
