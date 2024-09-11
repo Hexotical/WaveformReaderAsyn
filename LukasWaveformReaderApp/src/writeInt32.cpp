@@ -37,9 +37,7 @@ asynStatus WaveformReader::writeInt32(asynUser *pasynUser, epicsInt32 value)
     int number_of_words;
     getIntegerParam(number_of_words_index, &number_of_words);
 
-    /// TO BE TESTED
     number_of_words = ((number_of_words + 4) / 8) * 8;
-    ///
 
     // Calculate the DaqMux Data Buffer Size (N/2)
     // Set the DaqMuxV2/DataBufferSize to N/2 (as this is expressed in 32-bit words)

@@ -72,6 +72,7 @@ LukasWaveformReader_SRCS += gettersAndSetters.cpp
 LukasWaveformReader_SRCS += maxBeamLoss.cpp
 LukasWaveformReader_SRCS += operatorOverload.cpp
 LukasWaveformReader_SRCS += printHelp.cpp
+LukasWaveformReader_SRCS += resetRegisters.cpp
 LukasWaveformReader_SRCS += statusCheck.cpp
 LukasWaveformReader_SRCS += WaveformReader.cpp
 LukasWaveformReader_SRCS += writeInt32.cpp
