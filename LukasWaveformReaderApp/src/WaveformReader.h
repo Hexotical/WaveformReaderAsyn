@@ -13,6 +13,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <vector>
+#include <array>
 #include <map>
 #include <mutex>
 #include <unistd.h>
@@ -65,9 +66,11 @@
 #define IMAG 1
 #define NUMBER_OF_WAVEFORM_RECORDS 3
 
+
 class WaveformReader : public asynPortDriver
 {
   public:
+
     WaveformReader(const char *portName, int bayNumber, int bufferSize, int waveformPVs);
 
     static WaveformReader* getPortDriver();
@@ -92,7 +95,9 @@ class WaveformReader : public asynPortDriver
 
     std::vector<std::string> waveform_param_indices; // order matters
     std::map<std::string, int> pv_param_map; //Identifier of pv to parameter in param list
-    std::map<std::string, std::string> streaming_status_map; // map the string identifiers to their streaming status
+    std::map<std::string, int> index_map; // map string identifiers to indices 0, 1, and 2, which are used to get waveform-specific data from arrays
+    std::array<std::string, NUMBER_OF_WAVEFORM_RECORDS> streaming_status; // store the streaming status of the waveforms 
+    std::array<std::chrono::milliseconds, NUMBER_OF_WAVEFORM_RECORDS> duration_data; // store the time it takes to read the stream from the hardware
     std::vector<int> local_maxima_indices; // store indices of local maxima of the waveform data
 
     //Variables to store indices of records which the asynPortDriver can talk to.

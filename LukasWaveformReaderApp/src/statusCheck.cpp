@@ -7,12 +7,20 @@
 void WaveformReader::statusCheck(void)
 {
   std::cout << "Status of connected waveforms: " << std::endl;
-  for(std::string paramIndex:waveform_param_indices)
+  std::cout << "-------------------------------------------------------------------------------------" << std::endl;
+  std::cout << "| " << std::setw(15) << "PV Identifier" << " | " << std::setw(50) 
+              << "Streaming Status" << " | " << std::setw(10) 
+              << "Time (ms)" << " |" << std::endl;
+
+  for(int i = 0; i < NUMBER_OF_WAVEFORM_RECORDS; i++)
   {
-    std::cout << "------------------------------------------------------------------------" << std::endl;
-    std::cout << "| " << std::setw(15) << paramIndex << " | " << std::setw(50) << streaming_status_map[paramIndex] << " |" << std::endl;
+    std::string paramIndex = waveform_param_indices[i];
+    std::cout << "-------------------------------------------------------------------------------------" << std::endl;
+    std::cout << "| " << std::setw(15) << paramIndex << " | " << std::setw(50) 
+              << streaming_status[i] << " | " << std::setw(10) 
+              << (duration_data[i]).count() << " |" << std::endl;
   }
-  std::cout << "------------------------------------------------------------------------" << std::endl;
+  std::cout << "-------------------------------------------------------------------------------------" << std::endl;
 }
 
 //-------------------------------------------------------------------------------------

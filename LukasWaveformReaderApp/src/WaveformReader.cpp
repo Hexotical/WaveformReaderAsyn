@@ -51,7 +51,9 @@ WaveformReader::WaveformReader(const char *portName, int bayNumber, int bufferSi
     std::cout << "The identifier is: " << pvIdentifier << " and the waveform_param_index is : " << waveform_param_index << std::endl;
     pv_param_map.insert(std::pair<std::string, int>(pvIdentifier, waveform_param_index));
     waveform_param_indices.push_back(pvIdentifier);
-    streaming_status_map[pvIdentifier] = "Not initialized yet";
+    index_map[pvIdentifier] = pvID;
+    streaming_status[pvID] = "Not initialized yet";
+    duration_data[pvID] = std::chrono::milliseconds(0);
 
     waveform_map[pvIdentifier] = (epicsInt16 *)calloc(STREAM_MAX_SIZE, sizeof(epicsInt16)); 
 
@@ -149,6 +151,8 @@ void WaveformReader::streamTask(const char *streamInit = "/Stream0", std::string
         int waveform_param_index = pv_param_map[pvID];
         std::cout << pvID << " corresponding index: " << waveform_param_index << std::endl;
 
+        int index = index_map[pvID];
+
         Path p;
         p = cpswGetRoot();
 
@@ -166,11 +170,11 @@ void WaveformReader::streamTask(const char *streamInit = "/Stream0", std::string
         {
           std::cout << "Value of stm: " << stm << std::endl;
           printf("Did that thing with a stream?\n");
-          streaming_status_map[pvID] = "Successfully initialized"; 
+          streaming_status[index] = "Successfully initialized"; 
         }
         else {
           printf("No stream access");
-          streaming_status_map[pvID] = "Initialization failed";
+          streaming_status[index] = "Initialization failed";
           return;
         }
 
@@ -185,9 +189,12 @@ void WaveformReader::streamTask(const char *streamInit = "/Stream0", std::string
         {
             //std::cout << "Inside the while loop " << std::endl;
             //std::cout << streamInit << std::endl;
-            //std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
+            std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
             got = stm->read( buf, MAX_BUFFER_SIZE, CTimeout(-1));
-            //std::chrono::steady_clock::time_point end1 = std::chrono::steady_clock::now();
+            std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
+            auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - begin);
+            //printf("Getting from the buffer required %llu milliseconds\n", duration);
+            duration_data[index] = duration;
             //std::cout << "No. of values read in from the stream (value of got): " << got << std::endl;
             //std::cout << "Value of lastGot: " << lastGot << std::endl;
 
@@ -199,11 +206,11 @@ void WaveformReader::streamTask(const char *streamInit = "/Stream0", std::string
                 nWords16 = nBytes / 2; //Amount of words in our buffer to read
                 if (nWords16 > 0)
                 {
-                  streaming_status_map[pvID] = "Successfully initialized and streaming data";
+                  streaming_status[index] = "Successfully initialized and streaming data";
                 }
                 else
                 {
-                  streaming_status_map[pvID] = "Successfully initialized but no data in buffer";
+                  streaming_status[index] = "Successfully initialized but no data in buffer";
                 }
                 //std::cout << "No. of words read in from the stream (after removing header and footer) : " << nWords16 << std::endl; 
 
@@ -231,13 +238,12 @@ void WaveformReader::streamTask(const char *streamInit = "/Stream0", std::string
             else
             {
                  asynPrint(pasynUserSelf, ASYN_TRACE_ERROR, "WaveformReader: Received frame too small\n");
-                 streaming_status_map[pvID] = "Successfully initialized but received frame too small";
+                 streaming_status[index] = "Successfully initialized but received frame too small";
                  //std::cout << "Inside the else right now" << std::endl;
             }
             //std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
-            //auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - begin);
-            //printf("Getting from the buffer required %llu milliseconds\n", duration);
-
+            // auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - begin);
+            // printf("Getting from the buffer required %llu milliseconds\n", duration);
       }
         
     //}
