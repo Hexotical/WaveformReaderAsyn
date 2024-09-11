@@ -96,8 +96,8 @@ class WaveformReader : public asynPortDriver
     std::vector<std::string> waveform_param_indices; // order matters
     std::map<std::string, int> pv_param_map; //Identifier of pv to parameter in param list
     std::map<std::string, int> index_map; // map string identifiers to indices 0, 1, and 2, which are used to get waveform-specific data from arrays
-    std::array<std::string, 3> streaming_status; // store the streaming status of the waveforms 
-    std::array<std::chrono::milliseconds, 3> duration_data; // store the time it takes to read the stream from the hardware
+    std::array<std::string, NUMBER_OF_WAVEFORM_RECORDS> streaming_status; // store the streaming status of the waveforms 
+    std::array<std::chrono::milliseconds, NUMBER_OF_WAVEFORM_RECORDS> duration_data; // store the time it takes to read the stream from the hardware
     std::vector<int> local_maxima_indices; // store indices of local maxima of the waveform data
 
     //Variables to store indices of records which the asynPortDriver can talk to.
