@@ -2,17 +2,6 @@
 This is an ASYN port driver that takes a stream of data and pushes it to an EPICS waveform record
 
 ## Usage
-### waveformStreamInit
-Usage: **waveformStreamInit** "<Path to stream>" "<Waveform record asyn Identifier>"
-
-E.g. **waveformStreamInit** "/Stream0" "WAVEFORM:0"
-
-This command initializes a thread that connects to your specified stream, reads from the stream and proceeds to write the data it receives to the waveform record you specify.
-
-### waveformStatus
-Usage: **waveformStatus**
-
-Currently doesn't really do anything will eventually tell you what streams have been initialized, what they're connected to and will provide a health check
 
 ### fourierTransform
 Usage: **fourierTransform**
@@ -28,3 +17,20 @@ Usage: **maxBeamLossLocation** <Waveform Index>
 E.g. **maxBeamLossLocation** 0
 
 This command computes and displays the physical location where the maximum beam loss is detected by a beam loss monitor based on values of the starting and ending positions of the monitor as well as the size of the buffer or data that the beam loss monitor reads. The user must enter the index of the waveform, i.e., 0, 1, or 2, for WAVEFORM:0, WAVEFORM:1, or WAVEFORM:2, respectively.
+
+### resetRegisters
+Usage: **resetRegisters**
+
+This command sets relevant registers to values required by the port driver to function properly.
+
+### waveformStatus
+Usage: **waveformStatus**
+
+This command provides a health-check for the various streams our port driver is connected to by displaying relevant data about the waveforms, such as their streaming status, their date and time of initialization, the time each stream takes to read data from hardware, etc.
+
+### waveformStreamInit
+Usage: **waveformStreamInit** "<Path to stream>" "<Waveform record asyn Identifier>"
+
+E.g. **waveformStreamInit** "/Stream0" "WAVEFORM:0"
+
+This command initializes a thread that connects to your specified stream, reads from the stream and proceeds to write the data it receives to the waveform record you specify.
