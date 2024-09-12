@@ -18,6 +18,7 @@
 #include <mutex>
 #include <unistd.h>
 #include <chrono>
+#include <ctime>
 #include <iomanip>
 #include <math.h>
 #include <fftw3.h>
@@ -98,6 +99,9 @@ class WaveformReader : public asynPortDriver
     std::map<std::string, int> index_map; // map string identifiers to indices 0, 1, and 2, which are used to get waveform-specific data from arrays
     std::array<std::string, NUMBER_OF_WAVEFORM_RECORDS> streaming_status; // store the streaming status of the waveforms 
     std::array<std::chrono::milliseconds, NUMBER_OF_WAVEFORM_RECORDS> duration_data; // store the time it takes to read the stream from the hardware
+    std::array<std::chrono::system_clock::time_point, NUMBER_OF_WAVEFORM_RECORDS> initialization_times; // store initialization time of each stream
+    std::array<std::chrono::system_clock::time_point, NUMBER_OF_WAVEFORM_RECORDS> retrieval_times; // store time of latest retrieval of each stream
+    std::array<bool, NUMBER_OF_WAVEFORM_RECORDS> initialization_status; // store initialization status (true/false) of each stream 
     std::vector<int> local_maxima_indices; // store indices of local maxima of the waveform data
 
     //Variables to store indices of records which the asynPortDriver can talk to.
@@ -139,10 +143,10 @@ class WaveformReader : public asynPortDriver
     ScalVal _TriggerHwAutoRearm;
     ScalVal _DataBufferSize;
     ScalVal_RO _TrigCount;
-    ScalVal _Web0StartAddr;
-    ScalVal _Web0EndAddr;
     Command _WebInit;
 
+    ScalVal _Web0StartAddr;
+    ScalVal _Web0EndAddr;
     ScalVal _Web1StartAddr;
     ScalVal _Web1EndAddr;
     ScalVal _Web2StartAddr;

@@ -15,6 +15,7 @@ WaveformReader* WaveformReader::port_driver = nullptr;
  * Initialize an ASYN Port Driver
  *
  * @param portName port for the asyn driver to use
+ * @param bayNumber bay for the asyn driver to use (0 or 1)
  * @param bufferSize amount of words to read from the buffer
  * @param waveformPVs amount of EPICS waveform records our port driver should be of
  */
@@ -51,8 +52,10 @@ WaveformReader::WaveformReader(const char *portName, int bayNumber, int bufferSi
     std::cout << "The identifier is: " << pvIdentifier << " and the waveform_param_index is : " << waveform_param_index << std::endl;
     pv_param_map.insert(std::pair<std::string, int>(pvIdentifier, waveform_param_index));
     waveform_param_indices.push_back(pvIdentifier);
+    // initialize values 
     index_map[pvIdentifier] = pvID;
     streaming_status[pvID] = "Not initialized yet";
+    initialization_status[pvID] = false;
     duration_data[pvID] = std::chrono::milliseconds(0);
 
     waveform_map[pvIdentifier] = (epicsInt16 *)calloc(STREAM_MAX_SIZE, sizeof(epicsInt16)); 
@@ -71,10 +74,8 @@ WaveformReader::WaveformReader(const char *portName, int bayNumber, int bufferSi
     //retrieve hardware addresses and store them into corresponding records
     uint32_t u32_begin, u32_end;
     (*(start_addresses[pvID]))->getVal(&u32_begin, 1);
-    //std::cout << "u32_begin is " << u32_begin << std::endl;
     setIntegerParam(*(beginAddr_indices[pvID]), u32_begin);
     (*(end_addresses[pvID]))->getVal(&u32_end, 1);
-    //std::cout << "u32_end is " << u32_end << std::endl;
     setIntegerParam(*(endAddr_indices[pvID]), u32_end);
     callParamCallbacks();
 
@@ -122,6 +123,7 @@ void WaveformReader::streamInit(std::string pv_identifier, std::string stream_pa
   sleep(3); //Sleep so the launched thread can find the structure before it's overwritten by garbage TODO: Do this in a better way 
 }
 
+
 /**
  * Tell a port driver to use it's streamTask method with the passed args generally called by streamInit
  *
@@ -134,6 +136,7 @@ void streamTask(void* streamArgs)
   WaveformReader *pPvt = (WaveformReader *) passedArgs->pPvt;
   pPvt->streamTask(passedArgs->stream_path_to_find.c_str(), passedArgs->pv_identifier);
 }
+
 
 /**
  * Connect to a stream, write the data retrieved from the stream to the specified EPICS record
@@ -171,6 +174,10 @@ void WaveformReader::streamTask(const char *streamInit = "/Stream0", std::string
           std::cout << "Value of stm: " << stm << std::endl;
           printf("Did that thing with a stream?\n");
           streaming_status[index] = "Successfully initialized"; 
+          initialization_status[index] = true;
+          std::chrono::system_clock::time_point real_time = std::chrono::system_clock::now();
+          initialization_times[index] = real_time;
+
         }
         else {
           printf("No stream access");
@@ -187,16 +194,16 @@ void WaveformReader::streamTask(const char *streamInit = "/Stream0", std::string
         std::cout << "MAX_BUFFER_SIZE is: " << MAX_BUFFER_SIZE << std::endl;
         while(1)
         {
-            //std::cout << "Inside the while loop " << std::endl;
-            //std::cout << streamInit << std::endl;
             std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
             got = stm->read( buf, MAX_BUFFER_SIZE, CTimeout(-1));
             std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
             auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - begin);
             //printf("Getting from the buffer required %llu milliseconds\n", duration);
             duration_data[index] = duration;
-            //std::cout << "No. of values read in from the stream (value of got): " << got << std::endl;
-            //std::cout << "Value of lastGot: " << lastGot << std::endl;
+
+            std::chrono::system_clock::time_point real_time = std::chrono::system_clock::now();
+            retrieval_times[index] = real_time;
+            
 
             if(got > 8)
             {
@@ -211,8 +218,7 @@ void WaveformReader::streamTask(const char *streamInit = "/Stream0", std::string
                 else
                 {
                   streaming_status[index] = "Successfully initialized but no data in buffer";
-                }
-                //std::cout << "No. of words read in from the stream (after removing header and footer) : " << nWords16 << std::endl; 
+                } 
 
                 doCallbacksInt16Array((epicsInt16*)(buf + 8), nWords16, waveform_param_index, 0);
 
@@ -225,8 +231,6 @@ void WaveformReader::streamTask(const char *streamInit = "/Stream0", std::string
                   waveform_map[pvID][i] = (int16_t)buf[i];
                 }
 
-                //std::cout << "Size of buf: " << (sizeof(buf)/sizeof(buf[0])) << std::endl;
-                //std::cout << "Size of waveformData: " << (sizeof(waveformData)/sizeof(waveformData[0])) << std::endl;
                 if (lastGot > got)
                 {
                   //Clear the the buffer of previously read data
@@ -239,11 +243,7 @@ void WaveformReader::streamTask(const char *streamInit = "/Stream0", std::string
             {
                  asynPrint(pasynUserSelf, ASYN_TRACE_ERROR, "WaveformReader: Received frame too small\n");
                  streaming_status[index] = "Successfully initialized but received frame too small";
-                 //std::cout << "Inside the else right now" << std::endl;
             }
-            //std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
-            // auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - begin);
-            // printf("Getting from the buffer required %llu milliseconds\n", duration);
       }
         
     //}
