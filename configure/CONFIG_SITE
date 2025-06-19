@@ -70,19 +70,21 @@ PKG_ARCH=$(T_A)
 endif
 
 #fftw
-FFTW_LIB					= /afs/slac/u/gu/tanisha/Downloads/fftw-3.3.10/lib
-FFTW_INCLUDE				= /afs/slac/u/gu/tanisha/Downloads/fftw-3.3.10/include
+# FFTW_LIB					= /afs/slac/u/gu/tanisha/Downloads/fftw-3.3.10/lib
+# FFTW_INCLUDE				= /afs/slac/u/gu/tanisha/Downloads/fftw-3.3.10/include
+FFTW_LIB = $(HOME)/WaveformReaderAsyn/fftw_files/lib
+FFTW_INCLUDE = $(HOME)/WaveformReaderAsyn/fftw_files/include
 
 # CPSW
 CPSW_FRAMEWORK_PACKAGE_NAME = cpsw/framework
-CPSW_FRAMEWORK_VERSION      = R4.4.1
+CPSW_FRAMEWORK_VERSION      = R4.5.2# R4.4.1
 CPSW_FRAMEWORK_TOP          = $(PACKAGE_SITE_TOP)/$(CPSW_FRAMEWORK_PACKAGE_NAME)/$(CPSW_FRAMEWORK_VERSION)
 CPSW_FRAMEWORK_LIB          = $(CPSW_FRAMEWORK_TOP)/$(PKG_ARCH)/lib
 CPSW_FRAMEWORK_INCLUDE      = $(CPSW_FRAMEWORK_TOP)/$(PKG_ARCH)/include
 
 # CPSW Device Library
 DEVICELIB_PACKAGE_NAME     = cpsw/deviceLibrary
-DEVICELIB_VERSION          = R1.2.0
+DEVICELIB_VERSION          = R1.2.2# R1.2.0
 DEVICELIB_TOP              = $(PACKAGE_SITE_TOP)/$(DEVICELIB_PACKAGE_NAME)/$(DEVICELIB_VERSION)
 DEVICELIB_LIB              = $(DEVICELIB_TOP)/$(PKG_ARCH)/lib
 DEVICELIB_INCLUDE          = $(DEVICELIB_TOP)/$(PKG_ARCH)/include
@@ -103,7 +105,7 @@ BOOST_INCLUDE      = $(BOOST_TOP)/$(PKG_ARCH)/include
 
 # YamlReader
 YAMLREADER_PACKAGE_NAME     = cpsw/yamlReader
-YAMLREADER_VERSION          = R1.2.0
+YAMLREADER_VERSION          = R1.2.2#R1.2.0
 YAMLREADER_TOP              = $(PACKAGE_SITE_TOP)/$(YAMLREADER_PACKAGE_NAME)/$(YAMLREADER_VERSION)
 YAMLREADER_LIB              = $(YAMLREADER_TOP)/$(PKG_ARCH)/lib
 YAMLREADER_INCLUDE          = $(YAMLREADER_TOP)/$(PKG_ARCH)/include
@@ -114,3 +116,9 @@ YAMLREADER_INCLUDE          = $(YAMLREADER_TOP)/$(PKG_ARCH)/include
 #COMMONATCA_LIB=$(COMMONATCA_TOP)/$(PKG_ARCH)/lib
 #COMMONATCA_INCLUDE=$(COMMONATCA_TOP)/$(PKG_ARCH)/include
 
+# TIRPC
+TIRPC_PACKAGE_NAME    = tirpc
+TIRPC_VERSION         = 1.3.5
+TIRPC_TOP             = $(PACKAGE_SITE_TOP)/$(TIRPC_PACKAGE_NAME)/$(TIRPC_VERSION)
+TIRPC_LIB             = $(TIRPC_TOP)/$(PKG_ARCH)/lib
+TIRPC_INCLUDE         = $(TIRPC_TOP)/$(PKG_ARCH)/include
