@@ -36,4 +36,4 @@ E.g. **waveformStreamInit** "/Stream0" "WAVEFORM:0"
 This command initializes a thread that connects to your specified stream, reads from the stream and proceeds to write the data it receives to the waveform record you specify.
 
 ## Importing
-To import this WaveformReader as a module, follow the steps listed [here] (https://confluence.slac.stanford.edu/spaces/ACHIP/pages/610483645/Steps+to+add+WaveformReaderAsyn+to+another+app).
+To import this WaveformReader as a module, follow the steps listed [here](https://confluence.slac.stanford.edu/spaces/ACHIP/pages/610483645/Steps+to+add+WaveformReaderAsyn+to+another+app).
