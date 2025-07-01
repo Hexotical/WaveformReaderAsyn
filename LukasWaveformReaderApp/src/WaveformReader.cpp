@@ -40,7 +40,8 @@ WaveformReader::WaveformReader(const char *portName, int bayNumber, int bufferSi
   _DataBufferSize = IScalVal::create(p->findByName(("/mmio/AppTop/DaqMuxV2[" + std::to_string(bayNumber) + "]/DataBufferSize").c_str()));
   _TrigCount = IScalVal_RO::create(p->findByName(("/mmio/AppTop/DaqMuxV2[" + std::to_string(bayNumber) + "]/TrigCount").c_str()));
   _WebInit = ICommand::create(p->findByName(("/mmio/AmcCarrierCore/AmcCarrierBsa/BsaWaveformEngine[" + std::to_string(bayNumber) + "]/WaveformEngineBuffers/Initialize").c_str()));
- 
+  _ClkFrequency = IScalVal::create(p->findByName(("/mmio/AppTop/AppCore/AmcGenericAdcDacCore[" + std::to_string(bayNumber) + "]/AmcGenericAdcDacCtrl/AmcClkFreq").c_str()));
+
   //Connecting to the records our port driver will eventually need to interact with
   for(int pvID = 0; pvID < waveformPVs; pvID++)
   {
@@ -87,7 +88,11 @@ WaveformReader::WaveformReader(const char *portName, int bayNumber, int bufferSi
   createParam(WAVEFORM_BUFFER_SIZE_STRING, asynParamInt32, &waveform_buffer_size_index);
   createParam(WAVEFORM_INITIALIZE_STRING, asynParamUInt32Digital, &waveform_init_index);
   //MAX_BUFFER_SIZE = bufferSize; //One of the parameters we pass to our port driver is the bufferSize, which is essentially how many words of information we want at a time
-
+  createParam(CLK_FREQUENCY_STRING, asynParamInt32, &clk_frequency_index); // assuming clk frequency is a 32-bit integer
+    uint32_t clk_frequency;
+    _ClkFrequency->getVal(&clk_frequency, 1);
+    setIntegerParam(clk_frequency_index, clk_frequency);
+    callParamCallbacks();
 }
 
 

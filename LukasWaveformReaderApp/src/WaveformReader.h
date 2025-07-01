@@ -34,6 +34,7 @@
 #define NO_OF_WORDS_STRING "NO_OF_WORDS"
 #define WAVEFORM_BUFFER_SIZE_STRING "BUFFER_SIZE"
 #define WAVEFORM_INITIALIZE_STRING "INITIALIZE"
+#define CLK_FREQUENCY_STRING "CLK_FREQUENCY"
 
 
 #define WAVEFORM0_PV_STRING "WAVEFORM:0"
@@ -43,6 +44,7 @@
 #define WAVEFORM0_ENDING_LOCATION_STRING "END_LOC0"
 #define WAVEFORM0_BEAM_LOSS_LOCATION_STRING "BEAM_LOSS_LOC0"
 #define WAVEFORM0_BUFFER_SIZE_INIT_STRING "WAVEFORM_BUFFER_SIZE_INIT0"
+#define WAVEFORM0_THRESHOLD_STRING "THRESHOLD:0"
 
 
 #define WAVEFORM1_PV_STRING "WAVEFORM:1"
@@ -52,6 +54,7 @@
 #define WAVEFORM1_ENDING_LOCATION_STRING "END_LOC1"
 #define WAVEFORM1_BEAM_LOSS_LOCATION_STRING "BEAM_LOSS_LOC1"
 #define WAVEFORM1_BUFFER_SIZE_INIT_STRING "WAVEFORM_BUFFER_SIZE_INIT1"
+#define WAVEFORM1_THRESHOLD_STRING "THRESHOLD:1"
 
 
 #define WAVEFORM2_PV_STRING "WAVEFORM:2"
@@ -61,7 +64,7 @@
 #define WAVEFORM2_ENDING_LOCATION_STRING "END_LOC2"
 #define WAVEFORM2_BEAM_LOSS_LOCATION_STRING "BEAM_LOSS_LOC2"
 #define WAVEFORM2_BUFFER_SIZE_INIT_STRING "WAVEFORM_BUFFER_SIZE_INIT2"
-
+#define WAVEFORM2_THRESHOLD_STRING "THRESHOLD:2"
 
 #define REAL 0
 #define IMAG 1
@@ -110,24 +113,28 @@ class WaveformReader : public asynPortDriver
     int waveform_buffer_size_index;
     int waveform_init_index;
     int MAX_BUFFER_SIZE;
+    int clk_frequency_index;
 
     int waveform0_beginAddr_index;
     int waveform0_endAddr_index;
     int waveform0_start_loc_index;
     int waveform0_end_loc_index;
     int waveform0_beam_loss_loc_index;
-    
+    int waveform0_threshold_index;
+
     int waveform1_beginAddr_index;
     int waveform1_endAddr_index;
     int waveform1_start_loc_index;
     int waveform1_end_loc_index;
     int waveform1_beam_loss_loc_index;
+    int waveform1_threshold_index;
     
     int waveform2_beginAddr_index;
     int waveform2_endAddr_index;
     int waveform2_start_loc_index;
     int waveform2_end_loc_index;
     int waveform2_beam_loss_loc_index;
+    int waveform2_threshold_index;
     
     // the indices of the arrays, 0, 1, and 2, refer to WAVEFORM:0, WAVEFORM:1, and WAVEFORM:2, respectively
     int* beginAddr_indices[NUMBER_OF_WAVEFORM_RECORDS] = {&waveform0_beginAddr_index, &waveform1_beginAddr_index, &waveform2_beginAddr_index};
@@ -135,7 +142,7 @@ class WaveformReader : public asynPortDriver
     int* start_loc_indices[NUMBER_OF_WAVEFORM_RECORDS] = {&waveform0_start_loc_index, &waveform1_start_loc_index, &waveform2_start_loc_index};
     int* end_loc_indices[NUMBER_OF_WAVEFORM_RECORDS] = {&waveform0_end_loc_index, &waveform1_end_loc_index, &waveform2_end_loc_index};   
     int* beam_loss_loc_indices[NUMBER_OF_WAVEFORM_RECORDS] = {&waveform0_beam_loss_loc_index, &waveform1_beam_loss_loc_index, &waveform2_beam_loss_loc_index};
-
+    int* threshold_indices[NUMBER_OF_WAVEFORM_RECORDS] = {&waveform0_threshold_index, &waveform1_threshold_index, &waveform2_threshold_index};
 
 
     //Hardware interfaces
@@ -144,6 +151,7 @@ class WaveformReader : public asynPortDriver
     ScalVal _DataBufferSize;
     ScalVal_RO _TrigCount;
     Command _WebInit;
+    ScalVal _ClkFrequency;
 
     ScalVal _Web0StartAddr;
     ScalVal _Web0EndAddr;

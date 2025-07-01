@@ -1,5 +1,31 @@
 ##Template file waveform
 
+record(ao,      "$(USER):SLOPE:${channel}") {
+    field(DESC, "Slope of channel in EGU/raw")
+    field(PINI, "YES")
+    field(SCAN, "Passive")
+    field(PREC, "3")
+    field(VAL,  "1")
+    info(autosaveFields, "VAL")
+}
+record(ao,      "$(USER):OFFSET:${channel}") {
+    field(DESC, "Offset of channel in EGU")
+    field(PINI, "YES")
+    field(SCAN, "Passive")
+    field(PREC, "3")
+    field(VAL,  "1")
+    info(autosaveFields, "VAL")
+}
+
+# NOT SURE WHERE THIS IS BEING USED YET
+#record(calc,    "$(USER):OFFSET:CALC:${channel}") {
+#    field(DESC, "Calculate offset in raw")
+#    field(INPA, "$(USER):OFFSET:${channel}")
+#   field(INPB, "$(USER):SLOPE:${channel}")
+#    field(SCAN, "1 second")
+#   field(CALC, "A/B")
+#    field(FLNK, $(USER):OFFSET:WF:${channel})
+#}
 
 record(waveform, "$(USER):WAVEFORM:${channel}")
 {
@@ -8,9 +34,196 @@ record(waveform, "$(USER):WAVEFORM:${channel}")
     field(INP, "@asyn($(PORT),$(ADDR),$(TIMEOUT))WAVEFORM:$(channel)")
     field(FTVL, "SHORT")
     field(NELM, "$(WAVEFORM_SIZE)")
-    field(FLNK, "$(USER):SUBARRAY:${channel} PP")
+    field(FLNK, "$(USER):X_WAVEFORM:${channel} PP")
     field(SCAN, "I/O Intr")
   }
+
+# Create a waveform with the sampling time. This will be the X axis of the
+# waveform.
+record (aSub, "$(USER):X_WAVEFORM:${channel}") {
+  field(SNAM, "calcTimeArray")
+  field(FTA, "LONG")
+  field(FTVA, "DOUBLE")
+  field(NOVA, "$(WAVEFORM_SIZE)")
+  field(INPA, "$(USER):CLK:FREQUENCY CP")
+  field(OUTA, "$(USER):X_WF:${channel}")
+  field(FLNK, "$(USER):X_WF:${channel} PP")
+}
+
+# Interface PV, to display only the necessary data
+# range from the data received in the buffer
+record(subArray, "$(USER):X_WF:${channel}") 
+{
+  field(DESC,    "X Subarray")
+  field(INP,     "$(USER):X_WAVEFORM:${channel}.VALA")
+  field(FTVL,    "DOUBLE")
+  field(MALM,    "$(WAVEFORM_SIZE)")
+  field(NELM,    "1024")
+  field(INDX,    "0")
+  field(FLNK,    "$(USER):WAVEFORM:RAW:${channel} PP")
+  field(EGU,     "ns")
+}
+
+# Interface PV, to display only the necessary data
+# range from the data received in the buffer
+record(subArray, "$(USER):WAVEFORM:RAW:${channel}") 
+{
+  field(DESC,    "Raw Subarray")
+  field(INP,     "$(USER):WAVEFORM:${channel}")
+  field(FTVL,    "SHORT")
+  field(MALM,    "$(WAVEFORM_SIZE)")
+  field(NELM,    "1024")
+  field(INDX,    "0")
+  #field(FLNK,   "$(USER):WAVEFORM:R2E:${channel} PP")
+}
+
+# PV to calculate the interface pv in user units
+record (aSub, "$(USER):WAVEFORM:R2E:${channel}") 
+{
+  field(DESC, "subarray raw to egu")
+  field(SNAM, "calcWaveformInEGU")
+  field(INPA, "$(USER):WF:RAW PP")
+  field(NOA, "${WAVEFORM_SIZE}")
+  field(FTA, "SHORT")
+  field(INPB, "$(USER):SLOPE:WF:${channel} PP")
+  field(FTB, "DOUBLE")
+  field(INPC, "$(USER):OFFSET:WF:${channel} PP")
+  field(FTC, "SHORT")
+  field(OUTA, "$(USER):WF:${channel}")
+  field(FLNK, "$(USER):WF:${channel}")
+  field(NOVA, "${WAVEFORM_SIZE}")
+  field(FTVA, "DOUBLE")
+}
+
+record(calcout, "$(USER):SLOPE:WF:CALC:${channel}") 
+{
+  field(DESC,    "WF slope")
+  field(PREC,    "3")
+  field(FLNK,    "$(USER):SLOPE:WF:${channel}")
+  field(CALC,    "A*.5")
+  field(INPA,    "$(USER):SLOPE:${channel} CPP")
+}
+
+# PV to hold the slope for the display array (raw to egu conversion)
+record(ao, "$(USER):SLOPE:WF:${channel}") 
+{
+  field(DESC,    "WF slope")
+  field(PREC,    "3")
+  field(PINI,    "YES")
+  field(FLNK,    "$(USER):WAVEFORM:R2E:${channel}")
+  field(OMSL,    "closed_loop")
+  field(DOL,     "$(USER):SLOPE:WF:CALC:${channel}")
+}
+
+# PV to hold the offset for the display array (raw to egu conversion)
+record(ao, "$(USER):OFFSET:WF:${channel}") 
+{
+  field(DESC,    "WF offset in raw")
+  field(PINI,    "YES")
+  field(FLNK,    "$(USER):WAVEFORM:R2E:${channel}")
+  field(EGU,     "raw")
+  field(OMSL,    "closed_loop")
+  field(DOL,     "$(USER):OFFSET:CALC:${channel}")
+}
+
+# Interface PV, to display only the necessary data
+# range from the data received in the buffer in user units
+record(subArray, "$(USER):WF:${channel}") 
+{
+  field(DESC,    "Subarray")
+  field(INP,     "$(USER):WAVEFORM:R2E:${channel}.VALA")
+  field(FTVL,    "DOUBLE")
+  field(MALM,    "${WAVEFORM_SIZE}")
+  field(NELM,    "1024")
+  field(INDX,    "0")
+}
+
+record(ao, "$(USER):WF:START:EGU:${channel}")
+{
+  field(DESC,    "Subarray start EGU")
+  field(DRVH,    "2857143")
+  field(HOPR,    "2857143")
+  field(FLNK,    "$(USER):WF:START:CALC:${channel}")
+  info(autosaveFields, "VAL")
+  field(PINI,    "YES")
+  field(EGU,     "ns")
+}
+
+# PV to hold the start for the display array
+record(calcout, "$(USER):WF:START:CALC:{channel}")
+{
+  field(DESC,    "Subarray start EGU")
+  field(FLNK,    "$(USER):WF:START:${channel}")
+  field(OUT,     "$(USER):WF:START:${channel}")
+  field(INPA,    "$(USER):WF:START:EGU:${channel}")
+  field(INPB,    "$(USER):CLK:FREQUENCY CP")
+  field(CALC,    "FLOOR((2*A*B)/1000)")
+}
+
+record(ao, "$(USER):WF:START:${channel}") 
+{
+  field(DESC,    "Subarray start")
+  field(DRVH,    "${WAVEFORM_SIZE}")
+  field(HOPR,    "${WAVEFORM_SIZE}")
+  field(PINI,    "NO")
+  field(FLNK,    "$(USER):WF:SEQ:${channel}")
+  field(DOL,     "$(USER):WF:START:CALC:${channel}")
+  field(OMSL,    "closed_loop")
+}
+
+record(ao, "$(USER):WF:NELM:EGU:{channel}")
+{
+  field(DESC,    "Subarray start EGU")
+  field(DRVH,    "2857143")
+  field(HOPR,    "2857143")
+  field(FLNK,    "$(USER):WF:NELM:CALC:${channel}")
+  info(autosaveFields, "VAL")
+  field(PINI,    "YES")
+  field(EGU,     "ns")
+}
+
+# PV to hold the start for the display array
+record(calcout, "$(USER):WF:NELM:CALC:${channel}")
+{
+  field(DESC,    "Subarray start EGU")
+  field(FLNK,    "$(USER):WF:NELM")
+  field(OUT,     "$(USER):WF:NELM")
+  field(INPA,    "$(USER):WF:NELM:EGU")
+  field(INPB,    "$(USER):CLK:FREQUENCY CP")
+  field(CALC,    "FLOOR((2*A*B)/1000)")
+}
+
+# PV to hold the length for the display array
+record(ao, "$(USER):WF:NELM") 
+{
+  field(DESC,    "Subarray length")
+  field(PINI,    "NO")
+  field(FLNK,    "$(USER):WF:SEQ:${channel}")
+  field(DOL,     "$(USER):WF:NELM:CALC:${channel}")
+  field(OMSL,    "closed_loop")
+}
+
+# PV to send data start and nelm to raw and wf PVs
+record(seq, "$(USER):WF:SEQ:${channel}") 
+{
+  field(DESC, "Update NELM and INDX value")
+  field(DOL1, "$(USER):WF:START")
+  field(LNK1, "$(USER):WF:RAW.INDX PP")
+
+  field(DOL2, "$(USER):WF:NELM")
+  field(LNK2, "$(USER):WF:RAW.NELM PP")
+
+  field(DOL3, "$(USER):WF:NELM")
+  field(LNK3, "$(USER):WF.NELM PP")
+
+  field(DOL4, "$(USER):WF:START")
+  field(LNK4, "$(USER):X:WF.INDX PP")
+
+  field(DOL5, "$(USER):WF:NELM")
+  field(LNK5, "$(USER):X:WF.NELM PP")
+
+  field(ASG,  "Internal")
+}
 
 
 record(subArray, "$(USER):SUBARRAY:${channel}")
@@ -102,3 +315,15 @@ record(ai, "$(USER):BEAM:LOSS:LOC:${channel}")
     field(INP, "@asyn($(PORT),$(ADDR),$(TIMEOUT))BEAM_LOSS_LOC${channel}")
     field(SCAN, "I/O Intr")
 }
+
+## This represents the threshold for finding the peak value of beam ##
+## loss; if the value is lower than this, then it should considered noise ##
+record(ao, "$(USER):THRESHOLD:${channel}") 
+{
+  field(DTYP, "asynInt32")
+  field(SCAN, "Passive")
+  field(DESC, "Threshold for beam loss")
+  field(VAL, 0)
+  field(OUT,  "@asyn($(PORT), $(ADDR), $(TIMEOUT))THRESHOLD")
+}
+

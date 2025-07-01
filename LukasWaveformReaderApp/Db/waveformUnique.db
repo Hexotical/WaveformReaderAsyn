@@ -45,5 +45,9 @@ record(ao, "$(USER):NO:OF:WORDS")
   info(autosaveFields, "VAL")
 }
 
-
-
+record(longin, "$(USER):CLK:FREQUENCY")
+{
+    field(DTYP, "asynInt32")
+    field(SCAN, "I/O Intr")
+    field(INP, "@asyn($(PORT), $(ADDR), $(TIMEOUT))CLK_FREQUENCY")
+  }

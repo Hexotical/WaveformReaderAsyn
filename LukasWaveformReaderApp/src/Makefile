@@ -88,7 +88,7 @@ LukasWaveformReader_SRCS += statusCheck.cpp
 LukasWaveformReader_SRCS += WaveformReader.cpp
 LukasWaveformReader_SRCS += writeInt32.cpp
 LukasWaveformReader_SRCS += writeUInt32Digital.cpp
-
+LukasWaveformReader_SRCS += asubXAxis.c asubRawWF2EGU.c
 
 # Build the main IOC entry point on workstation OSs.
 LukasWaveformReader_SRCS_DEFAULT += LukasWaveformReaderMain.cpp
