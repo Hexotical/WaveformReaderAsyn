@@ -56,6 +56,7 @@ record(subArray, "$(USER):X_WF:${channel}")
 {
   field(DESC,    "X Subarray")
   field(INP,     "$(USER):X_WAVEFORM:${channel}.VALA")
+  field(OUT, "@asyn($(PORT),$(ADDR),$(TIMEOUT))WAVEFORM_X_AXIS:${channel}")
   field(FTVL,    "DOUBLE")
   field(MALM,    "$(WAVEFORM_SIZE)")
   field(NELM,    "1024")
@@ -132,6 +133,7 @@ record(subArray, "$(USER):WF:${channel}")
 {
   field(DESC,    "Subarray")
   field(INP,     "$(USER):WAVEFORM:R2E:${channel}.VALA")
+  field(OUT, "@asyn($(PORT),$(ADDR),$(TIMEOUT))REFINED_WAVEFORM:${channel}")
   field(FTVL,    "DOUBLE")
   field(MALM,    "${WAVEFORM_SIZE}")
   field(NELM,    "1024")
@@ -150,7 +152,7 @@ record(ao, "$(USER):WF:START:EGU:${channel}")
 }
 
 # PV to hold the start for the display array
-record(calcout, "$(USER):WF:START:CALC:{channel}")
+record(calcout, "$(USER):WF:START:CALC:${channel}")
 {
   field(DESC,    "Subarray start EGU")
   field(FLNK,    "$(USER):WF:START:${channel}")
@@ -171,7 +173,7 @@ record(ao, "$(USER):WF:START:${channel}")
   field(OMSL,    "closed_loop")
 }
 
-record(ao, "$(USER):WF:NELM:EGU:{channel}")
+record(ao, "$(USER):WF:NELM:EGU:${channel}")
 {
   field(DESC,    "Subarray start EGU")
   field(DRVH,    "2857143")
@@ -186,15 +188,15 @@ record(ao, "$(USER):WF:NELM:EGU:{channel}")
 record(calcout, "$(USER):WF:NELM:CALC:${channel}")
 {
   field(DESC,    "Subarray start EGU")
-  field(FLNK,    "$(USER):WF:NELM")
-  field(OUT,     "$(USER):WF:NELM")
-  field(INPA,    "$(USER):WF:NELM:EGU")
+  field(FLNK,    "$(USER):WF:NELM:${channel}")
+  field(OUT,     "$(USER):WF:NELM:${channel}")
+  field(INPA,    "$(USER):WF:NELM:EGU:${channel}")
   field(INPB,    "$(USER):CLK:FREQUENCY CP")
   field(CALC,    "FLOOR((2*A*B)/1000)")
 }
 
 # PV to hold the length for the display array
-record(ao, "$(USER):WF:NELM") 
+record(ao, "$(USER):WF:NELM:${channel}") 
 {
   field(DESC,    "Subarray length")
   field(PINI,    "NO")
@@ -207,20 +209,20 @@ record(ao, "$(USER):WF:NELM")
 record(seq, "$(USER):WF:SEQ:${channel}") 
 {
   field(DESC, "Update NELM and INDX value")
-  field(DOL1, "$(USER):WF:START")
-  field(LNK1, "$(USER):WF:RAW.INDX PP")
+  field(DOL1, "$(USER):WF:START:${channel}")
+  field(LNK1, "$(USER):WF:RAW:${channel}.INDX PP")
 
-  field(DOL2, "$(USER):WF:NELM")
-  field(LNK2, "$(USER):WF:RAW.NELM PP")
+  field(DOL2, "$(USER):WF:NELM:${channel}")
+  field(LNK2, "$(USER):WF:RAW.NELM:${channel} PP")
 
-  field(DOL3, "$(USER):WF:NELM")
-  field(LNK3, "$(USER):WF.NELM PP")
+  field(DOL3, "$(USER):WF:NELM:${channel}")
+  field(LNK3, "$(USER):WF.NELM:${channel} PP")
 
-  field(DOL4, "$(USER):WF:START")
-  field(LNK4, "$(USER):X:WF.INDX PP")
+  field(DOL4, "$(USER):WF:START:${channel}")
+  field(LNK4, "$(USER):X:WF:${channel}.INDX PP")
 
-  field(DOL5, "$(USER):WF:NELM")
-  field(LNK5, "$(USER):X:WF.NELM PP")
+  field(DOL5, "$(USER):WF:NELM:${channel}")
+  field(LNK5, "$(USER):X:WF:${channel}.NELM PP")
 
   field(ASG,  "Internal")
 }
@@ -324,6 +326,95 @@ record(ao, "$(USER):THRESHOLD:${channel}")
   field(SCAN, "Passive")
   field(DESC, "Threshold for beam loss")
   field(VAL, 0)
-  field(OUT,  "@asyn($(PORT), $(ADDR), $(TIMEOUT))THRESHOLD")
+  field(OUT,  "@asyn($(PORT), $(ADDR), $(TIMEOUT))THRESHOLD:${channel}")
 }
 
+# Length of the fiber
+# Assuming units of meters 
+record(ao,      "$(USER):LENGTH:${channel}") {
+    field(DESC, "Length in m")
+    field(PINI, "YES")
+    field(SCAN, "Passive")
+    field(PREC, "3")
+    field(VAL,  "100")
+    info(autosaveFields, "VAL")
+}
+
+# Physical location of the start of the fiber
+# Assuming units of meters
+record(ao,      "$(USER):Z:OFFSET:START:${channel}") {
+    field(DESC, "Location of the start of the fiber in m")
+    field(PINI, "YES")
+    field(OUT,  "@asyn($(PORT), $(ADDR), $(TIMEOUT))Z_OFFSET_START${channel}")
+    field(SCAN, "Passive")
+    field(PREC, "3")
+    field(VAL,  "0")
+    info(autosaveFields, "VAL")
+}
+
+# Physical location of the end of the fiber
+# Assuming units of meters
+record(ao,      "$(USER):Z:OFFSET:END:${channel}") {
+    field(DESC, "Location of the end of the fiber in m")
+    field(PINI, "YES")
+    field(OUT,  "@asyn($(PORT), $(ADDR), $(TIMEOUT))Z_OFFSET_END${channel}")
+    field(SCAN, "Passive")
+    field(PREC, "3")
+    field(VAL,  "100")
+    info(autosaveFields, "VAL")
+}
+
+# Physical location of the start of the extraction range
+# Assuming units of meters
+record(ao,      "$(USER):START:EXTRACTION:${channel}") {
+    field(DESC, "Location of the start of the extraction range in m")
+    field(PINI, "YES")
+    field(OUT,  "@asyn($(PORT), $(ADDR), $(TIMEOUT))EXTRACTION_START${channel}")
+    field(SCAN, "Passive")
+    field(PREC, "3")
+    field(VAL,  "0")
+    info(autosaveFields, "VAL")
+}
+
+# Physical location of the end of the extraction range
+# Assuming units of meters
+record(ao,      "$(USER):END:EXTRACTION:${channel}") {
+    field(DESC, "Location of the end of the extraction range in m")
+    field(PINI, "YES")
+    field(OUT,  "@asyn($(PORT), $(ADDR), $(TIMEOUT))EXTRACTION_END${channel}")
+    field(SCAN, "Passive")
+    field(PREC, "3")
+    field(VAL,  "100")
+    info(autosaveFields, "VAL")
+}
+
+record(ai, "$(USER):EXTRACTED:NO:OF:ELEMENTS:${channel}")
+{
+    field(DTYP, "asynInt32")
+    field(INP, "@asyn($(PORT),$(ADDR),$(TIMEOUT))EXTRACTED_NO_OF_ELEMENTS${channel}")
+    #field(FLNK,    "$(USER):WAVEFORM:RAW:${channel} PP")
+    field(SCAN, "I/O Intr")
+}
+
+record(subArray, "$(USER):EXTRACTED:X:WF:${channel}") 
+{
+  field(DESC,    "X Subarray")
+  field(INP, "@asyn($(PORT),$(ADDR),$(TIMEOUT))EXTRACTED_X_AXIS:$(channel)")
+  field(FTVL,    "DOUBLE")
+  field(MALM,    "$(WAVEFORM_SIZE)")
+  field(NELM,    "$(USER):EXTRACTED:NO:OF:ELEMENTS:${channel}")
+  field(INDX,    "0")
+  #field(FLNK,    "$(USER):WAVEFORM:RAW:${channel} PP")
+  field(EGU,     "meters")
+}
+
+record(subArray, "$(USER):EXTRACTED:WF:${channel}") 
+{
+  field(DESC,    "X Subarray")
+  field(INP, "@asyn($(PORT),$(ADDR),$(TIMEOUT))EXTRACTED_WAVEFORM:$(channel)")
+  field(FTVL,    "DOUBLE")
+  field(MALM,    "$(WAVEFORM_SIZE)")
+  field(NELM,    "$(USER):EXTRACTED:NO:OF:ELEMENTS:${channel}")
+  field(INDX,    "0")
+  #field(FLNK,    "$(USER):WAVEFORM:RAW:${channel} PP")
+}

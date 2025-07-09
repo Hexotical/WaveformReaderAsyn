@@ -1,16 +1,16 @@
-#include <epicsStdlib.h>
-#include <epicsStdioRedirect.h>
+// #include <epicsStdlib.h>
+// #include <epicsStdioRedirect.h>
 #include <epicsMath.h>
-#include <dbDefs.h>
-#include <dbCommon.h>
+// #include <dbDefs.h>
+// #include <dbCommon.h>
 #include <registryFunction.h>
 #include <epicsExport.h>
-#include <recSup.h>
+// #include <recSup.h>
 #include <aSubRecord.h>
 /* Make an array with each element */
 /* EGU_WF= (RAW_WF + OFFSET) * SLOPE */
 
-static long calcWFInEGU(aSubRecord *pasub) {
+static long unitConversion(aSubRecord *pasub) {
     short i;
     double scaledInput;
 	short *rawInput = (short *)pasub->a;
@@ -50,3 +50,5 @@ static long calcWFInEGU(aSubRecord *pasub) {
     //pasub->pact = 0;
     return 0; /* process output links */
 }
+
+epicsRegisterFunction(unitConversion);

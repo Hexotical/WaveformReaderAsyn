@@ -51,3 +51,15 @@ record(longin, "$(USER):CLK:FREQUENCY")
     field(SCAN, "I/O Intr")
     field(INP, "@asyn($(PORT), $(ADDR), $(TIMEOUT))CLK_FREQUENCY")
   }
+
+# represents the speed of light/beam loss particles in the beam
+# ASSUMING m/ns for now
+record(ao,      "$(USER):SPEED") {
+    field(DESC, "Speed in m/ns")
+    field(PINI, "YES")
+    field(OUT,  "@asyn($(PORT), $(ADDR), $(TIMEOUT))SPEED")
+    field(SCAN, "Passive")
+    field(PREC, "3")
+    field(VAL,  "0.2")
+    info(autosaveFields, "VAL")
+}
