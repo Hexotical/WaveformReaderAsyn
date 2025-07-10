@@ -18,6 +18,7 @@ USR_INCLUDES += -I$(YAML_INCLUDE)
 USR_INCLUDES += -I$(YAMLREADER_INCLUDE)
 USR_INCLUDES += -I$(DEVICELIB_INCLUDE)
 USR_INCLUDES += -I$(FFTW_INCLUDE)
+USR_INCLUDES += -I$(TIRPC_INCLUDE)
 
 # =====================================================
 
@@ -30,24 +31,35 @@ deviceLib_DIR    = $(DEVICELIB_LIB)
 yamlReader_DIR   = $(YAMLREADER_LIB)
 boost_system_DIR = $(BOOST_LIB)
 fftw_DIR		 = $(FFTW_LIB)
+tirpc_DIR        = $(TIRPC_LIB)
 # ======================================================
 
 # ======================================================
 # LINK "NON EPICS" EXTERNAL PACKAGE LIBRARIES STATICALLY
 # ======================================================
 
-USR_LIBS_Linux += cpsw
-USR_LIBS_Linux += boost_system
-USR_LIBS_Linux += yaml-cpp
-USR_LIBS_Linux += yamlReader 
-USR_LIBS_Linux += deviceLib
-USR_LIBS_Linux += fftw3
+# USR_LIBS_Linux += cpsw
+# USR_LIBS_Linux += boost_system
+# USR_LIBS_Linux += yaml-cpp
+# USR_LIBS_Linux += yamlReader 
+# USR_LIBS_Linux += deviceLib
+# USR_LIBS_Linux += fftw3
 
+LDIR  = -L. 
+LDIR += -L$(cpsw_DIR)
+LDIR += -L$(yaml-cpp_DIR)
+LDIR += -L$(yamlReader_DIR)
+LDIR += -L$(deviceLib_DIR)
+LDIR += -L$(boost_system_DIR)
+LDIR += -L$(fftw_DIR)
 
 # ======================================================
-PROD_IOC = LukasWaveformReader
 # LukasWaveformReader.dbd will be created and installed
 DBD += LukasWaveformReader.dbd
+
+# INC += WaveformReader.h
+
+LIBRARY_IOC = LukasWaveformReader
 
 # LukasWaveformReader.dbd will be made up from these files:
 LukasWaveformReader_DBD += base.dbd
@@ -98,8 +110,9 @@ include $(TOP)/configure/RULES
 #----------------------------------------
 #  ADD RULES AFTER THIS LINE
 
-tirpc_DIR         = $(TIRPC_LIB)
+
 
 ifeq ($(NEEDS_TIRPC),YES)
-USR_LIBS_Linux += tirpc
+# USR_LIBS_Linux += tirpc
+LDIR += -L$(tirpc_DIR)
 endif
