@@ -100,7 +100,7 @@ void WaveformReader::extractWaveform(int waveformIndex)
     }
   }
 
-  setDoubleParam(*(extracted_elements_indices[waveformIndex]), no_of_extracted_elements);
+  setIntegerParam(*(extracted_elements_indices[waveformIndex]), no_of_extracted_elements);
   callParamCallbacks();
 
   std::string extracted_pvIdentifier = extracted_waveform_param_indices[waveformIndex];
@@ -111,6 +111,8 @@ void WaveformReader::extractWaveform(int waveformIndex)
   {
     //extracted_x_axis_waveform_map[extracted_x_axis_pvIdentifier][i] = extracted_x_axis[i];
     extracted_waveform_map[extracted_pvIdentifier][i] = extracted_waveform_data[i];
+
+    // do I need some kind of array callbacks here?
   }
 
 }

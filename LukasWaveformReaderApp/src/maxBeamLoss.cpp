@@ -7,21 +7,28 @@
  */
 void WaveformReader::maxBeamLoss(int waveformIndex)
 {
-  double startingPosition, endingPosition;
-  getDoubleParam(*(start_loc_indices[waveformIndex]), &startingPosition);
-  getDoubleParam(*(end_loc_indices[waveformIndex]), &endingPosition);
+  // double startingPosition, endingPosition;
+  // getDoubleParam(*(start_loc_indices[waveformIndex]), &startingPosition);
+  // getDoubleParam(*(end_loc_indices[waveformIndex]), &endingPosition);
 
-  double lengthOfMonitor = endingPosition - startingPosition;
+  // double lengthOfMonitor = endingPosition - startingPosition;
 
+  // int maxIndex = findMaxIndex(waveformIndex);
+
+  // int bufferSize;
+  // getIntegerParam(number_of_words_index, &bufferSize);
+  // // size of array is (no of 16-bit words * 2) because 8-bit words are cast to 16-bit words 
+  // bufferSize *= 2;
+
+  // double locationOfMaxIndex = (maxIndex * (lengthOfMonitor / bufferSize)) + startingPosition;
+
+  std::string waveform_pvIdentifier = extracted_waveform_param_indices[waveformIndex];
+  std::string x_axis_pvIdentifier = extracted_x_axis_waveform_indices[waveformIndex];
   int maxIndex = findMaxIndex(waveformIndex);
+  double locationOfMaxIndex = extracted_x_axis_waveform_map[x_axis_pvIdentifier][maxIndex];
 
-  int bufferSize;
-  getIntegerParam(number_of_words_index, &bufferSize);
-  // size of array is (no of 16-bit words * 2) because 8-bit words are cast to 16-bit words 
-  bufferSize *= 2;
-
-  double locationOfMaxIndex = (maxIndex * (lengthOfMonitor / bufferSize)) + startingPosition;
   std::cout << "The location of maximum beam loss is " << locationOfMaxIndex << std::endl;
+  std::cout << "The value of maximum beam loss is " <<  extracted_waveform_map[waveform_pvIdentifier][maxIndex] << std::endl;
   setDoubleParam(*(beam_loss_loc_indices[waveformIndex]), locationOfMaxIndex);
   callParamCallbacks();
 }
