@@ -47,26 +47,26 @@ WaveformReader::WaveformReader(const char *portName, int bayNumber, int bufferSi
   {
     //For loop generates the string identifier for each Waveform records and then creates a parameter our asynDriver can interact with for it
     int waveform_param_index;
-    int refined_waveform_param_index;
-    int x_axis_waveform_param_index;
+    // int refined_waveform_param_index;
+    // int x_axis_waveform_param_index;
     int extracted_waveform_param_index;
     int extracted_x_axis_waveform_param_index;
     std::string pvIdentifier = "WAVEFORM:" + std::to_string(pvID);
-    std::string refined_pvIdentifier = "REFINED_WAVEFORM:" + std::to_string(pvID);
-    std::string x_axis_pvIdentifier = "WAVEFORM_X_AXIS:" + std::to_string(pvID);
+    // std::string refined_pvIdentifier = "REFINED_WAVEFORM:" + std::to_string(pvID);
+    // std::string x_axis_pvIdentifier = "WAVEFORM_X_AXIS:" + std::to_string(pvID);
     std::string extracted_pvIdentifier = "EXTRACTED_WAVEFORM:" + std::to_string(pvID);
     std::string extracted_x_axis_pvIdentifier = "WAVEFORM_X_AXIS:" + std::to_string(pvID);
     std::cout << pvIdentifier << std::endl;
     createParam(pvIdentifier.c_str(), asynParamInt16Array, &waveform_param_index);
-    createParam(refined_pvIdentifier.c_str(), asynParamInt16Array, &refined_waveform_param_index);
-    createParam(x_axis_pvIdentifier.c_str(), asynParamInt16Array, &x_axis_waveform_param_index);
+    // createParam(refined_pvIdentifier.c_str(), asynParamInt16Array, &refined_waveform_param_index);
+    // createParam(x_axis_pvIdentifier.c_str(), asynParamInt16Array, &x_axis_waveform_param_index);
     createParam(extracted_pvIdentifier.c_str(), asynParamInt16Array, &extracted_waveform_param_index);
     createParam(extracted_x_axis_pvIdentifier.c_str(), asynParamInt16Array, &extracted_x_axis_waveform_param_index);
     std::cout << "The identifier is: " << pvIdentifier << " and the waveform_param_index is : " << waveform_param_index << std::endl;
     pv_param_map.insert(std::pair<std::string, int>(pvIdentifier, waveform_param_index));
     waveform_param_indices.push_back(pvIdentifier);
-    refined_waveform_param_indices.push_back(refined_pvIdentifier);
-    x_axis_waveform_indices.push_back(x_axis_pvIdentifier);
+    // refined_waveform_param_indices.push_back(refined_pvIdentifier);
+    // x_axis_waveform_indices.push_back(x_axis_pvIdentifier);
     extracted_waveform_param_indices.push_back(extracted_pvIdentifier);
     extracted_x_axis_waveform_indices.push_back(extracted_x_axis_pvIdentifier);
     // initialize values 
@@ -77,8 +77,8 @@ WaveformReader::WaveformReader(const char *portName, int bayNumber, int bufferSi
 
     waveform_map[pvIdentifier] = (epicsInt16 *)calloc(STREAM_MAX_SIZE, sizeof(epicsInt16)); 
     // the refined waveform obtains its data from the waveform PV not directly from hardware
-    refined_waveform_map[refined_pvIdentifier] = (epicsInt16 *)calloc(STREAM_MAX_SIZE, sizeof(epicsInt16)); 
-    x_axis_waveform_map[x_axis_pvIdentifier] = (epicsInt16 *)calloc(STREAM_MAX_SIZE, sizeof(epicsInt16)); 
+    // refined_waveform_map[refined_pvIdentifier] = (epicsInt16 *)calloc(STREAM_MAX_SIZE, sizeof(epicsInt16)); 
+    // x_axis_waveform_map[x_axis_pvIdentifier] = (epicsInt16 *)calloc(STREAM_MAX_SIZE, sizeof(epicsInt16)); 
     extracted_waveform_map[extracted_pvIdentifier] = (epicsInt16 *)calloc(STREAM_MAX_SIZE, sizeof(epicsInt16)); 
     extracted_x_axis_waveform_map[extracted_x_axis_pvIdentifier] = (epicsInt16 *)calloc(STREAM_MAX_SIZE, sizeof(epicsInt16)); 
 
@@ -94,6 +94,8 @@ WaveformReader::WaveformReader(const char *portName, int bayNumber, int bufferSi
     createParam(("EXTRACTION_START" + std::to_string(pvID)).c_str(), asynParamFloat64, extraction_start_indices[pvID]);
     createParam(("EXTRACTION_END" + std::to_string(pvID)).c_str(), asynParamFloat64, extraction_end_indices[pvID]);
     createParam(("EXTRACTED_NO_OF_ELEMENTS" + std::to_string(pvID)).c_str(), asynParamFloat64, extracted_elements_indices[pvID]);
+    createParam(("OFFSET" + std::to_string(pvID)).c_str(), asynParamFloat64, offset_indices[pvID]);
+    createParam(("SLOPE" + std::to_string(pvID)).c_str(), asynParamFloat64, slope_indices[pvID]);
 
 
     (*(start_addresses[pvID])) = IScalVal::create(p->findByName(("/mmio/AmcCarrierCore/AmcCarrierBsa/BsaWaveformEngine[" + std::to_string(bayNumber) + "]/WaveformEngineBuffers/StartAddr[" + std::to_string(pvID) + "]").c_str()));

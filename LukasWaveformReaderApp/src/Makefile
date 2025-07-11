@@ -76,6 +76,7 @@ LukasWaveformReader_DBD += waveform.dbd
 # LukasWaveformReader_registerRecordDeviceDriver.cpp derives from LukasWaveformReader.dbd
 LukasWaveformReader_SRCS += LukasWaveformReader_registerRecordDeviceDriver.cpp
 
+LukasWaveformReader_SRCS += extractWaveform.cpp
 LukasWaveformReader_SRCS += fft.cpp
 LukasWaveformReader_SRCS += findLocalMaxima.cpp
 LukasWaveformReader_SRCS += findMaxIndex.cpp

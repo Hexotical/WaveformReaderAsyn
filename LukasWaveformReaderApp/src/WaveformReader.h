@@ -46,8 +46,8 @@
 #define WAVEFORM0_BEAM_LOSS_LOCATION_STRING "BEAM_LOSS_LOC0"
 #define WAVEFORM0_BUFFER_SIZE_INIT_STRING "WAVEFORM_BUFFER_SIZE_INIT0"
 #define WAVEFORM0_THRESHOLD_STRING "THRESHOLD:0"
-#define WAVEFORM0_REFINED_STRING "REFINED_WAVEFORM:0" // waveform obtained about applying scale and adding offset
-#define WAVEFORM0_X_AXIS_STRING "WAVEFORM_X_AXIS:0" // time axis
+// #define WAVEFORM0_REFINED_STRING "REFINED_WAVEFORM:0" // waveform obtained about applying scale and adding offset
+// #define WAVEFORM0_X_AXIS_STRING "WAVEFORM_X_AXIS:0" // time axis
 #define WAVEFORM0_Z_OFFSET_START_STRING "Z_OFFSET_START0"
 #define WAVEFORM0_Z_OFFSET_END_STRING "Z_OFFSET_END0"
 #define WAVEFORM0_LENGTH_STRING "LENGTH0" // time axis
@@ -56,6 +56,8 @@
 #define WAVEFORM0_EXTRACTED_PV_STRING "EXTRACTED_WAVEFORM:0"
 #define WAVEFORM0_EXTRACTED_X_AXIS_PV_STRING "EXTRACTED_X_AXIS:0"
 #define WAVEFORM0_EXTRACTED_NO_OF_ELEMENTS_STRING "EXTRACTED_NO_OF_ELEMENTS0"
+#define WAVEFORM0_OFFSET_STRING "OFFSET0"
+#define WAVEFORM0_SLOPE_STRING "SLOPE0"
 
 
 #define WAVEFORM1_PV_STRING "WAVEFORM:1"
@@ -66,8 +68,8 @@
 #define WAVEFORM1_BEAM_LOSS_LOCATION_STRING "BEAM_LOSS_LOC1"
 #define WAVEFORM1_BUFFER_SIZE_INIT_STRING "WAVEFORM_BUFFER_SIZE_INIT1"
 #define WAVEFORM1_THRESHOLD_STRING "THRESHOLD:1"
-#define WAVEFORM1_REFINED_STRING "REFINED_WAVEFORM:1" // waveform obtained about applying scale and adding offset
-#define WAVEFORM1_X_AXIS_STRING "WAVEFORM_X_AXIS:1" // time axis
+// #define WAVEFORM1_REFINED_STRING "REFINED_WAVEFORM:1" // waveform obtained about applying scale and adding offset
+// #define WAVEFORM1_X_AXIS_STRING "WAVEFORM_X_AXIS:1" // time axis
 #define WAVEFORM1_Z_OFFSET_START_STRING "Z_OFFSET_START1"
 #define WAVEFORM1_Z_OFFSET_END_STRING "Z_OFFSET_END1"
 #define WAVEFORM1_LENGTH_STRING "LENGTH1" // time axis
@@ -76,6 +78,8 @@
 #define WAVEFORM1_EXTRACTED_PV_STRING "EXTRACTED_WAVEFORM:1"
 #define WAVEFORM1_EXTRACTED_X_AXIS_PV_STRING "EXTRACTED_X_AXIS:1"
 #define WAVEFORM1_EXTRACTED_NO_OF_ELEMENTS_STRING "EXTRACTED_NO_OF_ELEMENTS1"
+#define WAVEFORM1_OFFSET_STRING "OFFSET1"
+#define WAVEFORM1_SLOPE_STRING "SLOPE1"
 
 
 #define WAVEFORM2_PV_STRING "WAVEFORM:2"
@@ -86,8 +90,8 @@
 #define WAVEFORM2_BEAM_LOSS_LOCATION_STRING "BEAM_LOSS_LOC2"
 #define WAVEFORM2_BUFFER_SIZE_INIT_STRING "WAVEFORM_BUFFER_SIZE_INIT2"
 #define WAVEFORM2_THRESHOLD_STRING "THRESHOLD:2"
-#define WAVEFORM2_REFINED_STRING "REFINED_WAVEFORM:2" // waveform obtained about applying scale and adding offset
-#define WAVEFORM2_X_AXIS_STRING "WAVEFORM_X_AXIS:2" // time axis
+// #define WAVEFORM2_REFINED_STRING "REFINED_WAVEFORM:2" // waveform obtained about applying scale and adding offset
+// #define WAVEFORM2_X_AXIS_STRING "WAVEFORM_X_AXIS:2" // time axis
 #define WAVEFORM2_Z_OFFSET_START_STRING "Z_OFFSET_START2"
 #define WAVEFORM2_Z_OFFSET_END_STRING "Z_OFFSET_END2"
 #define WAVEFORM2_LENGTH_STRING "LENGTH2" // time axis
@@ -96,6 +100,9 @@
 #define WAVEFORM2_EXTRACTED_PV_STRING "EXTRACTED_WAVEFORM:2"
 #define WAVEFORM2_EXTRACTED_X_AXIS_PV_STRING "EXTRACTED_X_AXIS:2"
 #define WAVEFORM2_EXTRACTED_NO_OF_ELEMENTS_STRING "EXTRACTED_NO_OF_ELEMENTS2"
+#define WAVEFORM2_OFFSET_STRING "OFFSET2"
+#define WAVEFORM2_SLOPE_STRING "SLOPE2"
+
 
 #define REAL 0
 #define IMAG 1
@@ -117,6 +124,7 @@ class WaveformReader : public asynPortDriver
     void findRange(int& low, int& high, int maxIndex, const int LOWER_LIMIT, int waveformIndex);
     void findLocalMaxima(int waveformIndex);
     void maxBeamLoss(int waveformIndex);
+    void extractWaveform(int waveformIndex);
     WaveformReader& operator=(WaveformReader& rhs);
 
 
@@ -129,8 +137,8 @@ class WaveformReader : public asynPortDriver
     //TODO find a way to make these read only without having to write a weird get or set method
 
     std::vector<std::string> waveform_param_indices; // order matters
-    std::vector<std::string> refined_waveform_param_indices;
-    std::vector<std::string> x_axis_waveform_indices;
+    // std::vector<std::string> refined_waveform_param_indices;
+    // std::vector<std::string> x_axis_waveform_indices;
     std::vector<std::string> extracted_waveform_param_indices;
     std::vector<std::string> extracted_x_axis_waveform_indices;
     std::map<std::string, int> pv_param_map; //Identifier of pv to parameter in param list
@@ -163,6 +171,8 @@ class WaveformReader : public asynPortDriver
     int waveform0_extraction_start_index;
     int waveform0_extraction_end_index;
     int waveform0_extracted_elements_index;
+    int waveform0_offset_index;
+    int waveform0_slope_index;
     // int waveform0_extracted_index;
 
     int waveform1_beginAddr_index;
@@ -177,6 +187,8 @@ class WaveformReader : public asynPortDriver
     int waveform1_extraction_start_index;
     int waveform1_extraction_end_index;
     int waveform1_extracted_elements_index;
+    int waveform1_offset_index;
+    int waveform1_slope_index;
     // int waveform1_extracted_index;
     
     int waveform2_beginAddr_index;
@@ -191,6 +203,8 @@ class WaveformReader : public asynPortDriver
     int waveform2_extraction_start_index;
     int waveform2_extraction_end_index;
     int waveform2_extracted_elements_index;
+    int waveform2_offset_index;
+    int waveform2_slope_index;
     // int waveform2_extracted_index;
     
     // the indices of the arrays, 0, 1, and 2, refer to WAVEFORM:0, WAVEFORM:1, and WAVEFORM:2, respectively
@@ -206,6 +220,8 @@ class WaveformReader : public asynPortDriver
     int* extraction_start_indices[NUMBER_OF_WAVEFORM_RECORDS] = {&waveform0_extraction_start_index, &waveform1_extraction_start_index, &waveform2_extraction_start_index};
     int* extraction_end_indices[NUMBER_OF_WAVEFORM_RECORDS] = {&waveform0_extraction_end_index, &waveform1_extraction_end_index, &waveform2_extraction_end_index};
     int* extracted_elements_indices[NUMBER_OF_WAVEFORM_RECORDS] = {&waveform0_extracted_elements_index, &waveform1_extracted_elements_index, &waveform2_extracted_elements_index};
+    int* offset_indices[NUMBER_OF_WAVEFORM_RECORDS] = {&waveform0_offset_index, &waveform1_offset_index, &waveform2_offset_index};
+    int* slope_indices[NUMBER_OF_WAVEFORM_RECORDS] = {&waveform0_slope_index, &waveform1_slope_index, &waveform2_slope_index};
 
     //Hardware interfaces
   protected:
@@ -229,8 +245,8 @@ class WaveformReader : public asynPortDriver
   private:
     //epicsInt16* waveformData0; //Not really necessary atm I want to use this when I do data modification things
     std::map<std::string, epicsInt16*> waveform_map; // maps the pv Identifier to the corresponding array
-    std::map<std::string, epicsInt16*> refined_waveform_map; // maps the pv Identifier to the corresponding array
-    std::map<std::string, epicsInt16*> x_axis_waveform_map;
+    // std::map<std::string, epicsInt16*> refined_waveform_map; // maps the pv Identifier to the corresponding array
+    // std::map<std::string, epicsInt16*> x_axis_waveform_map;
     std::map<std::string, epicsInt16*> extracted_waveform_map; // maps the pv Identifier to the corresponding array
     std::map<std::string, epicsInt16*> extracted_x_axis_waveform_map;
     static WaveformReader* port_driver; // stores the port driver that will be used to execute the iocsh commands
