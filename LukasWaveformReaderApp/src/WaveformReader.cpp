@@ -64,6 +64,8 @@ WaveformReader::WaveformReader(const char *portName, int bayNumber, int bufferSi
     createParam(extracted_x_axis_pvIdentifier.c_str(), asynParamInt16Array, &extracted_x_axis_waveform_param_index);
     std::cout << "The identifier is: " << pvIdentifier << " and the waveform_param_index is : " << waveform_param_index << std::endl;
     pv_param_map.insert(std::pair<std::string, int>(pvIdentifier, waveform_param_index));
+    extracted_param_map.insert(std::pair<std::string, int>(extracted_pvIdentifier, extracted_waveform_param_index));
+    x_axis_param_map.insert(std::pair<std::string, int>(extracted_x_axis_pvIdentifier, extracted_x_axis_waveform_param_index));
     waveform_param_indices.push_back(pvIdentifier);
     // refined_waveform_param_indices.push_back(refined_pvIdentifier);
     // x_axis_waveform_indices.push_back(x_axis_pvIdentifier);
@@ -85,8 +87,8 @@ WaveformReader::WaveformReader(const char *portName, int bayNumber, int bufferSi
     // connect to the PVs that represent parameters of each waveform record using corresponding arrays
     createParam(("END_ADDR" + std::to_string(pvID)).c_str(), asynParamInt32, endAddr_indices[pvID]);
     createParam(("BEGIN_ADDR" + std::to_string(pvID)).c_str(), asynParamInt32, beginAddr_indices[pvID]);
-    createParam(("START_LOC" + std::to_string(pvID)).c_str(), asynParamFloat64, start_loc_indices[pvID]);
-    createParam(("END_LOC" + std::to_string(pvID)).c_str(), asynParamFloat64, end_loc_indices[pvID]);
+    // createParam(("START_LOC" + std::to_string(pvID)).c_str(), asynParamFloat64, start_loc_indices[pvID]);
+    // createParam(("END_LOC" + std::to_string(pvID)).c_str(), asynParamFloat64, end_loc_indices[pvID]);
     createParam(("BEAM_LOSS_LOC" + std::to_string(pvID)).c_str(), asynParamFloat64, beam_loss_loc_indices[pvID]);
     createParam(("Z_OFFSET_START" + std::to_string(pvID)).c_str(), asynParamFloat64, z_offset_start_indices[pvID]);
     createParam(("Z_OFFSET_END" + std::to_string(pvID)).c_str(), asynParamFloat64, z_offset_end_indices[pvID]);

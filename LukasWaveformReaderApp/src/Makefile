@@ -38,13 +38,6 @@ tirpc_DIR        = $(TIRPC_LIB)
 # LINK "NON EPICS" EXTERNAL PACKAGE LIBRARIES STATICALLY
 # ======================================================
 
-# USR_LIBS_Linux += cpsw
-# USR_LIBS_Linux += boost_system
-# USR_LIBS_Linux += yaml-cpp
-# USR_LIBS_Linux += yamlReader 
-# USR_LIBS_Linux += deviceLib
-# USR_LIBS_Linux += fftw3
-
 LDIR  = -L. 
 LDIR += -L$(cpsw_DIR)
 LDIR += -L$(yaml-cpp_DIR)
@@ -89,7 +82,6 @@ LukasWaveformReader_SRCS += statusCheck.cpp
 LukasWaveformReader_SRCS += WaveformReader.cpp
 LukasWaveformReader_SRCS += writeInt32.cpp
 LukasWaveformReader_SRCS += writeUInt32Digital.cpp
-LukasWaveformReader_SRCS += asubXAxis.c asubInversion.c asubConversion.c
 
 # Build the main IOC entry point on workstation OSs.
 LukasWaveformReader_SRCS_DEFAULT += LukasWaveformReaderMain.cpp

@@ -17,16 +17,6 @@ record(ao,      "$(P):OFFSET:0") {
     info(autosaveFields, "VAL")
 }
 
-# NOT SURE WHERE THIS IS BEING USED YET
-#record(calc,    "$(P):OFFSET:CALC:0") {
-#    field(DESC, "Calculate offset in raw")
-#    field(INPA, "$(P):OFFSET:0")
-#   field(INPB, "$(P):SLOPE:0")
-#    field(SCAN, "1 second")
-#   field(CALC, "A/B")
-#    field(FLNK, $(P):OFFSET:WF:0)
-#}
-
 record(waveform, "$(P):WAVEFORM:0")
 {
     field(PINI, "1")
@@ -38,196 +28,6 @@ record(waveform, "$(P):WAVEFORM:0")
     field(FLNK, "$(P):SUBARRAY:0 PP")
     field(SCAN, "I/O Intr")
   }
-
-# Create a waveform with the sampling time. This will be the X axis of the
-# waveform.
-#record (aSub, "$(P):X_WAVEFORM:0") {
-##  field(SNAM, "calcTimeArray")
-##  field(FTA, "LONG")
-##  field(FTVA, "DOUBLE")
-##  field(NOVA, "$(WAVEFORM_SIZE)")
-##  field(INPA, "$(P):CLK:FREQUENCY CP")
-##  field(OUTA, "$(P):X_WF:0")
-##  field(FLNK, "$(P):X_WF:0 PP")
-##}
-#
-# Interface PV, to display only the necessary data
-# range from the data received in the buffer
-record(subArray, "$(P):X_WF:0") 
-#{
-#  field(DESC,    "X Subarray")
-#  field(INP,     "$(P):X_WAVEFORM:0.VALA")
-#  field(OUT, "@asyn($(PORT),$(ADDR),$(TIMEOUT))WAVEFORM_X_AXIS:0")
-#  field(FTVL,    "DOUBLE")
-#  field(MALM,    "$(WAVEFORM_SIZE)")
-#  field(NELM,    "1024")
-#  field(INDX,    "0")
-#  field(FLNK,    "$(P):WAVEFORM:RAW:0 PP")
-#  field(EGU,     "ns")
-#}
-#
-## Interface PV, to display only the necessary data
-## range from the data received in the buffer
-#record(subArray, "$(P):WAVEFORM:RAW:0") 
-#{
-#  field(DESC,    "Raw Subarray")
-#  field(INP,     "$(P):WAVEFORM:0")
-#  field(FTVL,    "SHORT")
-#  field(MALM,    "$(WAVEFORM_SIZE)")
-#  field(NELM,    "1024")
-#  field(INDX,    "0")
-#  #field(FLNK,   "$(P):WAVEFORM:R2E:0 PP")
-#}
-#
-## PV to calculate the interface pv in P units
-#record (aSub, "$(P):WAVEFORM:R2E:0") 
-#{
-#  field(DESC, "subarray raw to egu")
-#  field(SNAM, "calcWaveformInEGU")
-#  field(INPA, "$(P):WF:RAW PP")
-#  field(NOA, "$(WAVEFORM_SIZE)")
-#  field(FTA, "SHORT")
-#  field(INPB, "$(P):SLOPE:WF:0 PP")
-#  field(FTB, "DOUBLE")
-#  field(INPC, "$(P):OFFSET:WF:0 PP")
-#  field(FTC, "SHORT")
-#  field(OUTA, "$(P):WF:0")
-#  field(FLNK, "$(P):WF:0")
-#  field(NOVA, "$(WAVEFORM_SIZE)")
-#  field(FTVA, "DOUBLE")
-#}
-#
-#record(calcout, "$(P):SLOPE:WF:CALC:0") 
-#{
-#  field(DESC,    "WF slope")
-#  field(PREC,    "3")
-#  field(FLNK,    "$(P):SLOPE:WF:0")
-#  field(CALC,    "A*.5")
-#  field(INPA,    "$(P):SLOPE:0 CPP")
-#}
-#
-## PV to hold the slope for the display array (raw to egu conversion)
-#record(ao, "$(P):SLOPE:WF:0") 
-#{
-#  field(DESC,    "WF slope")
-#  field(PREC,    "3")
-#  field(PINI,    "YES")
-#  field(FLNK,    "$(P):WAVEFORM:R2E:0")
-#  field(OMSL,    "closed_loop")
-#  field(DOL,     "$(P):SLOPE:WF:CALC:0")
-#}
-#
-## PV to hold the offset for the display array (raw to egu conversion)
-#record(ao, "$(P):OFFSET:WF:0") 
-#{
-#  field(DESC,    "WF offset in raw")
-#  field(PINI,    "YES")
-#  field(FLNK,    "$(P):WAVEFORM:R2E:0")
-#  field(EGU,     "raw")
-#  field(OMSL,    "closed_loop")
-#  field(DOL,     "$(P):OFFSET:CALC:0")
-#}
-#
-## Interface PV, to display only the necessary data
-## range from the data received in the buffer in P units
-#record(subArray, "$(P):WF:0") 
-#{
-#  field(DESC,    "Subarray")
-#  field(INP,     "$(P):WAVEFORM:R2E:0.VALA")
-#  field(OUT, "@asyn($(PORT),$(ADDR),$(TIMEOUT))REFINED_WAVEFORM:0")
-#  field(FTVL,    "DOUBLE")
-#  field(MALM,    "$(WAVEFORM_SIZE)")
-#  field(NELM,    "1024")
-#  field(INDX,    "0")
-#}
-#
-#record(ao, "$(P):WF:START:EGU:0")
-#{
-#  field(DESC,    "Subarray start EGU")
-#  field(DRVH,    "2857143")
-#  field(HOPR,    "2857143")
-#  field(FLNK,    "$(P):WF:START:CALC:0")
-#  info(autosaveFields, "VAL")
-#  field(PINI,    "YES")
-#  field(EGU,     "ns")
-#}
-#
-## PV to hold the start for the display array
-#record(calcout, "$(P):WF:START:CALC:0")
-#{
-#  field(DESC,    "Subarray start EGU")
-#  field(FLNK,    "$(P):WF:START:0")
-#  field(OUT,     "$(P):WF:START:0")
-#  field(INPA,    "$(P):WF:START:EGU:0")
-#  field(INPB,    "$(P):CLK:FREQUENCY CP")
-#  field(CALC,    "FLOOR((2*A*B)/1000)")
-#}
-#
-#record(ao, "$(P):WF:START:0") 
-#{
-#  field(DESC,    "Subarray start")
-#  field(DRVH,    "$(WAVEFORM_SIZE)")
-#  field(HOPR,    "$(WAVEFORM_SIZE)")
-#  field(PINI,    "NO")
-#  field(FLNK,    "$(P):WF:SEQ:0")
-#  field(DOL,     "$(P):WF:START:CALC:0")
-#  field(OMSL,    "closed_loop")
-#}
-#
-#record(ao, "$(P):WF:NELM:EGU:0")
-#{
-#  field(DESC,    "Subarray start EGU")
-#  field(DRVH,    "2857143")
-#  field(HOPR,    "2857143")
-#  field(FLNK,    "$(P):WF:NELM:CALC:0")
-#  info(autosaveFields, "VAL")
-#  field(PINI,    "YES")
-#  field(EGU,     "ns")
-#}
-#
-## PV to hold the start for the display array
-#record(calcout, "$(P):WF:NELM:CALC:0")
-#{
-#  field(DESC,    "Subarray start EGU")
-#  field(FLNK,    "$(P):WF:NELM:0")
-#  field(OUT,     "$(P):WF:NELM:0")
-#  field(INPA,    "$(P):WF:NELM:EGU:0")
-#  field(INPB,    "$(P):CLK:FREQUENCY CP")
-#  field(CALC,    "FLOOR((2*A*B)/1000)")
-#}
-#
-## PV to hold the length for the display array
-#record(ao, "$(P):WF:NELM:0") 
-#{
-#  field(DESC,    "Subarray length")
-#  field(PINI,    "NO")
-#  field(FLNK,    "$(P):WF:SEQ:0")
-#  field(DOL,     "$(P):WF:NELM:CALC:0")
-#  field(OMSL,    "closed_loop")
-#}
-#
-## PV to send data start and nelm to raw and wf PVs
-#record(seq, "$(P):WF:SEQ:0") 
-#{
-#  field(DESC, "Update NELM and INDX value")
-#  field(DOL1, "$(P):WF:START:0")
-#  field(LNK1, "$(P):WF:RAW:0.INDX PP")
-#
-#  field(DOL2, "$(P):WF:NELM:0")
-#  field(LNK2, "$(P):WF:RAW.NELM:0 PP")
-#
-#  field(DOL3, "$(P):WF:NELM:0")
-#  field(LNK3, "$(P):WF.NELM:0 PP")
-#
-#  field(DOL4, "$(P):WF:START:0")
-#  field(LNK4, "$(P):X:WF:0.INDX PP")
-#
-#  field(DOL5, "$(P):WF:NELM:0")
-#  field(LNK5, "$(P):X:WF:0.NELM PP")
-#
-#  field(ASG,  "Internal")
-#}
-
 
 record(subArray, "$(P):SUBARRAY:0")
 {
@@ -296,20 +96,20 @@ record(calcout, "$(P):TO:DIV:0")
   }
 
 
-record(ao, "$(P):STARTING:LOC:0")
-{
-    field(DTYP, "asynFloat64")
-    field(OUT, "@asyn($(PORT),$(ADDR),$(TIMEOUT))START_LOC0")
-    field(SCAN, "Passive")
-}
-
-
-record(ao, "$(P):ENDING:LOC:0")
-{
-    field(DTYP, "asynFloat64")
-    field(OUT, "@asyn($(PORT),$(ADDR),$(TIMEOUT))END_LOC0")
-    field(SCAN, "Passive")
-}
+#record(ao, "$(P):STARTING:LOC:0")
+#{
+#    field(DTYP, "asynFloat64")
+#    field(OUT, "@asyn($(PORT),$(ADDR),$(TIMEOUT))START_LOC0")
+#    field(SCAN, "Passive")
+#}
+#
+#
+#record(ao, "$(P):ENDING:LOC:0")
+#{
+#    field(DTYP, "asynFloat64")
+#    field(OUT, "@asyn($(PORT),$(ADDR),$(TIMEOUT))END_LOC0")
+#    field(SCAN, "Passive")
+#}
 
 
 record(ai, "$(P):BEAM:LOSS:LOC:0")
@@ -324,6 +124,7 @@ record(ai, "$(P):BEAM:LOSS:LOC:0")
 record(ao, "$(P):THRESHOLD:0") 
 {
   field(DTYP, "asynInt32")
+  field(PINI, "YES")
   field(SCAN, "Passive")
   field(DESC, "Threshold for beam loss")
   field(VAL, 0)
@@ -341,31 +142,22 @@ record(ao,      "$(P):LENGTH:0") {
     info(autosaveFields, "VAL")
 }
 
-# Physical location of the start of the fiber
-# Assuming units of meters
-#record(ao,      "$(P):Z:OFFSET:START:0") {
-#    field(DESC, "Location of the start of the fiber in m")
-#    field(PINI, "YES")
-#    field(OUT,  "@asyn($(PORT), $(ADDR), $(TIMEOUT))Z_OFFSET_START0")
-#    field(SCAN, "Passive")
-#    field(PREC, "3")
-#    field(VAL,  "0")
-#    info(autosaveFields, "VAL")
-#}
-
 record(ao, "$(P):Z:OFFSET:START:0")
 {
     field(DESC, "Location of the start of the fiber in m")
+    field(PINI, "YES")
     field(DTYP, "asynFloat64")
     field(OUT, "@asyn($(PORT),$(ADDR),$(TIMEOUT))Z_OFFSET_START0")
     field(SCAN, "Passive")
     field(VAL,  "0")
+    info(autosaveFields, "VAL")
 }
 
 # Physical location of the end of the fiber
 # Assuming units of meters
 record(ao,      "$(P):Z:OFFSET:END:0") {
     field(DESC, "Location of the end of the fiber in m")
+    field(PINI, "YES")
     field(DTYP, "asynFloat64")
     field(OUT, "@asyn($(PORT),$(ADDR),$(TIMEOUT))Z_OFFSET_END0")
     field(SCAN, "Passive")
@@ -375,6 +167,7 @@ record(ao,      "$(P):Z:OFFSET:END:0") {
 # Physical location of the start of the extraction range
 # Assuming units of meters
 record(ao,      "$(P):START:EXTRACTION:0") {
+    field(PINI, "YES")
     field(DESC, "Start of extraction range in m")
     field(DTYP, "asynFloat64")
     field(OUT,  "@asyn($(PORT), $(ADDR), $(TIMEOUT))EXTRACTION_START0")
@@ -385,6 +178,7 @@ record(ao,      "$(P):START:EXTRACTION:0") {
 # Physical location of the end of the extraction range
 # Assuming units of meters
 record(ao,      "$(P):END:EXTRACTION:0") {
+    field(PINI, "YES")
     field(DESC, "End of extraction range in m")
     field(DTYP, "asynFloat64")
     field(OUT,  "@asyn($(PORT), $(ADDR), $(TIMEOUT))EXTRACTION_END0")
@@ -395,27 +189,22 @@ record(ao,      "$(P):END:EXTRACTION:0") {
 record(ai, "$(P):EXTRACTED:NO:OF:ELEMENTS:0")
 {
     field(DTYP, "asynInt32")
+    field(PINI, "YES")
     field(INP, "@asyn($(PORT),$(ADDR),$(TIMEOUT))EXTRACTED_NO_OF_ELEMENTS0")
-    #field(FLNK,    "$(P):WAVEFORM:RAW:0 PP")
     field(SCAN, "I/O Intr")
     field(VAL, "100")
 }
 
-#record(waveform, "$(P):EXTRACTED:X:WF:0") 
-#{
-#  field(PINI, "1")
-#  field(DESC,    "X Subarray")
-#  field(INP, "@asyn($(PORT),$(ADDR),$(TIMEOUT))EXTRACTED_X_AXIS:0")
-#  field(DTYP, "asynInt16ArrayIn")
-#  field(FTVL,    "SHORT")
-#  #field(MALM,    "$(WAVEFORM_SIZE)")
-#  #field(NELM,    "$(P):EXTRACTED:NO:OF:ELEMENTS:0")
-#  field(NELM,    "$(WAVEFORM_SIZE)")
-#  field(SCAN, "I/O Intr")
-#  #field(INDX,    "0")
-#  #field(FLNK,    "$(P):WAVEFORM:RAW:0 PP")
-#  #field(EGU,     "meters")
-#}
+record(waveform, "$(P):EXTRACTED:X:WF:0") 
+{
+  field(PINI, "1")
+  field(DESC,    "X Subarray")
+  field(INP, "@asyn($(PORT),$(ADDR),$(TIMEOUT))EXTRACTED_X_AXIS:0")
+  field(DTYP, "asynFloat64ArrayIn")
+  field(FTVL,    "DOUBLE")
+  field(NELM,    "$(WAVEFORM_SIZE)")
+  field(SCAN, "I/O Intr")
+}
 
 record(waveform, "$(P):EXTRACTED:WF:0") 
 {
@@ -446,16 +235,6 @@ record(ao,      "$(P):OFFSET:1") {
     info(autosaveFields, "VAL")
 }
 
-# NOT SURE WHERE THIS IS BEING USED YET
-#record(calc,    "$(P):OFFSET:CALC:1") {
-#    field(DESC, "Calculate offset in raw")
-#    field(INPA, "$(P):OFFSET:1")
-#   field(INPB, "$(P):SLOPE:1")
-#    field(SCAN, "1 second")
-#   field(CALC, "A/B")
-#    field(FLNK, $(P):OFFSET:WF:1)
-#}
-
 record(waveform, "$(P):WAVEFORM:1")
 {
     field(PINI, "1")
@@ -467,196 +246,6 @@ record(waveform, "$(P):WAVEFORM:1")
     field(FLNK, "$(P):SUBARRAY:1 PP")
     field(SCAN, "I/O Intr")
   }
-
-# Create a waveform with the sampling time. This will be the X axis of the
-# waveform.
-#record (aSub, "$(P):X_WAVEFORM:1") {
-##  field(SNAM, "calcTimeArray")
-##  field(FTA, "LONG")
-##  field(FTVA, "DOUBLE")
-##  field(NOVA, "$(WAVEFORM_SIZE)")
-##  field(INPA, "$(P):CLK:FREQUENCY CP")
-##  field(OUTA, "$(P):X_WF:1")
-##  field(FLNK, "$(P):X_WF:1 PP")
-##}
-#
-# Interface PV, to display only the necessary data
-# range from the data received in the buffer
-record(subArray, "$(P):X_WF:1") 
-#{
-#  field(DESC,    "X Subarray")
-#  field(INP,     "$(P):X_WAVEFORM:1.VALA")
-#  field(OUT, "@asyn($(PORT),$(ADDR),$(TIMEOUT))WAVEFORM_X_AXIS:1")
-#  field(FTVL,    "DOUBLE")
-#  field(MALM,    "$(WAVEFORM_SIZE)")
-#  field(NELM,    "1024")
-#  field(INDX,    "0")
-#  field(FLNK,    "$(P):WAVEFORM:RAW:1 PP")
-#  field(EGU,     "ns")
-#}
-#
-## Interface PV, to display only the necessary data
-## range from the data received in the buffer
-#record(subArray, "$(P):WAVEFORM:RAW:1") 
-#{
-#  field(DESC,    "Raw Subarray")
-#  field(INP,     "$(P):WAVEFORM:1")
-#  field(FTVL,    "SHORT")
-#  field(MALM,    "$(WAVEFORM_SIZE)")
-#  field(NELM,    "1024")
-#  field(INDX,    "0")
-#  #field(FLNK,   "$(P):WAVEFORM:R2E:1 PP")
-#}
-#
-## PV to calculate the interface pv in P units
-#record (aSub, "$(P):WAVEFORM:R2E:1") 
-#{
-#  field(DESC, "subarray raw to egu")
-#  field(SNAM, "calcWaveformInEGU")
-#  field(INPA, "$(P):WF:RAW PP")
-#  field(NOA, "$(WAVEFORM_SIZE)")
-#  field(FTA, "SHORT")
-#  field(INPB, "$(P):SLOPE:WF:1 PP")
-#  field(FTB, "DOUBLE")
-#  field(INPC, "$(P):OFFSET:WF:1 PP")
-#  field(FTC, "SHORT")
-#  field(OUTA, "$(P):WF:1")
-#  field(FLNK, "$(P):WF:1")
-#  field(NOVA, "$(WAVEFORM_SIZE)")
-#  field(FTVA, "DOUBLE")
-#}
-#
-#record(calcout, "$(P):SLOPE:WF:CALC:1") 
-#{
-#  field(DESC,    "WF slope")
-#  field(PREC,    "3")
-#  field(FLNK,    "$(P):SLOPE:WF:1")
-#  field(CALC,    "A*.5")
-#  field(INPA,    "$(P):SLOPE:1 CPP")
-#}
-#
-## PV to hold the slope for the display array (raw to egu conversion)
-#record(ao, "$(P):SLOPE:WF:1") 
-#{
-#  field(DESC,    "WF slope")
-#  field(PREC,    "3")
-#  field(PINI,    "YES")
-#  field(FLNK,    "$(P):WAVEFORM:R2E:1")
-#  field(OMSL,    "closed_loop")
-#  field(DOL,     "$(P):SLOPE:WF:CALC:1")
-#}
-#
-## PV to hold the offset for the display array (raw to egu conversion)
-#record(ao, "$(P):OFFSET:WF:1") 
-#{
-#  field(DESC,    "WF offset in raw")
-#  field(PINI,    "YES")
-#  field(FLNK,    "$(P):WAVEFORM:R2E:1")
-#  field(EGU,     "raw")
-#  field(OMSL,    "closed_loop")
-#  field(DOL,     "$(P):OFFSET:CALC:1")
-#}
-#
-## Interface PV, to display only the necessary data
-## range from the data received in the buffer in P units
-#record(subArray, "$(P):WF:1") 
-#{
-#  field(DESC,    "Subarray")
-#  field(INP,     "$(P):WAVEFORM:R2E:1.VALA")
-#  field(OUT, "@asyn($(PORT),$(ADDR),$(TIMEOUT))REFINED_WAVEFORM:1")
-#  field(FTVL,    "DOUBLE")
-#  field(MALM,    "$(WAVEFORM_SIZE)")
-#  field(NELM,    "1024")
-#  field(INDX,    "0")
-#}
-#
-#record(ao, "$(P):WF:START:EGU:1")
-#{
-#  field(DESC,    "Subarray start EGU")
-#  field(DRVH,    "2857143")
-#  field(HOPR,    "2857143")
-#  field(FLNK,    "$(P):WF:START:CALC:1")
-#  info(autosaveFields, "VAL")
-#  field(PINI,    "YES")
-#  field(EGU,     "ns")
-#}
-#
-## PV to hold the start for the display array
-#record(calcout, "$(P):WF:START:CALC:1")
-#{
-#  field(DESC,    "Subarray start EGU")
-#  field(FLNK,    "$(P):WF:START:1")
-#  field(OUT,     "$(P):WF:START:1")
-#  field(INPA,    "$(P):WF:START:EGU:1")
-#  field(INPB,    "$(P):CLK:FREQUENCY CP")
-#  field(CALC,    "FLOOR((2*A*B)/1000)")
-#}
-#
-#record(ao, "$(P):WF:START:1") 
-#{
-#  field(DESC,    "Subarray start")
-#  field(DRVH,    "$(WAVEFORM_SIZE)")
-#  field(HOPR,    "$(WAVEFORM_SIZE)")
-#  field(PINI,    "NO")
-#  field(FLNK,    "$(P):WF:SEQ:1")
-#  field(DOL,     "$(P):WF:START:CALC:1")
-#  field(OMSL,    "closed_loop")
-#}
-#
-#record(ao, "$(P):WF:NELM:EGU:1")
-#{
-#  field(DESC,    "Subarray start EGU")
-#  field(DRVH,    "2857143")
-#  field(HOPR,    "2857143")
-#  field(FLNK,    "$(P):WF:NELM:CALC:1")
-#  info(autosaveFields, "VAL")
-#  field(PINI,    "YES")
-#  field(EGU,     "ns")
-#}
-#
-## PV to hold the start for the display array
-#record(calcout, "$(P):WF:NELM:CALC:1")
-#{
-#  field(DESC,    "Subarray start EGU")
-#  field(FLNK,    "$(P):WF:NELM:1")
-#  field(OUT,     "$(P):WF:NELM:1")
-#  field(INPA,    "$(P):WF:NELM:EGU:1")
-#  field(INPB,    "$(P):CLK:FREQUENCY CP")
-#  field(CALC,    "FLOOR((2*A*B)/1000)")
-#}
-#
-## PV to hold the length for the display array
-#record(ao, "$(P):WF:NELM:1") 
-#{
-#  field(DESC,    "Subarray length")
-#  field(PINI,    "NO")
-#  field(FLNK,    "$(P):WF:SEQ:1")
-#  field(DOL,     "$(P):WF:NELM:CALC:1")
-#  field(OMSL,    "closed_loop")
-#}
-#
-## PV to send data start and nelm to raw and wf PVs
-#record(seq, "$(P):WF:SEQ:1") 
-#{
-#  field(DESC, "Update NELM and INDX value")
-#  field(DOL1, "$(P):WF:START:1")
-#  field(LNK1, "$(P):WF:RAW:1.INDX PP")
-#
-#  field(DOL2, "$(P):WF:NELM:1")
-#  field(LNK2, "$(P):WF:RAW.NELM:1 PP")
-#
-#  field(DOL3, "$(P):WF:NELM:1")
-#  field(LNK3, "$(P):WF.NELM:1 PP")
-#
-#  field(DOL4, "$(P):WF:START:1")
-#  field(LNK4, "$(P):X:WF:1.INDX PP")
-#
-#  field(DOL5, "$(P):WF:NELM:1")
-#  field(LNK5, "$(P):X:WF:1.NELM PP")
-#
-#  field(ASG,  "Internal")
-#}
-
 
 record(subArray, "$(P):SUBARRAY:1")
 {
@@ -725,20 +314,20 @@ record(calcout, "$(P):TO:DIV:1")
   }
 
 
-record(ao, "$(P):STARTING:LOC:1")
-{
-    field(DTYP, "asynFloat64")
-    field(OUT, "@asyn($(PORT),$(ADDR),$(TIMEOUT))START_LOC1")
-    field(SCAN, "Passive")
-}
-
-
-record(ao, "$(P):ENDING:LOC:1")
-{
-    field(DTYP, "asynFloat64")
-    field(OUT, "@asyn($(PORT),$(ADDR),$(TIMEOUT))END_LOC1")
-    field(SCAN, "Passive")
-}
+#record(ao, "$(P):STARTING:LOC:1")
+#{
+#    field(DTYP, "asynFloat64")
+#    field(OUT, "@asyn($(PORT),$(ADDR),$(TIMEOUT))START_LOC1")
+#    field(SCAN, "Passive")
+#}
+#
+#
+#record(ao, "$(P):ENDING:LOC:1")
+#{
+#    field(DTYP, "asynFloat64")
+#    field(OUT, "@asyn($(PORT),$(ADDR),$(TIMEOUT))END_LOC1")
+#    field(SCAN, "Passive")
+#}
 
 
 record(ai, "$(P):BEAM:LOSS:LOC:1")
@@ -753,6 +342,7 @@ record(ai, "$(P):BEAM:LOSS:LOC:1")
 record(ao, "$(P):THRESHOLD:1") 
 {
   field(DTYP, "asynInt32")
+  field(PINI, "YES")
   field(SCAN, "Passive")
   field(DESC, "Threshold for beam loss")
   field(VAL, 0)
@@ -770,31 +360,22 @@ record(ao,      "$(P):LENGTH:1") {
     info(autosaveFields, "VAL")
 }
 
-# Physical location of the start of the fiber
-# Assuming units of meters
-#record(ao,      "$(P):Z:OFFSET:START:1") {
-#    field(DESC, "Location of the start of the fiber in m")
-#    field(PINI, "YES")
-#    field(OUT,  "@asyn($(PORT), $(ADDR), $(TIMEOUT))Z_OFFSET_START1")
-#    field(SCAN, "Passive")
-#    field(PREC, "3")
-#    field(VAL,  "0")
-#    info(autosaveFields, "VAL")
-#}
-
 record(ao, "$(P):Z:OFFSET:START:1")
 {
     field(DESC, "Location of the start of the fiber in m")
+    field(PINI, "YES")
     field(DTYP, "asynFloat64")
     field(OUT, "@asyn($(PORT),$(ADDR),$(TIMEOUT))Z_OFFSET_START1")
     field(SCAN, "Passive")
     field(VAL,  "0")
+    info(autosaveFields, "VAL")
 }
 
 # Physical location of the end of the fiber
 # Assuming units of meters
 record(ao,      "$(P):Z:OFFSET:END:1") {
     field(DESC, "Location of the end of the fiber in m")
+    field(PINI, "YES")
     field(DTYP, "asynFloat64")
     field(OUT, "@asyn($(PORT),$(ADDR),$(TIMEOUT))Z_OFFSET_END1")
     field(SCAN, "Passive")
@@ -804,6 +385,7 @@ record(ao,      "$(P):Z:OFFSET:END:1") {
 # Physical location of the start of the extraction range
 # Assuming units of meters
 record(ao,      "$(P):START:EXTRACTION:1") {
+    field(PINI, "YES")
     field(DESC, "Start of extraction range in m")
     field(DTYP, "asynFloat64")
     field(OUT,  "@asyn($(PORT), $(ADDR), $(TIMEOUT))EXTRACTION_START1")
@@ -814,6 +396,7 @@ record(ao,      "$(P):START:EXTRACTION:1") {
 # Physical location of the end of the extraction range
 # Assuming units of meters
 record(ao,      "$(P):END:EXTRACTION:1") {
+    field(PINI, "YES")
     field(DESC, "End of extraction range in m")
     field(DTYP, "asynFloat64")
     field(OUT,  "@asyn($(PORT), $(ADDR), $(TIMEOUT))EXTRACTION_END1")
@@ -824,27 +407,22 @@ record(ao,      "$(P):END:EXTRACTION:1") {
 record(ai, "$(P):EXTRACTED:NO:OF:ELEMENTS:1")
 {
     field(DTYP, "asynInt32")
+    field(PINI, "YES")
     field(INP, "@asyn($(PORT),$(ADDR),$(TIMEOUT))EXTRACTED_NO_OF_ELEMENTS1")
-    #field(FLNK,    "$(P):WAVEFORM:RAW:1 PP")
     field(SCAN, "I/O Intr")
     field(VAL, "100")
 }
 
-#record(waveform, "$(P):EXTRACTED:X:WF:1") 
-#{
-#  field(PINI, "1")
-#  field(DESC,    "X Subarray")
-#  field(INP, "@asyn($(PORT),$(ADDR),$(TIMEOUT))EXTRACTED_X_AXIS:1")
-#  field(DTYP, "asynInt16ArrayIn")
-#  field(FTVL,    "SHORT")
-#  #field(MALM,    "$(WAVEFORM_SIZE)")
-#  #field(NELM,    "$(P):EXTRACTED:NO:OF:ELEMENTS:1")
-#  field(NELM,    "$(WAVEFORM_SIZE)")
-#  field(SCAN, "I/O Intr")
-#  #field(INDX,    "0")
-#  #field(FLNK,    "$(P):WAVEFORM:RAW:1 PP")
-#  #field(EGU,     "meters")
-#}
+record(waveform, "$(P):EXTRACTED:X:WF:1") 
+{
+  field(PINI, "1")
+  field(DESC,    "X Subarray")
+  field(INP, "@asyn($(PORT),$(ADDR),$(TIMEOUT))EXTRACTED_X_AXIS:1")
+  field(DTYP, "asynFloat64ArrayIn")
+  field(FTVL,    "DOUBLE")
+  field(NELM,    "$(WAVEFORM_SIZE)")
+  field(SCAN, "I/O Intr")
+}
 
 record(waveform, "$(P):EXTRACTED:WF:1") 
 {
@@ -875,16 +453,6 @@ record(ao,      "$(P):OFFSET:2") {
     info(autosaveFields, "VAL")
 }
 
-# NOT SURE WHERE THIS IS BEING USED YET
-#record(calc,    "$(P):OFFSET:CALC:2") {
-#    field(DESC, "Calculate offset in raw")
-#    field(INPA, "$(P):OFFSET:2")
-#   field(INPB, "$(P):SLOPE:2")
-#    field(SCAN, "1 second")
-#   field(CALC, "A/B")
-#    field(FLNK, $(P):OFFSET:WF:2)
-#}
-
 record(waveform, "$(P):WAVEFORM:2")
 {
     field(PINI, "1")
@@ -896,196 +464,6 @@ record(waveform, "$(P):WAVEFORM:2")
     field(FLNK, "$(P):SUBARRAY:2 PP")
     field(SCAN, "I/O Intr")
   }
-
-# Create a waveform with the sampling time. This will be the X axis of the
-# waveform.
-#record (aSub, "$(P):X_WAVEFORM:2") {
-##  field(SNAM, "calcTimeArray")
-##  field(FTA, "LONG")
-##  field(FTVA, "DOUBLE")
-##  field(NOVA, "$(WAVEFORM_SIZE)")
-##  field(INPA, "$(P):CLK:FREQUENCY CP")
-##  field(OUTA, "$(P):X_WF:2")
-##  field(FLNK, "$(P):X_WF:2 PP")
-##}
-#
-# Interface PV, to display only the necessary data
-# range from the data received in the buffer
-record(subArray, "$(P):X_WF:2") 
-#{
-#  field(DESC,    "X Subarray")
-#  field(INP,     "$(P):X_WAVEFORM:2.VALA")
-#  field(OUT, "@asyn($(PORT),$(ADDR),$(TIMEOUT))WAVEFORM_X_AXIS:2")
-#  field(FTVL,    "DOUBLE")
-#  field(MALM,    "$(WAVEFORM_SIZE)")
-#  field(NELM,    "1024")
-#  field(INDX,    "0")
-#  field(FLNK,    "$(P):WAVEFORM:RAW:2 PP")
-#  field(EGU,     "ns")
-#}
-#
-## Interface PV, to display only the necessary data
-## range from the data received in the buffer
-#record(subArray, "$(P):WAVEFORM:RAW:2") 
-#{
-#  field(DESC,    "Raw Subarray")
-#  field(INP,     "$(P):WAVEFORM:2")
-#  field(FTVL,    "SHORT")
-#  field(MALM,    "$(WAVEFORM_SIZE)")
-#  field(NELM,    "1024")
-#  field(INDX,    "0")
-#  #field(FLNK,   "$(P):WAVEFORM:R2E:2 PP")
-#}
-#
-## PV to calculate the interface pv in P units
-#record (aSub, "$(P):WAVEFORM:R2E:2") 
-#{
-#  field(DESC, "subarray raw to egu")
-#  field(SNAM, "calcWaveformInEGU")
-#  field(INPA, "$(P):WF:RAW PP")
-#  field(NOA, "$(WAVEFORM_SIZE)")
-#  field(FTA, "SHORT")
-#  field(INPB, "$(P):SLOPE:WF:2 PP")
-#  field(FTB, "DOUBLE")
-#  field(INPC, "$(P):OFFSET:WF:2 PP")
-#  field(FTC, "SHORT")
-#  field(OUTA, "$(P):WF:2")
-#  field(FLNK, "$(P):WF:2")
-#  field(NOVA, "$(WAVEFORM_SIZE)")
-#  field(FTVA, "DOUBLE")
-#}
-#
-#record(calcout, "$(P):SLOPE:WF:CALC:2") 
-#{
-#  field(DESC,    "WF slope")
-#  field(PREC,    "3")
-#  field(FLNK,    "$(P):SLOPE:WF:2")
-#  field(CALC,    "A*.5")
-#  field(INPA,    "$(P):SLOPE:2 CPP")
-#}
-#
-## PV to hold the slope for the display array (raw to egu conversion)
-#record(ao, "$(P):SLOPE:WF:2") 
-#{
-#  field(DESC,    "WF slope")
-#  field(PREC,    "3")
-#  field(PINI,    "YES")
-#  field(FLNK,    "$(P):WAVEFORM:R2E:2")
-#  field(OMSL,    "closed_loop")
-#  field(DOL,     "$(P):SLOPE:WF:CALC:2")
-#}
-#
-## PV to hold the offset for the display array (raw to egu conversion)
-#record(ao, "$(P):OFFSET:WF:2") 
-#{
-#  field(DESC,    "WF offset in raw")
-#  field(PINI,    "YES")
-#  field(FLNK,    "$(P):WAVEFORM:R2E:2")
-#  field(EGU,     "raw")
-#  field(OMSL,    "closed_loop")
-#  field(DOL,     "$(P):OFFSET:CALC:2")
-#}
-#
-## Interface PV, to display only the necessary data
-## range from the data received in the buffer in P units
-#record(subArray, "$(P):WF:2") 
-#{
-#  field(DESC,    "Subarray")
-#  field(INP,     "$(P):WAVEFORM:R2E:2.VALA")
-#  field(OUT, "@asyn($(PORT),$(ADDR),$(TIMEOUT))REFINED_WAVEFORM:2")
-#  field(FTVL,    "DOUBLE")
-#  field(MALM,    "$(WAVEFORM_SIZE)")
-#  field(NELM,    "1024")
-#  field(INDX,    "0")
-#}
-#
-#record(ao, "$(P):WF:START:EGU:2")
-#{
-#  field(DESC,    "Subarray start EGU")
-#  field(DRVH,    "2857143")
-#  field(HOPR,    "2857143")
-#  field(FLNK,    "$(P):WF:START:CALC:2")
-#  info(autosaveFields, "VAL")
-#  field(PINI,    "YES")
-#  field(EGU,     "ns")
-#}
-#
-## PV to hold the start for the display array
-#record(calcout, "$(P):WF:START:CALC:2")
-#{
-#  field(DESC,    "Subarray start EGU")
-#  field(FLNK,    "$(P):WF:START:2")
-#  field(OUT,     "$(P):WF:START:2")
-#  field(INPA,    "$(P):WF:START:EGU:2")
-#  field(INPB,    "$(P):CLK:FREQUENCY CP")
-#  field(CALC,    "FLOOR((2*A*B)/1000)")
-#}
-#
-#record(ao, "$(P):WF:START:2") 
-#{
-#  field(DESC,    "Subarray start")
-#  field(DRVH,    "$(WAVEFORM_SIZE)")
-#  field(HOPR,    "$(WAVEFORM_SIZE)")
-#  field(PINI,    "NO")
-#  field(FLNK,    "$(P):WF:SEQ:2")
-#  field(DOL,     "$(P):WF:START:CALC:2")
-#  field(OMSL,    "closed_loop")
-#}
-#
-#record(ao, "$(P):WF:NELM:EGU:2")
-#{
-#  field(DESC,    "Subarray start EGU")
-#  field(DRVH,    "2857143")
-#  field(HOPR,    "2857143")
-#  field(FLNK,    "$(P):WF:NELM:CALC:2")
-#  info(autosaveFields, "VAL")
-#  field(PINI,    "YES")
-#  field(EGU,     "ns")
-#}
-#
-## PV to hold the start for the display array
-#record(calcout, "$(P):WF:NELM:CALC:2")
-#{
-#  field(DESC,    "Subarray start EGU")
-#  field(FLNK,    "$(P):WF:NELM:2")
-#  field(OUT,     "$(P):WF:NELM:2")
-#  field(INPA,    "$(P):WF:NELM:EGU:2")
-#  field(INPB,    "$(P):CLK:FREQUENCY CP")
-#  field(CALC,    "FLOOR((2*A*B)/1000)")
-#}
-#
-## PV to hold the length for the display array
-#record(ao, "$(P):WF:NELM:2") 
-#{
-#  field(DESC,    "Subarray length")
-#  field(PINI,    "NO")
-#  field(FLNK,    "$(P):WF:SEQ:2")
-#  field(DOL,     "$(P):WF:NELM:CALC:2")
-#  field(OMSL,    "closed_loop")
-#}
-#
-## PV to send data start and nelm to raw and wf PVs
-#record(seq, "$(P):WF:SEQ:2") 
-#{
-#  field(DESC, "Update NELM and INDX value")
-#  field(DOL1, "$(P):WF:START:2")
-#  field(LNK1, "$(P):WF:RAW:2.INDX PP")
-#
-#  field(DOL2, "$(P):WF:NELM:2")
-#  field(LNK2, "$(P):WF:RAW.NELM:2 PP")
-#
-#  field(DOL3, "$(P):WF:NELM:2")
-#  field(LNK3, "$(P):WF.NELM:2 PP")
-#
-#  field(DOL4, "$(P):WF:START:2")
-#  field(LNK4, "$(P):X:WF:2.INDX PP")
-#
-#  field(DOL5, "$(P):WF:NELM:2")
-#  field(LNK5, "$(P):X:WF:2.NELM PP")
-#
-#  field(ASG,  "Internal")
-#}
-
 
 record(subArray, "$(P):SUBARRAY:2")
 {
@@ -1154,20 +532,20 @@ record(calcout, "$(P):TO:DIV:2")
   }
 
 
-record(ao, "$(P):STARTING:LOC:2")
-{
-    field(DTYP, "asynFloat64")
-    field(OUT, "@asyn($(PORT),$(ADDR),$(TIMEOUT))START_LOC2")
-    field(SCAN, "Passive")
-}
-
-
-record(ao, "$(P):ENDING:LOC:2")
-{
-    field(DTYP, "asynFloat64")
-    field(OUT, "@asyn($(PORT),$(ADDR),$(TIMEOUT))END_LOC2")
-    field(SCAN, "Passive")
-}
+#record(ao, "$(P):STARTING:LOC:2")
+#{
+#    field(DTYP, "asynFloat64")
+#    field(OUT, "@asyn($(PORT),$(ADDR),$(TIMEOUT))START_LOC2")
+#    field(SCAN, "Passive")
+#}
+#
+#
+#record(ao, "$(P):ENDING:LOC:2")
+#{
+#    field(DTYP, "asynFloat64")
+#    field(OUT, "@asyn($(PORT),$(ADDR),$(TIMEOUT))END_LOC2")
+#    field(SCAN, "Passive")
+#}
 
 
 record(ai, "$(P):BEAM:LOSS:LOC:2")
@@ -1182,6 +560,7 @@ record(ai, "$(P):BEAM:LOSS:LOC:2")
 record(ao, "$(P):THRESHOLD:2") 
 {
   field(DTYP, "asynInt32")
+  field(PINI, "YES")
   field(SCAN, "Passive")
   field(DESC, "Threshold for beam loss")
   field(VAL, 0)
@@ -1199,31 +578,22 @@ record(ao,      "$(P):LENGTH:2") {
     info(autosaveFields, "VAL")
 }
 
-# Physical location of the start of the fiber
-# Assuming units of meters
-#record(ao,      "$(P):Z:OFFSET:START:2") {
-#    field(DESC, "Location of the start of the fiber in m")
-#    field(PINI, "YES")
-#    field(OUT,  "@asyn($(PORT), $(ADDR), $(TIMEOUT))Z_OFFSET_START2")
-#    field(SCAN, "Passive")
-#    field(PREC, "3")
-#    field(VAL,  "0")
-#    info(autosaveFields, "VAL")
-#}
-
 record(ao, "$(P):Z:OFFSET:START:2")
 {
     field(DESC, "Location of the start of the fiber in m")
+    field(PINI, "YES")
     field(DTYP, "asynFloat64")
     field(OUT, "@asyn($(PORT),$(ADDR),$(TIMEOUT))Z_OFFSET_START2")
     field(SCAN, "Passive")
     field(VAL,  "0")
+    info(autosaveFields, "VAL")
 }
 
 # Physical location of the end of the fiber
 # Assuming units of meters
 record(ao,      "$(P):Z:OFFSET:END:2") {
     field(DESC, "Location of the end of the fiber in m")
+    field(PINI, "YES")
     field(DTYP, "asynFloat64")
     field(OUT, "@asyn($(PORT),$(ADDR),$(TIMEOUT))Z_OFFSET_END2")
     field(SCAN, "Passive")
@@ -1233,6 +603,7 @@ record(ao,      "$(P):Z:OFFSET:END:2") {
 # Physical location of the start of the extraction range
 # Assuming units of meters
 record(ao,      "$(P):START:EXTRACTION:2") {
+    field(PINI, "YES")
     field(DESC, "Start of extraction range in m")
     field(DTYP, "asynFloat64")
     field(OUT,  "@asyn($(PORT), $(ADDR), $(TIMEOUT))EXTRACTION_START2")
@@ -1243,6 +614,7 @@ record(ao,      "$(P):START:EXTRACTION:2") {
 # Physical location of the end of the extraction range
 # Assuming units of meters
 record(ao,      "$(P):END:EXTRACTION:2") {
+    field(PINI, "YES")
     field(DESC, "End of extraction range in m")
     field(DTYP, "asynFloat64")
     field(OUT,  "@asyn($(PORT), $(ADDR), $(TIMEOUT))EXTRACTION_END2")
@@ -1253,27 +625,22 @@ record(ao,      "$(P):END:EXTRACTION:2") {
 record(ai, "$(P):EXTRACTED:NO:OF:ELEMENTS:2")
 {
     field(DTYP, "asynInt32")
+    field(PINI, "YES")
     field(INP, "@asyn($(PORT),$(ADDR),$(TIMEOUT))EXTRACTED_NO_OF_ELEMENTS2")
-    #field(FLNK,    "$(P):WAVEFORM:RAW:2 PP")
     field(SCAN, "I/O Intr")
     field(VAL, "100")
 }
 
-#record(waveform, "$(P):EXTRACTED:X:WF:2") 
-#{
-#  field(PINI, "1")
-#  field(DESC,    "X Subarray")
-#  field(INP, "@asyn($(PORT),$(ADDR),$(TIMEOUT))EXTRACTED_X_AXIS:2")
-#  field(DTYP, "asynInt16ArrayIn")
-#  field(FTVL,    "SHORT")
-#  #field(MALM,    "$(WAVEFORM_SIZE)")
-#  #field(NELM,    "$(P):EXTRACTED:NO:OF:ELEMENTS:2")
-#  field(NELM,    "$(WAVEFORM_SIZE)")
-#  field(SCAN, "I/O Intr")
-#  #field(INDX,    "0")
-#  #field(FLNK,    "$(P):WAVEFORM:RAW:2 PP")
-#  #field(EGU,     "meters")
-#}
+record(waveform, "$(P):EXTRACTED:X:WF:2") 
+{
+  field(PINI, "1")
+  field(DESC,    "X Subarray")
+  field(INP, "@asyn($(PORT),$(ADDR),$(TIMEOUT))EXTRACTED_X_AXIS:2")
+  field(DTYP, "asynFloat64ArrayIn")
+  field(FTVL,    "DOUBLE")
+  field(NELM,    "$(WAVEFORM_SIZE)")
+  field(SCAN, "I/O Intr")
+}
 
 record(waveform, "$(P):EXTRACTED:WF:2") 
 {

@@ -1,21 +1,28 @@
 #include "WaveformReader.h"
 
+/**
+ * Extracts relevant portion of the waveform from the entire buffer by removing extraneous data and clipping the remaining data based on 
+ * starting and ending physical locations entered by the user in the extraction_start and extraction_end PVs.
+ * Also creates an x_axis that contains physical locations corresponding to the values in the waveform.
+ * 
+ * @param waveformIndex index of waveform: 0, 1, and 2, for WAVEFORM:0, WAVEFORM:1, and WAVEFORM:2 respectively
+ */
 void WaveformReader::extractWaveform(int waveformIndex)
 {
-  double clock_frequency = 0, scaled_input;//, offset, slope;
+  int clock_frequency = 0, scaled_input;
   double sum = 0;
   double time_ns = 0;
   int offset, slope;
 
   // might have to change clock_frequency to int because the record type errors on asynFloat64
-  getDoubleParam(clk_frequency_index, &clock_frequency);
+  getIntegerParam(clk_frequency_index, &clock_frequency);
   getIntegerParam(*(offset_indices[waveformIndex]), &offset);
   getIntegerParam(*(slope_indices[waveformIndex]), &slope);
 
   std::string original_pvIdentifier = waveform_param_indices[waveformIndex];
 
   epicsInt16 *refined_waveform = (epicsInt16 *)calloc(STREAM_MAX_SIZE, sizeof(epicsInt16));
-  epicsInt16 *x_axis_time = (epicsInt16 *)calloc(STREAM_MAX_SIZE, sizeof(epicsInt16));  
+  epicsFloat64 *x_axis_time = (epicsFloat64 *)calloc(STREAM_MAX_SIZE, sizeof(epicsFloat64));  
 
   /* Calculate the time in ns between each sample */
   time_ns = 1000.0 / (2.0 * clock_frequency);
@@ -30,9 +37,6 @@ void WaveformReader::extractWaveform(int waveformIndex)
     refined_waveform[i] = scaled_input * slope;
   }
 
-  //std::string refined_pvIdentifier = refined_waveform_param_indices[waveformIndex];
-  //std::string x_axis_pvIdentifier = x_axis_waveform_indices[waveformIndex];
-  // assuming all these are doubles, double check this
   double length, z_offset_start, z_offset_end, speed, extraneous_length, actual_length, extraction_start, extraction_end;
   getDoubleParam(*(length_indices[waveformIndex]), &length);
   getDoubleParam(*(z_offset_start_indices[waveformIndex]), &z_offset_start);
@@ -45,11 +49,9 @@ void WaveformReader::extractWaveform(int waveformIndex)
   actual_length = z_offset_end - z_offset_start;
   extraneous_length = (length - actual_length) / 2;
 
-  // (epicsInt16 *) first_iteration;
   epicsInt16 *first_iteration = (epicsInt16 *)calloc(STREAM_MAX_SIZE, sizeof(epicsInt16)); 
-  epicsInt16 *x_axis_distance = (epicsInt16 *)calloc(STREAM_MAX_SIZE, sizeof(epicsInt16)); 
+  epicsFloat64 *x_axis_distance = (epicsFloat64 *)calloc(STREAM_MAX_SIZE, sizeof(epicsFloat64)); 
 
-  // WANT TO TRAVERSE ENTIRE WAVEFORM, CHECK IF MAX_BUFFER_SIZE IS THE CORRECT LIMIT OR DO I HAVE TO USE WAVEFORM_SIZE
   // shave off extraneous data, just keep the first iteration of the waveform data
   double total_distance = 0;
   int no_of_elements = 0;
@@ -63,7 +65,7 @@ void WaveformReader::extractWaveform(int waveformIndex)
   }
 
   epicsInt16 *waveform_data_clipped = (epicsInt16 *)calloc(STREAM_MAX_SIZE, sizeof(epicsInt16)); 
-  epicsInt16 *x_axis_clipped = (epicsInt16 *)calloc(STREAM_MAX_SIZE, sizeof(epicsInt16));
+  epicsFloat64 *x_axis_clipped = (epicsFloat64 *)calloc(STREAM_MAX_SIZE, sizeof(epicsFloat64));
 
   // remove data representing vertical parts
   int no_of_valid_elements = 0;
@@ -78,7 +80,7 @@ void WaveformReader::extractWaveform(int waveformIndex)
   }
 
   epicsInt16 *waveform_data = (epicsInt16 *)calloc(STREAM_MAX_SIZE, sizeof(epicsInt16)); 
-  epicsInt16 *x_axis = (epicsInt16 *)calloc(STREAM_MAX_SIZE, sizeof(epicsInt16)); 
+  epicsFloat64 *x_axis = (epicsFloat64 *)calloc(STREAM_MAX_SIZE, sizeof(epicsFloat64)); 
   // invert the waveforms because right now the data starts on the right side of the fiber
   for (int i = 0; i < no_of_valid_elements; i++) 
   {
@@ -86,8 +88,15 @@ void WaveformReader::extractWaveform(int waveformIndex)
     x_axis[i] = actual_length - x_axis_clipped[no_of_valid_elements - i - 1] + z_offset_start;
   }
 
+  if (extraction_start > extraction_end || extraction_start < z_offset_start || extraction_start > z_offset_end
+   || extraction_end > z_offset_end || extraction_end < z_offset_start) 
+  {
+    extraction_start = z_offset_start;
+    extraction_end = z_offset_end;
+  }
+
   epicsInt16 *extracted_waveform_data = (epicsInt16 *)calloc(STREAM_MAX_SIZE, sizeof(epicsInt16)); 
-  epicsInt16 *extracted_x_axis = (epicsInt16 *)calloc(STREAM_MAX_SIZE, sizeof(epicsInt16)); 
+  epicsFloat64 *extracted_x_axis = (epicsFloat64 *)calloc(STREAM_MAX_SIZE, sizeof(epicsFloat64)); 
   int no_of_extracted_elements = 0;
   // extract relevant part of the waveform based on starting and ending extraction points entered by the user
   for (int i = 0; i < no_of_valid_elements; i++) 
@@ -104,14 +113,15 @@ void WaveformReader::extractWaveform(int waveformIndex)
   callParamCallbacks();
 
   std::string extracted_pvIdentifier = extracted_waveform_param_indices[waveformIndex];
-  //std::string extracted_x_axis_pvIdentifier = extracted_x_axis_waveform_indices[waveformIndex];
+  std::string extracted_x_axis_pvIdentifier = extracted_x_axis_waveform_indices[waveformIndex];
 
   
   for (int i = 0; i < no_of_extracted_elements; i++) 
   {
-    //extracted_x_axis_waveform_map[extracted_x_axis_pvIdentifier][i] = extracted_x_axis[i];
+    extracted_x_axis_waveform_map[extracted_x_axis_pvIdentifier][i] = extracted_x_axis[i];
     extracted_waveform_map[extracted_pvIdentifier][i] = extracted_waveform_data[i];
-
+    doCallbacksInt16Array(extracted_waveform_data, no_of_extracted_elements, extracted_param_map[extracted_pvIdentifier], 0);
+    doCallbacksFloat64Array(extracted_x_axis, no_of_extracted_elements, x_axis_param_map[extracted_x_axis_pvIdentifier], 0);
     // do I need some kind of array callbacks here?
   }
 

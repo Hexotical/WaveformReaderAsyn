@@ -41,8 +41,8 @@
 #define WAVEFORM0_PV_STRING "WAVEFORM:0"
 #define WAVEFORM0_END_ADDR_STRING "END_ADDR0"
 #define WAVEFORM0_BEGIN_ADDR_STRING "BEGIN_ADDR0"
-#define WAVEFORM0_STARTING_LOCATION_STRING "START_LOC0"
-#define WAVEFORM0_ENDING_LOCATION_STRING "END_LOC0"
+// #define WAVEFORM0_STARTING_LOCATION_STRING "START_LOC0"
+// #define WAVEFORM0_ENDING_LOCATION_STRING "END_LOC0"
 #define WAVEFORM0_BEAM_LOSS_LOCATION_STRING "BEAM_LOSS_LOC0"
 #define WAVEFORM0_BUFFER_SIZE_INIT_STRING "WAVEFORM_BUFFER_SIZE_INIT0"
 #define WAVEFORM0_THRESHOLD_STRING "THRESHOLD:0"
@@ -63,8 +63,8 @@
 #define WAVEFORM1_PV_STRING "WAVEFORM:1"
 #define WAVEFORM1_END_ADDR_STRING "END_ADDR1"
 #define WAVEFORM1_BEGIN_ADDR_STRING "BEGIN_ADDR1"
-#define WAVEFORM1_STARTING_LOCATION_STRING "START_LOC1"
-#define WAVEFORM1_ENDING_LOCATION_STRING "END_LOC1"
+// #define WAVEFORM1_STARTING_LOCATION_STRING "START_LOC1"
+// #define WAVEFORM1_ENDING_LOCATION_STRING "END_LOC1"
 #define WAVEFORM1_BEAM_LOSS_LOCATION_STRING "BEAM_LOSS_LOC1"
 #define WAVEFORM1_BUFFER_SIZE_INIT_STRING "WAVEFORM_BUFFER_SIZE_INIT1"
 #define WAVEFORM1_THRESHOLD_STRING "THRESHOLD:1"
@@ -85,8 +85,8 @@
 #define WAVEFORM2_PV_STRING "WAVEFORM:2"
 #define WAVEFORM2_END_ADDR_STRING "END_ADDR2"
 #define WAVEFORM2_BEGIN_ADDR_STRING "BEGIN_ADDR2"
-#define WAVEFORM2_STARTING_LOCATION_STRING "START_LOC2"
-#define WAVEFORM2_ENDING_LOCATION_STRING "END_LOC2"
+// #define WAVEFORM2_STARTING_LOCATION_STRING "START_LOC2"
+// #define WAVEFORM2_ENDING_LOCATION_STRING "END_LOC2"
 #define WAVEFORM2_BEAM_LOSS_LOCATION_STRING "BEAM_LOSS_LOC2"
 #define WAVEFORM2_BUFFER_SIZE_INIT_STRING "WAVEFORM_BUFFER_SIZE_INIT2"
 #define WAVEFORM2_THRESHOLD_STRING "THRESHOLD:2"
@@ -142,6 +142,8 @@ class WaveformReader : public asynPortDriver
     std::vector<std::string> extracted_waveform_param_indices;
     std::vector<std::string> extracted_x_axis_waveform_indices;
     std::map<std::string, int> pv_param_map; //Identifier of pv to parameter in param list
+    std::map<std::string, int> extracted_param_map;
+    std::map<std::string, int> x_axis_param_map;
     std::map<std::string, int> index_map; // map string identifiers to indices 0, 1, and 2, which are used to get waveform-specific data from arrays
     std::array<std::string, NUMBER_OF_WAVEFORM_RECORDS> streaming_status; // store the streaming status of the waveforms 
     std::array<std::chrono::milliseconds, NUMBER_OF_WAVEFORM_RECORDS> duration_data; // store the time it takes to read the stream from the hardware
