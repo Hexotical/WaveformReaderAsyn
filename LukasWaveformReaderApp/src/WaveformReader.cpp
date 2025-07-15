@@ -40,31 +40,20 @@ WaveformReader::WaveformReader(const char *portName, int bayNumber, int bufferSi
   _DataBufferSize = IScalVal::create(p->findByName(("/mmio/AppTop/DaqMuxV2[" + std::to_string(bayNumber) + "]/DataBufferSize").c_str()));
   _TrigCount = IScalVal_RO::create(p->findByName(("/mmio/AppTop/DaqMuxV2[" + std::to_string(bayNumber) + "]/TrigCount").c_str()));
   _WebInit = ICommand::create(p->findByName(("/mmio/AmcCarrierCore/AmcCarrierBsa/BsaWaveformEngine[" + std::to_string(bayNumber) + "]/WaveformEngineBuffers/Initialize").c_str()));
-  
-  
-  
-  
   _ClkFrequency = IScalVal_RO::create(p->findByName(("/mmio/AppTop/AppCore/AmcGenericAdcDacCore[" + std::to_string(bayNumber) + "]/AmcGenericAdcDacCtrl/AmcClkFreq").c_str()));
-  //_ClkFrequency = IScalVal::create(p->findByName(("/mmio/AppTop/DaqMuxV2[" + std::to_string(bayNumber) + "]/TriggerHwAutoRearm").c_str()));
 
   //Connecting to the records our port driver will eventually need to interact with
   for(int pvID = 0; pvID < waveformPVs; pvID++)
   {
     //For loop generates the string identifier for each Waveform records and then creates a parameter our asynDriver can interact with for it
     int waveform_param_index;
-    // int refined_waveform_param_index;
-    // int x_axis_waveform_param_index;
     int extracted_waveform_param_index;
     int extracted_x_axis_waveform_param_index;
     std::string pvIdentifier = "WAVEFORM:" + std::to_string(pvID);
-    // std::string refined_pvIdentifier = "REFINED_WAVEFORM:" + std::to_string(pvID);
-    // std::string x_axis_pvIdentifier = "WAVEFORM_X_AXIS:" + std::to_string(pvID);
     std::string extracted_pvIdentifier = "EXTRACTED_WAVEFORM:" + std::to_string(pvID);
     std::string extracted_x_axis_pvIdentifier = "EXTRACTED_X_AXIS:" + std::to_string(pvID);
     std::cout << pvIdentifier << std::endl;
     createParam(pvIdentifier.c_str(), asynParamInt16Array, &waveform_param_index);
-    // createParam(refined_pvIdentifier.c_str(), asynParamInt16Array, &refined_waveform_param_index);
-    // createParam(x_axis_pvIdentifier.c_str(), asynParamInt16Array, &x_axis_waveform_param_index);
     createParam(extracted_pvIdentifier.c_str(), asynParamInt16Array, &extracted_waveform_param_index);
     createParam(extracted_x_axis_pvIdentifier.c_str(), asynParamFloat64Array, &extracted_x_axis_waveform_param_index);
     std::cout << "The identifier is: " << pvIdentifier << " and the waveform_param_index is : " << waveform_param_index << std::endl;
@@ -72,8 +61,6 @@ WaveformReader::WaveformReader(const char *portName, int bayNumber, int bufferSi
     extracted_param_map.insert(std::pair<std::string, int>(extracted_pvIdentifier, extracted_waveform_param_index));
     x_axis_param_map.insert(std::pair<std::string, int>(extracted_x_axis_pvIdentifier, extracted_x_axis_waveform_param_index));
     waveform_param_indices.push_back(pvIdentifier);
-    // refined_waveform_param_indices.push_back(refined_pvIdentifier);
-    // x_axis_waveform_indices.push_back(x_axis_pvIdentifier);
     extracted_waveform_param_indices.push_back(extracted_pvIdentifier);
     extracted_x_axis_waveform_indices.push_back(extracted_x_axis_pvIdentifier);
     // initialize values 
@@ -83,17 +70,12 @@ WaveformReader::WaveformReader(const char *portName, int bayNumber, int bufferSi
     duration_data[pvID] = std::chrono::milliseconds(0);
 
     waveform_map[pvIdentifier] = (epicsInt16 *)calloc(STREAM_MAX_SIZE, sizeof(epicsInt16)); 
-    // the refined waveform obtains its data from the waveform PV not directly from hardware
-    // refined_waveform_map[refined_pvIdentifier] = (epicsInt16 *)calloc(STREAM_MAX_SIZE, sizeof(epicsInt16)); 
-    // x_axis_waveform_map[x_axis_pvIdentifier] = (epicsInt16 *)calloc(STREAM_MAX_SIZE, sizeof(epicsInt16)); 
     extracted_waveform_map[extracted_pvIdentifier] = (epicsInt16 *)calloc(STREAM_MAX_SIZE, sizeof(epicsInt16)); 
     extracted_x_axis_waveform_map[extracted_x_axis_pvIdentifier] = (epicsInt16 *)calloc(STREAM_MAX_SIZE, sizeof(epicsInt16)); 
 
     // connect to the PVs that represent parameters of each waveform record using corresponding arrays
     createParam(("END_ADDR" + std::to_string(pvID)).c_str(), asynParamInt32, endAddr_indices[pvID]);
     createParam(("BEGIN_ADDR" + std::to_string(pvID)).c_str(), asynParamInt32, beginAddr_indices[pvID]);
-    // createParam(("START_LOC" + std::to_string(pvID)).c_str(), asynParamFloat64, start_loc_indices[pvID]);
-    // createParam(("END_LOC" + std::to_string(pvID)).c_str(), asynParamFloat64, end_loc_indices[pvID]);
     createParam(("BEAM_LOSS_LOC" + std::to_string(pvID)).c_str(), asynParamFloat64, beam_loss_loc_indices[pvID]);
     createParam(("Z_OFFSET_START" + std::to_string(pvID)).c_str(), asynParamFloat64, z_offset_start_indices[pvID]);
     createParam(("Z_OFFSET_END" + std::to_string(pvID)).c_str(), asynParamFloat64, z_offset_end_indices[pvID]);

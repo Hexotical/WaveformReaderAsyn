@@ -19,10 +19,6 @@ LukasWaveformReader_registerRecordDeviceDriver pdbbase
 
 ## Load record instances
 #dbLoadRecords("db/xxx.db","user=lujko")
-#dbLoadRecords("db/waveform.db", "USER=lujko,PORT=lujko,ADDR=0,TIMEOUT=0, WAVEFORM_SIZE=500000")
-#dbLoadRecords("db/waveformUnique.db", "USER=lujko,PORT=lujko,ADDR=0,TIMEOUT=0, WAVEFORM_SIZE=500000")
-#dbLoadRecords("db/waveform.db", "P=${L2MPS_PREFIX},PORT=lujko,ADDR=0,TIMEOUT=0, WAVEFORM_SIZE=500000")
-#dbLoadRecords("db/waveformUnique.db", "P=${L2MPS_PREFIX},PORT=lujko,ADDR=0,TIMEOUT=0, WAVEFORM_SIZE=500000")
 dbLoadRecords("db/waveform.db", "P=lujko,PORT=lujko,ADDR=0,TIMEOUT=0, WAVEFORM_SIZE=500000")
 dbLoadRecords("db/waveformUnique.db", "P=lujko,PORT=lujko,ADDR=0,TIMEOUT=0, WAVEFORM_SIZE=500000")
 
@@ -36,7 +32,6 @@ cpswLoadConfigFile("${DEFAULTS_FILE}", "mmio")
 
 # Waveform Reader config
 waveformReaderConfigure("lujko", 0, 1000000, 3)
-#waveformReaderConfigure("${WAVEFORM_PORT}", 0, 1000000, 3)
 
 
 cd "${TOP}/iocBoot/${IOC}"
