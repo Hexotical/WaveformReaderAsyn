@@ -127,7 +127,7 @@ record(ai, "$(P):BEAM:LOSS:LOC:0")
 ## loss; if the value is lower than this, then it should considered noise ##
 record(ao, "$(P):THRESHOLD:0") 
 {
-  field(DTYP, "asynInt32")
+  field(DTYP, "asynFloat64")
   field(PINI, "YES")
   field(SCAN, "Passive")
   field(DESC, "Threshold for beam loss")
@@ -195,10 +195,10 @@ record(ao,      "$(P):END:EXTRACTION:0") {
 record(ai, "$(P):EXTRACTED:NO:OF:ELEMENTS:0")
 {
     field(DTYP, "asynInt32")
-    field(PINI, "YES")
+    #field(PINI, "YES")
     field(INP, "@asyn($(PORT),$(ADDR),$(TIMEOUT))EXTRACTED_NO_OF_ELEMENTS0")
     field(SCAN, "I/O Intr")
-    field(VAL, "100")
+    #field(VAL, "100")
 }
 
 record(waveform, "$(P):EXTRACTED:X:WF:0") 
@@ -351,7 +351,7 @@ record(ai, "$(P):BEAM:LOSS:LOC:1")
 ## loss; if the value is lower than this, then it should considered noise ##
 record(ao, "$(P):THRESHOLD:1") 
 {
-  field(DTYP, "asynInt32")
+  field(DTYP, "asynFloat64")
   field(PINI, "YES")
   field(SCAN, "Passive")
   field(DESC, "Threshold for beam loss")
@@ -419,10 +419,10 @@ record(ao,      "$(P):END:EXTRACTION:1") {
 record(ai, "$(P):EXTRACTED:NO:OF:ELEMENTS:1")
 {
     field(DTYP, "asynInt32")
-    field(PINI, "YES")
+    #field(PINI, "YES")
     field(INP, "@asyn($(PORT),$(ADDR),$(TIMEOUT))EXTRACTED_NO_OF_ELEMENTS1")
     field(SCAN, "I/O Intr")
-    field(VAL, "100")
+    #field(VAL, "100")
 }
 
 record(waveform, "$(P):EXTRACTED:X:WF:1") 
@@ -575,7 +575,7 @@ record(ai, "$(P):BEAM:LOSS:LOC:2")
 ## loss; if the value is lower than this, then it should considered noise ##
 record(ao, "$(P):THRESHOLD:2") 
 {
-  field(DTYP, "asynInt32")
+  field(DTYP, "asynFloat64")
   field(PINI, "YES")
   field(SCAN, "Passive")
   field(DESC, "Threshold for beam loss")
@@ -643,10 +643,10 @@ record(ao,      "$(P):END:EXTRACTION:2") {
 record(ai, "$(P):EXTRACTED:NO:OF:ELEMENTS:2")
 {
     field(DTYP, "asynInt32")
-    field(PINI, "YES")
+    #field(PINI, "YES")
     field(INP, "@asyn($(PORT),$(ADDR),$(TIMEOUT))EXTRACTED_NO_OF_ELEMENTS2")
     field(SCAN, "I/O Intr")
-    field(VAL, "100")
+    #field(VAL, "100")
 }
 
 record(waveform, "$(P):EXTRACTED:X:WF:2") 

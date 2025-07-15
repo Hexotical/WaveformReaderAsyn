@@ -229,9 +229,9 @@ class WaveformReader : public asynPortDriver
   protected:
     ScalVal _TriggerHwAutoRearm;
     ScalVal _DataBufferSize;
+    ScalVal_RO _ClkFrequency;
     ScalVal_RO _TrigCount;
     Command _WebInit;
-    ScalVal _ClkFrequency;
 
     ScalVal _Web0StartAddr;
     ScalVal _Web0EndAddr;

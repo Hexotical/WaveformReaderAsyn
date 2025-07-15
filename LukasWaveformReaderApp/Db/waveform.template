@@ -127,7 +127,7 @@ record(ai, "$(P):BEAM:LOSS:LOC:${channel}")
 ## loss; if the value is lower than this, then it should considered noise ##
 record(ao, "$(P):THRESHOLD:${channel}") 
 {
-  field(DTYP, "asynInt32")
+  field(DTYP, "asynFloat64")
   field(PINI, "YES")
   field(SCAN, "Passive")
   field(DESC, "Threshold for beam loss")
@@ -195,10 +195,10 @@ record(ao,      "$(P):END:EXTRACTION:${channel}") {
 record(ai, "$(P):EXTRACTED:NO:OF:ELEMENTS:${channel}")
 {
     field(DTYP, "asynInt32")
-    field(PINI, "YES")
+    #field(PINI, "YES")
     field(INP, "@asyn($(PORT),$(ADDR),$(TIMEOUT))EXTRACTED_NO_OF_ELEMENTS${channel}")
     field(SCAN, "I/O Intr")
-    field(VAL, "100")
+    #field(VAL, "100")
 }
 
 record(waveform, "$(P):EXTRACTED:X:WF:${channel}") 

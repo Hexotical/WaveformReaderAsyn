@@ -40,7 +40,12 @@ WaveformReader::WaveformReader(const char *portName, int bayNumber, int bufferSi
   _DataBufferSize = IScalVal::create(p->findByName(("/mmio/AppTop/DaqMuxV2[" + std::to_string(bayNumber) + "]/DataBufferSize").c_str()));
   _TrigCount = IScalVal_RO::create(p->findByName(("/mmio/AppTop/DaqMuxV2[" + std::to_string(bayNumber) + "]/TrigCount").c_str()));
   _WebInit = ICommand::create(p->findByName(("/mmio/AmcCarrierCore/AmcCarrierBsa/BsaWaveformEngine[" + std::to_string(bayNumber) + "]/WaveformEngineBuffers/Initialize").c_str()));
-  _ClkFrequency = IScalVal::create(p->findByName(("/mmio/AppTop/AppCore/AmcGenericAdcDacCore[" + std::to_string(bayNumber) + "]/AmcGenericAdcDacCtrl/AmcClkFreq").c_str()));
+  
+  
+  
+  
+  _ClkFrequency = IScalVal_RO::create(p->findByName(("/mmio/AppTop/AppCore/AmcGenericAdcDacCore[" + std::to_string(bayNumber) + "]/AmcGenericAdcDacCtrl/AmcClkFreq").c_str()));
+  //_ClkFrequency = IScalVal::create(p->findByName(("/mmio/AppTop/DaqMuxV2[" + std::to_string(bayNumber) + "]/TriggerHwAutoRearm").c_str()));
 
   //Connecting to the records our port driver will eventually need to interact with
   for(int pvID = 0; pvID < waveformPVs; pvID++)
@@ -55,13 +60,13 @@ WaveformReader::WaveformReader(const char *portName, int bayNumber, int bufferSi
     // std::string refined_pvIdentifier = "REFINED_WAVEFORM:" + std::to_string(pvID);
     // std::string x_axis_pvIdentifier = "WAVEFORM_X_AXIS:" + std::to_string(pvID);
     std::string extracted_pvIdentifier = "EXTRACTED_WAVEFORM:" + std::to_string(pvID);
-    std::string extracted_x_axis_pvIdentifier = "WAVEFORM_X_AXIS:" + std::to_string(pvID);
+    std::string extracted_x_axis_pvIdentifier = "EXTRACTED_X_AXIS:" + std::to_string(pvID);
     std::cout << pvIdentifier << std::endl;
     createParam(pvIdentifier.c_str(), asynParamInt16Array, &waveform_param_index);
     // createParam(refined_pvIdentifier.c_str(), asynParamInt16Array, &refined_waveform_param_index);
     // createParam(x_axis_pvIdentifier.c_str(), asynParamInt16Array, &x_axis_waveform_param_index);
     createParam(extracted_pvIdentifier.c_str(), asynParamInt16Array, &extracted_waveform_param_index);
-    createParam(extracted_x_axis_pvIdentifier.c_str(), asynParamInt16Array, &extracted_x_axis_waveform_param_index);
+    createParam(extracted_x_axis_pvIdentifier.c_str(), asynParamFloat64Array, &extracted_x_axis_waveform_param_index);
     std::cout << "The identifier is: " << pvIdentifier << " and the waveform_param_index is : " << waveform_param_index << std::endl;
     pv_param_map.insert(std::pair<std::string, int>(pvIdentifier, waveform_param_index));
     extracted_param_map.insert(std::pair<std::string, int>(extracted_pvIdentifier, extracted_waveform_param_index));
@@ -93,9 +98,10 @@ WaveformReader::WaveformReader(const char *portName, int bayNumber, int bufferSi
     createParam(("Z_OFFSET_START" + std::to_string(pvID)).c_str(), asynParamFloat64, z_offset_start_indices[pvID]);
     createParam(("Z_OFFSET_END" + std::to_string(pvID)).c_str(), asynParamFloat64, z_offset_end_indices[pvID]);
     createParam(("LENGTH" + std::to_string(pvID)).c_str(), asynParamFloat64, length_indices[pvID]);
+    createParam(("THRESHOLD:" + std::to_string(pvID)).c_str(), asynParamFloat64, length_indices[pvID]);
     createParam(("EXTRACTION_START" + std::to_string(pvID)).c_str(), asynParamFloat64, extraction_start_indices[pvID]);
     createParam(("EXTRACTION_END" + std::to_string(pvID)).c_str(), asynParamFloat64, extraction_end_indices[pvID]);
-    createParam(("EXTRACTED_NO_OF_ELEMENTS" + std::to_string(pvID)).c_str(), asynParamFloat64, extracted_elements_indices[pvID]);
+    createParam(("EXTRACTED_NO_OF_ELEMENTS" + std::to_string(pvID)).c_str(), asynParamInt32, extracted_elements_indices[pvID]);
     createParam(("OFFSET" + std::to_string(pvID)).c_str(), asynParamInt32, offset_indices[pvID]);
     createParam(("SLOPE" + std::to_string(pvID)).c_str(), asynParamInt32, slope_indices[pvID]);
 
