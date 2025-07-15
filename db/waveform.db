@@ -1,21 +1,21 @@
 ##Template file waveform
 
 
-record(waveform, "$(USER):WAVEFORM:0")
+record(waveform, "$(P):WAVEFORM:0")
 {
     field(PINI, "1")
     field(DTYP, "asynInt16ArrayIn")
     field(INP, "@asyn($(PORT),$(ADDR),$(TIMEOUT))WAVEFORM:0")
     field(FTVL, "SHORT")
     field(NELM, "$(WAVEFORM_SIZE)")
-    field(FLNK, "$(USER):SUBARRAY:0 PP")
+    field(FLNK, "$(P):SUBARRAY:0 PP")
     field(SCAN, "I/O Intr")
   }
 
 
-record(subArray, "$(USER):SUBARRAY:0")
+record(subArray, "$(P):SUBARRAY:0")
 {
-  field(INP, "$(USER):WAVEFORM:0.VAL")
+  field(INP, "$(P):WAVEFORM:0.VAL")
   field(FTVL, "SHORT")
   field(MALM, "$(WAVEFORM_SIZE)")
   field(NELM, "25000")
@@ -24,7 +24,7 @@ record(subArray, "$(USER):SUBARRAY:0")
   }
 
 
-record(longin, "$(USER):BEGIN:ADDR:0")
+record(longin, "$(P):BEGIN:ADDR:0")
 {
     field(DTYP, "asynInt32")
     field(INP, "@asyn($(PORT), $(ADDR), $(TIMEOUT))BEGIN_ADDR0")
@@ -32,7 +32,7 @@ record(longin, "$(USER):BEGIN:ADDR:0")
   }
 
 
-record(longin, "$(USER):END:ADDR:0")
+record(longin, "$(P):END:ADDR:0")
 {
     field(DTYP, "asynInt32")
     field(INP, "@asyn($(PORT), $(ADDR), $(TIMEOUT))END_ADDR0")
@@ -40,47 +40,47 @@ record(longin, "$(USER):END:ADDR:0")
   }
 
 
-record(ao, "$(USER):WORD:COUNT:0")
+record(ao, "$(P):WORD:COUNT:0")
 {
     field(SCAN, "Passive")
-    field(OUT, "$(USER):INIT:SEQ:0  PP")
+    field(OUT, "$(P):INIT:SEQ:0  PP")
   }
 
 
-record(seq, "$(USER):INIT:SEQ:0")
+record(seq, "$(P):INIT:SEQ:0")
 {
     field(SCAN, "Passive")
-    field(DOL1, "$(USER):WORD:COUNT:0")
-    field(LNK1, "$(USER):FANOUT:BUFFER:0 PP")
+    field(DOL1, "$(P):WORD:COUNT:0")
+    field(LNK1, "$(P):FANOUT:BUFFER:0 PP")
     field(DO2, "1")
-    field(LNK2, "$(USER):WEB:INIT:0 PP")
+    field(LNK2, "$(P):WEB:INIT:0 PP")
   }
 
 
-record(dfanout, "$(USER):FANOUT:BUFFER:0")
+record(dfanout, "$(P):FANOUT:BUFFER:0")
 {
     field(SCAN, "Passive")
-    field(OUTA, "$(USER):BUFFER:RBV:0 PP")
-    field(OUTB, "$(USER):TO:DIV:0.A PP")
-    field(OUTC, "$(USER):WEB:INIT:0.A PP")
+    field(OUTA, "$(P):BUFFER:RBV:0 PP")
+    field(OUTB, "$(P):TO:DIV:0.A PP")
+    field(OUTC, "$(P):WEB:INIT:0.A PP")
   }
 
 
-record(ai, "$(USER):BUFFER:RBV:0")
+record(ai, "$(P):BUFFER:RBV:0")
 {
     field(SCAN, "Passive")
   }
 
 
-record(calcout, "$(USER):TO:DIV:0")
+record(calcout, "$(P):TO:DIV:0")
 {
     field(SCAN, "Passive")
     field(CALC, "A/2")
-    field(OUT, "$(USER):BUFFER:SIZE PP")
+    field(OUT, "$(P):BUFFER:SIZE PP")
   }
 
 
-record(ao, "$(USER):STARTING:LOC:0")
+record(ao, "$(P):STARTING:LOC:0")
 {
     field(DTYP, "asynFloat64")
     field(OUT, "@asyn($(PORT),$(ADDR),$(TIMEOUT))START_LOC0")
@@ -88,7 +88,7 @@ record(ao, "$(USER):STARTING:LOC:0")
 }
 
 
-record(ao, "$(USER):ENDING:LOC:0")
+record(ao, "$(P):ENDING:LOC:0")
 {
     field(DTYP, "asynFloat64")
     field(OUT, "@asyn($(PORT),$(ADDR),$(TIMEOUT))END_LOC0")
@@ -96,7 +96,7 @@ record(ao, "$(USER):ENDING:LOC:0")
 }
 
 
-record(ai, "$(USER):BEAM:LOSS:LOC:0")
+record(ai, "$(P):BEAM:LOSS:LOC:0")
 {
     field(DTYP, "asynFloat64")
     field(INP, "@asyn($(PORT),$(ADDR),$(TIMEOUT))BEAM_LOSS_LOC0")
@@ -104,21 +104,21 @@ record(ai, "$(USER):BEAM:LOSS:LOC:0")
 }##Template file waveform
 
 
-record(waveform, "$(USER):WAVEFORM:1")
+record(waveform, "$(P):WAVEFORM:1")
 {
     field(PINI, "1")
     field(DTYP, "asynInt16ArrayIn")
     field(INP, "@asyn($(PORT),$(ADDR),$(TIMEOUT))WAVEFORM:1")
     field(FTVL, "SHORT")
     field(NELM, "$(WAVEFORM_SIZE)")
-    field(FLNK, "$(USER):SUBARRAY:1 PP")
+    field(FLNK, "$(P):SUBARRAY:1 PP")
     field(SCAN, "I/O Intr")
   }
 
 
-record(subArray, "$(USER):SUBARRAY:1")
+record(subArray, "$(P):SUBARRAY:1")
 {
-  field(INP, "$(USER):WAVEFORM:1.VAL")
+  field(INP, "$(P):WAVEFORM:1.VAL")
   field(FTVL, "SHORT")
   field(MALM, "$(WAVEFORM_SIZE)")
   field(NELM, "25000")
@@ -127,7 +127,7 @@ record(subArray, "$(USER):SUBARRAY:1")
   }
 
 
-record(longin, "$(USER):BEGIN:ADDR:1")
+record(longin, "$(P):BEGIN:ADDR:1")
 {
     field(DTYP, "asynInt32")
     field(INP, "@asyn($(PORT), $(ADDR), $(TIMEOUT))BEGIN_ADDR1")
@@ -135,7 +135,7 @@ record(longin, "$(USER):BEGIN:ADDR:1")
   }
 
 
-record(longin, "$(USER):END:ADDR:1")
+record(longin, "$(P):END:ADDR:1")
 {
     field(DTYP, "asynInt32")
     field(INP, "@asyn($(PORT), $(ADDR), $(TIMEOUT))END_ADDR1")
@@ -143,47 +143,47 @@ record(longin, "$(USER):END:ADDR:1")
   }
 
 
-record(ao, "$(USER):WORD:COUNT:1")
+record(ao, "$(P):WORD:COUNT:1")
 {
     field(SCAN, "Passive")
-    field(OUT, "$(USER):INIT:SEQ:1  PP")
+    field(OUT, "$(P):INIT:SEQ:1  PP")
   }
 
 
-record(seq, "$(USER):INIT:SEQ:1")
+record(seq, "$(P):INIT:SEQ:1")
 {
     field(SCAN, "Passive")
-    field(DOL1, "$(USER):WORD:COUNT:1")
-    field(LNK1, "$(USER):FANOUT:BUFFER:1 PP")
+    field(DOL1, "$(P):WORD:COUNT:1")
+    field(LNK1, "$(P):FANOUT:BUFFER:1 PP")
     field(DO2, "1")
-    field(LNK2, "$(USER):WEB:INIT:1 PP")
+    field(LNK2, "$(P):WEB:INIT:1 PP")
   }
 
 
-record(dfanout, "$(USER):FANOUT:BUFFER:1")
+record(dfanout, "$(P):FANOUT:BUFFER:1")
 {
     field(SCAN, "Passive")
-    field(OUTA, "$(USER):BUFFER:RBV:1 PP")
-    field(OUTB, "$(USER):TO:DIV:1.A PP")
-    field(OUTC, "$(USER):WEB:INIT:1.A PP")
+    field(OUTA, "$(P):BUFFER:RBV:1 PP")
+    field(OUTB, "$(P):TO:DIV:1.A PP")
+    field(OUTC, "$(P):WEB:INIT:1.A PP")
   }
 
 
-record(ai, "$(USER):BUFFER:RBV:1")
+record(ai, "$(P):BUFFER:RBV:1")
 {
     field(SCAN, "Passive")
   }
 
 
-record(calcout, "$(USER):TO:DIV:1")
+record(calcout, "$(P):TO:DIV:1")
 {
     field(SCAN, "Passive")
     field(CALC, "A/2")
-    field(OUT, "$(USER):BUFFER:SIZE PP")
+    field(OUT, "$(P):BUFFER:SIZE PP")
   }
 
 
-record(ao, "$(USER):STARTING:LOC:1")
+record(ao, "$(P):STARTING:LOC:1")
 {
     field(DTYP, "asynFloat64")
     field(OUT, "@asyn($(PORT),$(ADDR),$(TIMEOUT))START_LOC1")
@@ -191,7 +191,7 @@ record(ao, "$(USER):STARTING:LOC:1")
 }
 
 
-record(ao, "$(USER):ENDING:LOC:1")
+record(ao, "$(P):ENDING:LOC:1")
 {
     field(DTYP, "asynFloat64")
     field(OUT, "@asyn($(PORT),$(ADDR),$(TIMEOUT))END_LOC1")
@@ -199,7 +199,7 @@ record(ao, "$(USER):ENDING:LOC:1")
 }
 
 
-record(ai, "$(USER):BEAM:LOSS:LOC:1")
+record(ai, "$(P):BEAM:LOSS:LOC:1")
 {
     field(DTYP, "asynFloat64")
     field(INP, "@asyn($(PORT),$(ADDR),$(TIMEOUT))BEAM_LOSS_LOC1")
@@ -207,21 +207,21 @@ record(ai, "$(USER):BEAM:LOSS:LOC:1")
 }##Template file waveform
 
 
-record(waveform, "$(USER):WAVEFORM:2")
+record(waveform, "$(P):WAVEFORM:2")
 {
     field(PINI, "1")
     field(DTYP, "asynInt16ArrayIn")
     field(INP, "@asyn($(PORT),$(ADDR),$(TIMEOUT))WAVEFORM:2")
     field(FTVL, "SHORT")
     field(NELM, "$(WAVEFORM_SIZE)")
-    field(FLNK, "$(USER):SUBARRAY:2 PP")
+    field(FLNK, "$(P):SUBARRAY:2 PP")
     field(SCAN, "I/O Intr")
   }
 
 
-record(subArray, "$(USER):SUBARRAY:2")
+record(subArray, "$(P):SUBARRAY:2")
 {
-  field(INP, "$(USER):WAVEFORM:2.VAL")
+  field(INP, "$(P):WAVEFORM:2.VAL")
   field(FTVL, "SHORT")
   field(MALM, "$(WAVEFORM_SIZE)")
   field(NELM, "25000")
@@ -230,7 +230,7 @@ record(subArray, "$(USER):SUBARRAY:2")
   }
 
 
-record(longin, "$(USER):BEGIN:ADDR:2")
+record(longin, "$(P):BEGIN:ADDR:2")
 {
     field(DTYP, "asynInt32")
     field(INP, "@asyn($(PORT), $(ADDR), $(TIMEOUT))BEGIN_ADDR2")
@@ -238,7 +238,7 @@ record(longin, "$(USER):BEGIN:ADDR:2")
   }
 
 
-record(longin, "$(USER):END:ADDR:2")
+record(longin, "$(P):END:ADDR:2")
 {
     field(DTYP, "asynInt32")
     field(INP, "@asyn($(PORT), $(ADDR), $(TIMEOUT))END_ADDR2")
@@ -246,47 +246,47 @@ record(longin, "$(USER):END:ADDR:2")
   }
 
 
-record(ao, "$(USER):WORD:COUNT:2")
+record(ao, "$(P):WORD:COUNT:2")
 {
     field(SCAN, "Passive")
-    field(OUT, "$(USER):INIT:SEQ:2  PP")
+    field(OUT, "$(P):INIT:SEQ:2  PP")
   }
 
 
-record(seq, "$(USER):INIT:SEQ:2")
+record(seq, "$(P):INIT:SEQ:2")
 {
     field(SCAN, "Passive")
-    field(DOL1, "$(USER):WORD:COUNT:2")
-    field(LNK1, "$(USER):FANOUT:BUFFER:2 PP")
+    field(DOL1, "$(P):WORD:COUNT:2")
+    field(LNK1, "$(P):FANOUT:BUFFER:2 PP")
     field(DO2, "1")
-    field(LNK2, "$(USER):WEB:INIT:2 PP")
+    field(LNK2, "$(P):WEB:INIT:2 PP")
   }
 
 
-record(dfanout, "$(USER):FANOUT:BUFFER:2")
+record(dfanout, "$(P):FANOUT:BUFFER:2")
 {
     field(SCAN, "Passive")
-    field(OUTA, "$(USER):BUFFER:RBV:2 PP")
-    field(OUTB, "$(USER):TO:DIV:2.A PP")
-    field(OUTC, "$(USER):WEB:INIT:2.A PP")
+    field(OUTA, "$(P):BUFFER:RBV:2 PP")
+    field(OUTB, "$(P):TO:DIV:2.A PP")
+    field(OUTC, "$(P):WEB:INIT:2.A PP")
   }
 
 
-record(ai, "$(USER):BUFFER:RBV:2")
+record(ai, "$(P):BUFFER:RBV:2")
 {
     field(SCAN, "Passive")
   }
 
 
-record(calcout, "$(USER):TO:DIV:2")
+record(calcout, "$(P):TO:DIV:2")
 {
     field(SCAN, "Passive")
     field(CALC, "A/2")
-    field(OUT, "$(USER):BUFFER:SIZE PP")
+    field(OUT, "$(P):BUFFER:SIZE PP")
   }
 
 
-record(ao, "$(USER):STARTING:LOC:2")
+record(ao, "$(P):STARTING:LOC:2")
 {
     field(DTYP, "asynFloat64")
     field(OUT, "@asyn($(PORT),$(ADDR),$(TIMEOUT))START_LOC2")
@@ -294,7 +294,7 @@ record(ao, "$(USER):STARTING:LOC:2")
 }
 
 
-record(ao, "$(USER):ENDING:LOC:2")
+record(ao, "$(P):ENDING:LOC:2")
 {
     field(DTYP, "asynFloat64")
     field(OUT, "@asyn($(PORT),$(ADDR),$(TIMEOUT))END_LOC2")
@@ -302,7 +302,7 @@ record(ao, "$(USER):ENDING:LOC:2")
 }
 
 
-record(ai, "$(USER):BEAM:LOSS:LOC:2")
+record(ai, "$(P):BEAM:LOSS:LOC:2")
 {
     field(DTYP, "asynFloat64")
     field(INP, "@asyn($(PORT),$(ADDR),$(TIMEOUT))BEAM_LOSS_LOC2")

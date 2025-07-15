@@ -1,21 +1,21 @@
 ##Template file waveform
 
 
-record(waveform, "$(USER):WAVEFORM:${channel}")
+record(waveform, "$(P):WAVEFORM:${channel}")
 {
     field(PINI, "1")
     field(DTYP, "asynInt16ArrayIn")
     field(INP, "@asyn($(PORT),$(ADDR),$(TIMEOUT))WAVEFORM:$(channel)")
     field(FTVL, "SHORT")
     field(NELM, "$(WAVEFORM_SIZE)")
-    field(FLNK, "$(USER):SUBARRAY:${channel} PP")
+    field(FLNK, "$(P):SUBARRAY:${channel} PP")
     field(SCAN, "I/O Intr")
   }
 
 
-record(subArray, "$(USER):SUBARRAY:${channel}")
+record(subArray, "$(P):SUBARRAY:${channel}")
 {
-  field(INP, "$(USER):WAVEFORM:${channel}.VAL")
+  field(INP, "$(P):WAVEFORM:${channel}.VAL")
   field(FTVL, "SHORT")
   field(MALM, "$(WAVEFORM_SIZE)")
   field(NELM, "25000")
@@ -24,7 +24,7 @@ record(subArray, "$(USER):SUBARRAY:${channel}")
   }
 
 
-record(longin, "$(USER):BEGIN:ADDR:${channel}")
+record(longin, "$(P):BEGIN:ADDR:${channel}")
 {
     field(DTYP, "asynInt32")
     field(INP, "@asyn($(PORT), $(ADDR), $(TIMEOUT))BEGIN_ADDR${channel}")
@@ -32,7 +32,7 @@ record(longin, "$(USER):BEGIN:ADDR:${channel}")
   }
 
 
-record(longin, "$(USER):END:ADDR:${channel}")
+record(longin, "$(P):END:ADDR:${channel}")
 {
     field(DTYP, "asynInt32")
     field(INP, "@asyn($(PORT), $(ADDR), $(TIMEOUT))END_ADDR${channel}")
@@ -40,47 +40,47 @@ record(longin, "$(USER):END:ADDR:${channel}")
   }
 
 
-record(ao, "$(USER):WORD:COUNT:${channel}")
+record(ao, "$(P):WORD:COUNT:${channel}")
 {
     field(SCAN, "Passive")
-    field(OUT, "$(USER):INIT:SEQ:${channel}  PP")
+    field(OUT, "$(P):INIT:SEQ:${channel}  PP")
   }
 
 
-record(seq, "$(USER):INIT:SEQ:${channel}")
+record(seq, "$(P):INIT:SEQ:${channel}")
 {
     field(SCAN, "Passive")
-    field(DOL1, "$(USER):WORD:COUNT:${channel}")
-    field(LNK1, "$(USER):FANOUT:BUFFER:${channel} PP")
+    field(DOL1, "$(P):WORD:COUNT:${channel}")
+    field(LNK1, "$(P):FANOUT:BUFFER:${channel} PP")
     field(DO2, "1")
-    field(LNK2, "$(USER):WEB:INIT:${channel} PP")
+    field(LNK2, "$(P):WEB:INIT:${channel} PP")
   }
 
 
-record(dfanout, "$(USER):FANOUT:BUFFER:${channel}")
+record(dfanout, "$(P):FANOUT:BUFFER:${channel}")
 {
     field(SCAN, "Passive")
-    field(OUTA, "$(USER):BUFFER:RBV:${channel} PP")
-    field(OUTB, "$(USER):TO:DIV:${channel}.A PP")
-    field(OUTC, "$(USER):WEB:INIT:${channel}.A PP")
+    field(OUTA, "$(P):BUFFER:RBV:${channel} PP")
+    field(OUTB, "$(P):TO:DIV:${channel}.A PP")
+    field(OUTC, "$(P):WEB:INIT:${channel}.A PP")
   }
 
 
-record(ai, "$(USER):BUFFER:RBV:${channel}")
+record(ai, "$(P):BUFFER:RBV:${channel}")
 {
     field(SCAN, "Passive")
   }
 
 
-record(calcout, "$(USER):TO:DIV:${channel}")
+record(calcout, "$(P):TO:DIV:${channel}")
 {
     field(SCAN, "Passive")
     field(CALC, "A/2")
-    field(OUT, "$(USER):BUFFER:SIZE PP")
+    field(OUT, "$(P):BUFFER:SIZE PP")
   }
 
 
-record(ao, "$(USER):STARTING:LOC:${channel}")
+record(ao, "$(P):STARTING:LOC:${channel}")
 {
     field(DTYP, "asynFloat64")
     field(OUT, "@asyn($(PORT),$(ADDR),$(TIMEOUT))START_LOC${channel}")
@@ -88,7 +88,7 @@ record(ao, "$(USER):STARTING:LOC:${channel}")
 }
 
 
-record(ao, "$(USER):ENDING:LOC:${channel}")
+record(ao, "$(P):ENDING:LOC:${channel}")
 {
     field(DTYP, "asynFloat64")
     field(OUT, "@asyn($(PORT),$(ADDR),$(TIMEOUT))END_LOC${channel}")
@@ -96,7 +96,7 @@ record(ao, "$(USER):ENDING:LOC:${channel}")
 }
 
 
-record(ai, "$(USER):BEAM:LOSS:LOC:${channel}")
+record(ai, "$(P):BEAM:LOSS:LOC:${channel}")
 {
     field(DTYP, "asynFloat64")
     field(INP, "@asyn($(PORT),$(ADDR),$(TIMEOUT))BEAM_LOSS_LOC${channel}")
