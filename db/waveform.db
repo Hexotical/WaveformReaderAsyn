@@ -2,7 +2,9 @@
 
 record(ao,      "$(P):SLOPE:0") {
     field(DESC, "Slope of channel in EGU/raw")
+    field(DTYP, "asynInt32")
     field(PINI, "YES")
+    field(OUT,  "@asyn($(PORT), $(ADDR), $(TIMEOUT))SLOPE0")
     field(SCAN, "Passive")
     field(PREC, "3")
     field(VAL,  "1")
@@ -10,7 +12,9 @@ record(ao,      "$(P):SLOPE:0") {
 }
 record(ao,      "$(P):OFFSET:0") {
     field(DESC, "Offset of channel in EGU")
+    field(DTYP, "asynInt32")
     field(PINI, "YES")
+    field(OUT,  "@asyn($(PORT), $(ADDR), $(TIMEOUT))OFFSET0")
     field(SCAN, "Passive")
     field(PREC, "3")
     field(VAL,  "1")
@@ -136,6 +140,8 @@ record(ao, "$(P):THRESHOLD:0")
 record(ao,      "$(P):LENGTH:0") {
     field(DESC, "Length in m")
     field(PINI, "YES")
+    field(DTYP, "asynFloat64")
+    field(OUT,  "@asyn($(PORT), $(ADDR), $(TIMEOUT))LENGTH0")
     field(SCAN, "Passive")
     field(PREC, "3")
     field(VAL,  "100")
@@ -220,7 +226,9 @@ record(waveform, "$(P):EXTRACTED:WF:0")
 
 record(ao,      "$(P):SLOPE:1") {
     field(DESC, "Slope of channel in EGU/raw")
+    field(DTYP, "asynInt32")
     field(PINI, "YES")
+    field(OUT,  "@asyn($(PORT), $(ADDR), $(TIMEOUT))SLOPE1")
     field(SCAN, "Passive")
     field(PREC, "3")
     field(VAL,  "1")
@@ -228,7 +236,9 @@ record(ao,      "$(P):SLOPE:1") {
 }
 record(ao,      "$(P):OFFSET:1") {
     field(DESC, "Offset of channel in EGU")
+    field(DTYP, "asynInt32")
     field(PINI, "YES")
+    field(OUT,  "@asyn($(PORT), $(ADDR), $(TIMEOUT))OFFSET1")
     field(SCAN, "Passive")
     field(PREC, "3")
     field(VAL,  "1")
@@ -354,6 +364,8 @@ record(ao, "$(P):THRESHOLD:1")
 record(ao,      "$(P):LENGTH:1") {
     field(DESC, "Length in m")
     field(PINI, "YES")
+    field(DTYP, "asynFloat64")
+    field(OUT,  "@asyn($(PORT), $(ADDR), $(TIMEOUT))LENGTH1")
     field(SCAN, "Passive")
     field(PREC, "3")
     field(VAL,  "100")
@@ -438,7 +450,9 @@ record(waveform, "$(P):EXTRACTED:WF:1")
 
 record(ao,      "$(P):SLOPE:2") {
     field(DESC, "Slope of channel in EGU/raw")
+    field(DTYP, "asynInt32")
     field(PINI, "YES")
+    field(OUT,  "@asyn($(PORT), $(ADDR), $(TIMEOUT))SLOPE2")
     field(SCAN, "Passive")
     field(PREC, "3")
     field(VAL,  "1")
@@ -446,7 +460,9 @@ record(ao,      "$(P):SLOPE:2") {
 }
 record(ao,      "$(P):OFFSET:2") {
     field(DESC, "Offset of channel in EGU")
+    field(DTYP, "asynInt32")
     field(PINI, "YES")
+    field(OUT,  "@asyn($(PORT), $(ADDR), $(TIMEOUT))OFFSET2")
     field(SCAN, "Passive")
     field(PREC, "3")
     field(VAL,  "1")
@@ -572,6 +588,8 @@ record(ao, "$(P):THRESHOLD:2")
 record(ao,      "$(P):LENGTH:2") {
     field(DESC, "Length in m")
     field(PINI, "YES")
+    field(DTYP, "asynFloat64")
+    field(OUT,  "@asyn($(PORT), $(ADDR), $(TIMEOUT))LENGTH2")
     field(SCAN, "Passive")
     field(PREC, "3")
     field(VAL,  "100")

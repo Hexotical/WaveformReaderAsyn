@@ -96,8 +96,8 @@ WaveformReader::WaveformReader(const char *portName, int bayNumber, int bufferSi
     createParam(("EXTRACTION_START" + std::to_string(pvID)).c_str(), asynParamFloat64, extraction_start_indices[pvID]);
     createParam(("EXTRACTION_END" + std::to_string(pvID)).c_str(), asynParamFloat64, extraction_end_indices[pvID]);
     createParam(("EXTRACTED_NO_OF_ELEMENTS" + std::to_string(pvID)).c_str(), asynParamFloat64, extracted_elements_indices[pvID]);
-    createParam(("OFFSET" + std::to_string(pvID)).c_str(), asynParamFloat64, offset_indices[pvID]);
-    createParam(("SLOPE" + std::to_string(pvID)).c_str(), asynParamFloat64, slope_indices[pvID]);
+    createParam(("OFFSET" + std::to_string(pvID)).c_str(), asynParamInt32, offset_indices[pvID]);
+    createParam(("SLOPE" + std::to_string(pvID)).c_str(), asynParamInt32, slope_indices[pvID]);
 
 
     (*(start_addresses[pvID])) = IScalVal::create(p->findByName(("/mmio/AmcCarrierCore/AmcCarrierBsa/BsaWaveformEngine[" + std::to_string(bayNumber) + "]/WaveformEngineBuffers/StartAddr[" + std::to_string(pvID) + "]").c_str()));

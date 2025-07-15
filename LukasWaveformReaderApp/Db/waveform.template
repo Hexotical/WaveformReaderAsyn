@@ -2,6 +2,7 @@
 
 record(ao,      "$(P):SLOPE:${channel}") {
     field(DESC, "Slope of channel in EGU/raw")
+    field(DTYP, "asynInt32")
     field(PINI, "YES")
     field(OUT,  "@asyn($(PORT), $(ADDR), $(TIMEOUT))SLOPE${channel}")
     field(SCAN, "Passive")
@@ -11,6 +12,7 @@ record(ao,      "$(P):SLOPE:${channel}") {
 }
 record(ao,      "$(P):OFFSET:${channel}") {
     field(DESC, "Offset of channel in EGU")
+    field(DTYP, "asynInt32")
     field(PINI, "YES")
     field(OUT,  "@asyn($(PORT), $(ADDR), $(TIMEOUT))OFFSET${channel}")
     field(SCAN, "Passive")
@@ -138,6 +140,7 @@ record(ao, "$(P):THRESHOLD:${channel}")
 record(ao,      "$(P):LENGTH:${channel}") {
     field(DESC, "Length in m")
     field(PINI, "YES")
+    field(DTYP, "asynFloat64")
     field(OUT,  "@asyn($(PORT), $(ADDR), $(TIMEOUT))LENGTH${channel}")
     field(SCAN, "Passive")
     field(PREC, "3")
