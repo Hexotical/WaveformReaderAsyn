@@ -57,9 +57,9 @@ WaveformReader::WaveformReader(const char *portName, int bayNumber, int bufferSi
     createParam(extracted_pvIdentifier.c_str(), asynParamInt16Array, &extracted_waveform_param_index);
     createParam(extracted_x_axis_pvIdentifier.c_str(), asynParamFloat64Array, &extracted_x_axis_waveform_param_index);
     std::cout << "The identifier is: " << pvIdentifier << " and the waveform_param_index is : " << waveform_param_index << std::endl;
-    pv_param_map.insert(std::pair<std::string, int>(pvIdentifier, waveform_param_index));
-    extracted_param_map.insert(std::pair<std::string, int>(extracted_pvIdentifier, extracted_waveform_param_index));
-    x_axis_param_map.insert(std::pair<std::string, int>(extracted_x_axis_pvIdentifier, extracted_x_axis_waveform_param_index));
+    pv_param_map.insert(std::pair<std::string, int*>(pvIdentifier, &waveform_param_index));
+    extracted_param_map.insert(std::pair<std::string, int*>(extracted_pvIdentifier, &extracted_waveform_param_index));
+    x_axis_param_map.insert(std::pair<std::string, int*>(extracted_x_axis_pvIdentifier, &extracted_x_axis_waveform_param_index));
     waveform_param_indices.push_back(pvIdentifier);
     extracted_waveform_param_indices.push_back(extracted_pvIdentifier);
     extracted_x_axis_waveform_indices.push_back(extracted_x_axis_pvIdentifier);
@@ -177,8 +177,8 @@ void WaveformReader::streamTask(const char *streamInit = "/Stream0", std::string
         //TODO based on streamInit, add key and param to the asynPortDriver
 
         std::cout << "Passed pvID: " << pvID << std::endl;
-        int waveform_param_index = pv_param_map[pvID];
-        std::cout << pvID << " corresponding index: " << waveform_param_index << std::endl;
+        int* waveform_param_index_ptr = pv_param_map[pvID];
+        std::cout << pvID << " corresponding index: " << *waveform_param_index_ptr << std::endl;
 
         int index = index_map[pvID];
 
@@ -246,7 +246,7 @@ void WaveformReader::streamTask(const char *streamInit = "/Stream0", std::string
                   streaming_status[index] = "Successfully initialized but no data in buffer";
                 } 
 
-                doCallbacksInt16Array((epicsInt16*)(buf + 8), nWords16, waveform_param_index, 0);
+                doCallbacksInt16Array((epicsInt16*)(buf + 8), nWords16, *waveform_param_index_ptr, 0);
 
                 for(int i = 0; i < MAX_BUFFER_SIZE; i++)
                 {

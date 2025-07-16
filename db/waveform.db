@@ -133,6 +133,8 @@ record(ao,      "$(P):LENGTH:0") {
     info(autosaveFields, "VAL")
 }
 
+# Physical location of the start of the fiber
+# Assuming units of meters
 record(ao, "$(P):Z:OFFSET:START:0")
 {
     field(DESC, "Location of the start of the fiber in m")
@@ -186,6 +188,7 @@ record(ai, "$(P):EXTRACTED:NO:OF:ELEMENTS:0")
     #field(VAL, "100")
 }
 
+# the X-axis of the final extracted waveforms, contains distance values in m
 record(waveform, "$(P):EXTRACTED:X:WF:0") 
 {
   field(PINI, "1")
@@ -342,6 +345,8 @@ record(ao,      "$(P):LENGTH:1") {
     info(autosaveFields, "VAL")
 }
 
+# Physical location of the start of the fiber
+# Assuming units of meters
 record(ao, "$(P):Z:OFFSET:START:1")
 {
     field(DESC, "Location of the start of the fiber in m")
@@ -395,6 +400,7 @@ record(ai, "$(P):EXTRACTED:NO:OF:ELEMENTS:1")
     #field(VAL, "100")
 }
 
+# the X-axis of the final extracted waveforms, contains distance values in m
 record(waveform, "$(P):EXTRACTED:X:WF:1") 
 {
   field(PINI, "1")
@@ -551,6 +557,8 @@ record(ao,      "$(P):LENGTH:2") {
     info(autosaveFields, "VAL")
 }
 
+# Physical location of the start of the fiber
+# Assuming units of meters
 record(ao, "$(P):Z:OFFSET:START:2")
 {
     field(DESC, "Location of the start of the fiber in m")
@@ -604,6 +612,7 @@ record(ai, "$(P):EXTRACTED:NO:OF:ELEMENTS:2")
     #field(VAL, "100")
 }
 
+# the X-axis of the final extracted waveforms, contains distance values in m
 record(waveform, "$(P):EXTRACTED:X:WF:2") 
 {
   field(PINI, "1")

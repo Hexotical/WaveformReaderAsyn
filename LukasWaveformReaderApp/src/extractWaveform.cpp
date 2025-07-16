@@ -122,8 +122,8 @@ void WaveformReader::extractWaveform(int waveformIndex)
     extracted_waveform_map[extracted_pvIdentifier][i] = extracted_waveform_data[i];
   }
 
-  doCallbacksInt16Array(extracted_waveform_data, no_of_extracted_elements, extracted_param_map[extracted_pvIdentifier], 0);
-  doCallbacksFloat64Array(extracted_x_axis, no_of_extracted_elements, x_axis_param_map[extracted_x_axis_pvIdentifier], 0);
+  doCallbacksInt16Array(extracted_waveform_data, no_of_extracted_elements, *extracted_param_map[extracted_pvIdentifier], 0);
+  doCallbacksFloat64Array(extracted_x_axis, no_of_extracted_elements, *x_axis_param_map[extracted_x_axis_pvIdentifier], 0);
   // do I need some kind of array callbacks here?
 
 }
