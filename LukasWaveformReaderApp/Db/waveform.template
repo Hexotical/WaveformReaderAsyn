@@ -100,21 +100,6 @@ record(calcout, "$(P):TO:DIV:${channel}")
   }
 
 
-#record(ao, "$(P):STARTING:LOC:${channel}")
-#{
-#    field(DTYP, "asynFloat64")
-#    field(OUT, "@asyn($(PORT),$(ADDR),$(TIMEOUT))START_LOC${channel}")
-#    field(SCAN, "Passive")
-#}
-#
-#
-#record(ao, "$(P):ENDING:LOC:${channel}")
-#{
-#    field(DTYP, "asynFloat64")
-#    field(OUT, "@asyn($(PORT),$(ADDR),$(TIMEOUT))END_LOC${channel}")
-#    field(SCAN, "Passive")
-#}
-
 
 record(ai, "$(P):BEAM:LOSS:LOC:${channel}")
 {
@@ -148,6 +133,8 @@ record(ao,      "$(P):LENGTH:${channel}") {
     info(autosaveFields, "VAL")
 }
 
+# Physical location of the start of the fiber
+# Assuming units of meters
 record(ao, "$(P):Z:OFFSET:START:${channel}")
 {
     field(DESC, "Location of the start of the fiber in m")
@@ -201,6 +188,7 @@ record(ai, "$(P):EXTRACTED:NO:OF:ELEMENTS:${channel}")
     #field(VAL, "100")
 }
 
+# the X-axis of the final extracted waveforms, contains distance values in m
 record(waveform, "$(P):EXTRACTED:X:WF:${channel}") 
 {
   field(PINI, "1")
@@ -218,7 +206,7 @@ record(waveform, "$(P):EXTRACTED:WF:${channel}")
   field(DESC,    "X Subarray")
   field(INP, "@asyn($(PORT),$(ADDR),$(TIMEOUT))EXTRACTED_WAVEFORM:$(channel)")
   field(DTYP, "asynInt16ArrayIn")
-  field(FTVL,    "USHORT")
+  field(FTVL,    "SHORT")
   # NELM is the maximum number of values, NORD is the number of values actually read
   field(NELM,    "$(WAVEFORM_SIZE)")
   field(SCAN, "I/O Intr")

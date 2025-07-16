@@ -100,21 +100,6 @@ record(calcout, "$(P):TO:DIV:0")
   }
 
 
-#record(ao, "$(P):STARTING:LOC:0")
-#{
-#    field(DTYP, "asynFloat64")
-#    field(OUT, "@asyn($(PORT),$(ADDR),$(TIMEOUT))START_LOC0")
-#    field(SCAN, "Passive")
-#}
-#
-#
-#record(ao, "$(P):ENDING:LOC:0")
-#{
-#    field(DTYP, "asynFloat64")
-#    field(OUT, "@asyn($(PORT),$(ADDR),$(TIMEOUT))END_LOC0")
-#    field(SCAN, "Passive")
-#}
-
 
 record(ai, "$(P):BEAM:LOSS:LOC:0")
 {
@@ -218,7 +203,7 @@ record(waveform, "$(P):EXTRACTED:WF:0")
   field(DESC,    "X Subarray")
   field(INP, "@asyn($(PORT),$(ADDR),$(TIMEOUT))EXTRACTED_WAVEFORM:0")
   field(DTYP, "asynInt16ArrayIn")
-  field(FTVL,    "USHORT")
+  field(FTVL,    "SHORT")
   # NELM is the maximum number of values, NORD is the number of values actually read
   field(NELM,    "$(WAVEFORM_SIZE)")
   field(SCAN, "I/O Intr")
@@ -324,21 +309,6 @@ record(calcout, "$(P):TO:DIV:1")
   }
 
 
-#record(ao, "$(P):STARTING:LOC:1")
-#{
-#    field(DTYP, "asynFloat64")
-#    field(OUT, "@asyn($(PORT),$(ADDR),$(TIMEOUT))START_LOC1")
-#    field(SCAN, "Passive")
-#}
-#
-#
-#record(ao, "$(P):ENDING:LOC:1")
-#{
-#    field(DTYP, "asynFloat64")
-#    field(OUT, "@asyn($(PORT),$(ADDR),$(TIMEOUT))END_LOC1")
-#    field(SCAN, "Passive")
-#}
-
 
 record(ai, "$(P):BEAM:LOSS:LOC:1")
 {
@@ -442,7 +412,7 @@ record(waveform, "$(P):EXTRACTED:WF:1")
   field(DESC,    "X Subarray")
   field(INP, "@asyn($(PORT),$(ADDR),$(TIMEOUT))EXTRACTED_WAVEFORM:1")
   field(DTYP, "asynInt16ArrayIn")
-  field(FTVL,    "USHORT")
+  field(FTVL,    "SHORT")
   # NELM is the maximum number of values, NORD is the number of values actually read
   field(NELM,    "$(WAVEFORM_SIZE)")
   field(SCAN, "I/O Intr")
@@ -548,21 +518,6 @@ record(calcout, "$(P):TO:DIV:2")
   }
 
 
-#record(ao, "$(P):STARTING:LOC:2")
-#{
-#    field(DTYP, "asynFloat64")
-#    field(OUT, "@asyn($(PORT),$(ADDR),$(TIMEOUT))START_LOC2")
-#    field(SCAN, "Passive")
-#}
-#
-#
-#record(ao, "$(P):ENDING:LOC:2")
-#{
-#    field(DTYP, "asynFloat64")
-#    field(OUT, "@asyn($(PORT),$(ADDR),$(TIMEOUT))END_LOC2")
-#    field(SCAN, "Passive")
-#}
-
 
 record(ai, "$(P):BEAM:LOSS:LOC:2")
 {
@@ -666,7 +621,7 @@ record(waveform, "$(P):EXTRACTED:WF:2")
   field(DESC,    "X Subarray")
   field(INP, "@asyn($(PORT),$(ADDR),$(TIMEOUT))EXTRACTED_WAVEFORM:2")
   field(DTYP, "asynInt16ArrayIn")
-  field(FTVL,    "USHORT")
+  field(FTVL,    "SHORT")
   # NELM is the maximum number of values, NORD is the number of values actually read
   field(NELM,    "$(WAVEFORM_SIZE)")
   field(SCAN, "I/O Intr")

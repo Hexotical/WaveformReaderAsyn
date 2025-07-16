@@ -23,8 +23,8 @@ WaveformReader::WaveformReader(const char *portName, int bayNumber, int bufferSi
                                                        (
                                                         portName,
                                                         1,//Max Signals?
-                                                        asynDrvUserMask | asynInt32ArrayMask | asynInt16ArrayMask | asynUInt32DigitalMask | asynInt32Mask | asynFloat64Mask,
-                                                        asynInt32ArrayMask | asynInt16ArrayMask | asynInt32Mask | asynUInt32DigitalMask | asynFloat64Mask,
+                                                        asynDrvUserMask | asynInt32ArrayMask | asynInt16ArrayMask | asynUInt32DigitalMask | asynInt32Mask | asynFloat64Mask | asynFloat64ArrayMask,
+                                                        asynInt32ArrayMask | asynInt16ArrayMask | asynInt32Mask | asynUInt32DigitalMask | asynFloat64Mask | asynFloat64ArrayMask,
                                                         ASYN_MULTIDEVICE | ASYN_CANBLOCK,
                                                         1,
                                                         0,
@@ -71,7 +71,7 @@ WaveformReader::WaveformReader(const char *portName, int bayNumber, int bufferSi
 
     waveform_map[pvIdentifier] = (epicsInt16 *)calloc(STREAM_MAX_SIZE, sizeof(epicsInt16)); 
     extracted_waveform_map[extracted_pvIdentifier] = (epicsInt16 *)calloc(STREAM_MAX_SIZE, sizeof(epicsInt16)); 
-    extracted_x_axis_waveform_map[extracted_x_axis_pvIdentifier] = (epicsInt16 *)calloc(STREAM_MAX_SIZE, sizeof(epicsInt16)); 
+    extracted_x_axis_waveform_map[extracted_x_axis_pvIdentifier] = (epicsFloat64 *)calloc(STREAM_MAX_SIZE, sizeof(epicsFloat64)); 
 
     // connect to the PVs that represent parameters of each waveform record using corresponding arrays
     createParam(("END_ADDR" + std::to_string(pvID)).c_str(), asynParamInt32, endAddr_indices[pvID]);
