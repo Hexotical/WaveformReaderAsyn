@@ -221,7 +221,9 @@ void WaveformReader::streamTask(const char *streamInit = "/Stream0", std::string
         while(1)
         {
             std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
+            std::cout << "Value of got before: " << got << std::endl;
             got = stm->read( buf, MAX_BUFFER_SIZE, CTimeout(-1));
+            std::cout << "Value of got after: " << got << std::endl;
             std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
             auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - begin);
             //printf("Getting from the buffer required %llu milliseconds\n", duration);
@@ -233,7 +235,7 @@ void WaveformReader::streamTask(const char *streamInit = "/Stream0", std::string
 
             if(got > 8)
             {
-                //printf("There's a thing in the stream? %ld bytes\n", got);
+                printf("There's a thing in the stream? %ld bytes\n", got);
                 lock();
                 nBytes = (got - 9); // header = 8 bytes, footer = 1 byte, data = 32bit words.
                 nWords16 = nBytes / 2; //Amount of words in our buffer to read
