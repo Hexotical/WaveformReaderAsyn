@@ -38,14 +38,14 @@ This command must be called before calling maxBeamLossLocation.
 
 This command uses the following PVs for the extraction:
   1. $(P):CLK:FREQUENCY
-  2. \\$(P):SLOPE:\\${channel}
-  3. \\$(P):OFFSET:\\${channel}
-  4. \\$(P):Z:OFFSET:START:\\${channel}
-  5. \\$(P):Z:OFFSET:END:\\${channel}
+  2. `$(P):SLOPE:${channel}`
+  3. `$(P):OFFSET:${channel}`
+  4. `$(P):Z:OFFSET:START:${channel}`
+  5. `$(P):Z:OFFSET:END:${channel}`
   6. $(P):SPEED
-  7. \\$(P):START:EXTRACTION:\\${channel}
-  8. \\$(P):END:EXTRACTION:\\${channel}
-  9. \\$(P):FIBER:LENGTH:\\${channel}
+  7. `$(P):START:EXTRACTION:${channel}`
+  8. `$(P):END:EXTRACTION:${channel}`
+  9. `$(P):FIBER:LENGTH:${channel}`
 
 ### waveformStatus
 Usage: **waveformStatus**
