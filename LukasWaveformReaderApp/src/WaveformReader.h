@@ -45,7 +45,7 @@
 #define WAVEFORM0_THRESHOLD_STRING "THRESHOLD:0"
 #define WAVEFORM0_Z_OFFSET_START_STRING "Z_OFFSET_START0"
 #define WAVEFORM0_Z_OFFSET_END_STRING "Z_OFFSET_END0"
-#define WAVEFORM0_LENGTH_STRING "LENGTH0"
+#define WAVEFORM0_FIBER_LENGTH_STRING "FIBER_LENGTH0"
 #define WAVEFORM0_EXTRACTION_START_STRING "EXTRACTION_START0"
 #define WAVEFORM0_EXTRACTION_END_STRING "EXTRACTION_END0"
 #define WAVEFORM0_EXTRACTED_PV_STRING "EXTRACTED_WAVEFORM:0"
@@ -63,7 +63,7 @@
 #define WAVEFORM1_THRESHOLD_STRING "THRESHOLD:1"
 #define WAVEFORM1_Z_OFFSET_START_STRING "Z_OFFSET_START1"
 #define WAVEFORM1_Z_OFFSET_END_STRING "Z_OFFSET_END1"
-#define WAVEFORM1_LENGTH_STRING "LENGTH1"
+#define WAVEFORM1_FIBER_LENGTH_STRING "FIBER_LENGTH1"
 #define WAVEFORM1_EXTRACTION_START_STRING "EXTRACTION_START1"
 #define WAVEFORM1_EXTRACTION_END_STRING "EXTRACTION_END1"
 #define WAVEFORM1_EXTRACTED_PV_STRING "EXTRACTED_WAVEFORM:1"
@@ -81,7 +81,7 @@
 #define WAVEFORM2_THRESHOLD_STRING "THRESHOLD:2"
 #define WAVEFORM2_Z_OFFSET_START_STRING "Z_OFFSET_START2"
 #define WAVEFORM2_Z_OFFSET_END_STRING "Z_OFFSET_END2"
-#define WAVEFORM2_LENGTH_STRING "LENGTH2"
+#define WAVEFORM2_FIBER_LENGTH_STRING "FIBER_LENGTH2"
 #define WAVEFORM2_EXTRACTION_START_STRING "EXTRACTION_START2"
 #define WAVEFORM2_EXTRACTION_END_STRING "EXTRACTION_END2"
 #define WAVEFORM2_EXTRACTED_PV_STRING "EXTRACTED_WAVEFORM:2"
@@ -126,9 +126,9 @@ class WaveformReader : public asynPortDriver
     std::vector<std::string> waveform_param_indices; // order matters
     std::vector<std::string> extracted_waveform_param_indices;
     std::vector<std::string> extracted_x_axis_waveform_indices;
-    std::map<std::string, int*> pv_param_map; //Identifier of pv to parameter in param list
-    std::map<std::string, int*> extracted_param_map;
-    std::map<std::string, int*> x_axis_param_map;
+    std::map<std::string, int> pv_param_map; //Identifier of pv to parameter in param list
+    std::map<std::string, int> extracted_param_map;
+    std::map<std::string, int> x_axis_param_map;
     std::map<std::string, int> index_map; // map string identifiers to indices 0, 1, and 2, which are used to get waveform-specific data from arrays
     std::array<std::string, NUMBER_OF_WAVEFORM_RECORDS> streaming_status; // store the streaming status of the waveforms 
     std::array<std::chrono::milliseconds, NUMBER_OF_WAVEFORM_RECORDS> duration_data; // store the time it takes to read the stream from the hardware
@@ -152,7 +152,7 @@ class WaveformReader : public asynPortDriver
     int waveform0_threshold_index;
     int waveform0_z_offset_start_index;
     int waveform0_z_offset_end_index;
-    int waveform0_length_index;
+    int waveform0_fiber_length_index;
     int waveform0_extraction_start_index;
     int waveform0_extraction_end_index;
     int waveform0_extracted_elements_index;
@@ -165,7 +165,7 @@ class WaveformReader : public asynPortDriver
     int waveform1_threshold_index;
     int waveform1_z_offset_start_index;
     int waveform1_z_offset_end_index;
-    int waveform1_length_index;
+    int waveform1_fiber_length_index;
     int waveform1_extraction_start_index;
     int waveform1_extraction_end_index;
     int waveform1_extracted_elements_index;
@@ -178,7 +178,7 @@ class WaveformReader : public asynPortDriver
     int waveform2_threshold_index;
     int waveform2_z_offset_start_index;
     int waveform2_z_offset_end_index;
-    int waveform2_length_index;
+    int waveform2_fiber_length_index;
     int waveform2_extraction_start_index;
     int waveform2_extraction_end_index;
     int waveform2_extracted_elements_index;
@@ -192,7 +192,7 @@ class WaveformReader : public asynPortDriver
     int* threshold_indices[NUMBER_OF_WAVEFORM_RECORDS] = {&waveform0_threshold_index, &waveform1_threshold_index, &waveform2_threshold_index};
     int* z_offset_start_indices[NUMBER_OF_WAVEFORM_RECORDS] = {&waveform0_z_offset_start_index, &waveform1_z_offset_start_index, &waveform2_z_offset_start_index};
     int* z_offset_end_indices[NUMBER_OF_WAVEFORM_RECORDS] = {&waveform0_z_offset_end_index, &waveform1_z_offset_end_index, &waveform2_z_offset_end_index};
-    int* length_indices[NUMBER_OF_WAVEFORM_RECORDS] = {&waveform0_length_index, &waveform1_length_index, &waveform2_length_index};
+    int* fiber_length_indices[NUMBER_OF_WAVEFORM_RECORDS] = {&waveform0_fiber_length_index, &waveform1_fiber_length_index, &waveform2_fiber_length_index};
     int* extraction_start_indices[NUMBER_OF_WAVEFORM_RECORDS] = {&waveform0_extraction_start_index, &waveform1_extraction_start_index, &waveform2_extraction_start_index};
     int* extraction_end_indices[NUMBER_OF_WAVEFORM_RECORDS] = {&waveform0_extraction_end_index, &waveform1_extraction_end_index, &waveform2_extraction_end_index};
     int* extracted_elements_indices[NUMBER_OF_WAVEFORM_RECORDS] = {&waveform0_extracted_elements_index, &waveform1_extracted_elements_index, &waveform2_extracted_elements_index};

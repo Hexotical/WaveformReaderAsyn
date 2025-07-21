@@ -19,6 +19,7 @@ int WaveformReader::findMaxIndex(int waveformIndex)
       maxIndex = i;
     }
   }
+  std::cout << "Max index is: " << maxIndex << std::endl;
   return maxIndex;
 
 }

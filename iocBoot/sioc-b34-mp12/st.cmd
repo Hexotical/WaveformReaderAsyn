@@ -9,7 +9,7 @@ epicsEnvSet("YAML_DIR", "${IOC_DATA}/${IOC}/yaml")
 epicsEnvSet("YAML", "${YAML_DIR}/000TopLevel.yaml")
 epicsEnvSet("DEFAULTS_FILE", "${YAML_DIR}/config/defaults.yaml")
 # change these values later
-epicsEnvSet("L2MPS_PREFIX","MPLN:UNDH:MP01:1")
+epicsEnvSet("L2MPS_PREFIX","MPLN:UNDH:MP06:6")
 epicsEnvSet("WAVEFORM_PORT","WAVEFORM_PORT")
 cd "${TOP}"
 

@@ -45,6 +45,7 @@ record(ao, "$(P):NO:OF:WORDS")
   info(autosaveFields, "VAL")
 }
 
+# In Hz
 record(longin, "$(P):CLK:FREQUENCY")
 {
     field(DTYP, "asynInt32")
@@ -52,11 +53,11 @@ record(longin, "$(P):CLK:FREQUENCY")
     field(INP, "@asyn($(PORT), $(ADDR), $(TIMEOUT))CLK_FREQUENCY")
 }
 
-# represents the speed of light/beam loss particles in the beam
-# ASSUMING m/ns for now
+# Represents the speed of light/beam loss particles in the beam
+# Assuming units of m/ns
 record(ao,      "$(P):SPEED") {
     field(PINI, "YES")
-    field(DESC, "End of extraction range in m")
+    field(DESC, "Speed of beam loss particles")
     field(DTYP, "asynFloat64")
     field(OUT,  "@asyn($(PORT),$(ADDR),$(TIMEOUT))SPEED")
     field(SCAN, "Passive")

@@ -57,9 +57,9 @@ WaveformReader::WaveformReader(const char *portName, int bayNumber, int bufferSi
     createParam(extracted_pvIdentifier.c_str(), asynParamInt16Array, &extracted_waveform_param_index);
     createParam(extracted_x_axis_pvIdentifier.c_str(), asynParamFloat64Array, &extracted_x_axis_waveform_param_index);
     std::cout << "The identifier is: " << pvIdentifier << " and the waveform_param_index is : " << waveform_param_index << std::endl;
-    pv_param_map.insert(std::pair<std::string, int*>(pvIdentifier, &waveform_param_index));
-    extracted_param_map.insert(std::pair<std::string, int*>(extracted_pvIdentifier, &extracted_waveform_param_index));
-    x_axis_param_map.insert(std::pair<std::string, int*>(extracted_x_axis_pvIdentifier, &extracted_x_axis_waveform_param_index));
+    pv_param_map.insert(std::pair<std::string, int>(pvIdentifier, waveform_param_index));
+    extracted_param_map.insert(std::pair<std::string, int>(extracted_pvIdentifier, extracted_waveform_param_index));
+    x_axis_param_map.insert(std::pair<std::string, int>(extracted_x_axis_pvIdentifier, extracted_x_axis_waveform_param_index));
     waveform_param_indices.push_back(pvIdentifier);
     extracted_waveform_param_indices.push_back(extracted_pvIdentifier);
     extracted_x_axis_waveform_indices.push_back(extracted_x_axis_pvIdentifier);
@@ -79,8 +79,8 @@ WaveformReader::WaveformReader(const char *portName, int bayNumber, int bufferSi
     createParam(("BEAM_LOSS_LOC" + std::to_string(pvID)).c_str(), asynParamFloat64, beam_loss_loc_indices[pvID]);
     createParam(("Z_OFFSET_START" + std::to_string(pvID)).c_str(), asynParamFloat64, z_offset_start_indices[pvID]);
     createParam(("Z_OFFSET_END" + std::to_string(pvID)).c_str(), asynParamFloat64, z_offset_end_indices[pvID]);
-    createParam(("LENGTH" + std::to_string(pvID)).c_str(), asynParamFloat64, length_indices[pvID]);
-    createParam(("THRESHOLD:" + std::to_string(pvID)).c_str(), asynParamFloat64, length_indices[pvID]);
+    createParam(("FIBER_LENGTH" + std::to_string(pvID)).c_str(), asynParamFloat64, fiber_length_indices[pvID]);
+    createParam(("THRESHOLD:" + std::to_string(pvID)).c_str(), asynParamFloat64, threshold_indices[pvID]);
     createParam(("EXTRACTION_START" + std::to_string(pvID)).c_str(), asynParamFloat64, extraction_start_indices[pvID]);
     createParam(("EXTRACTION_END" + std::to_string(pvID)).c_str(), asynParamFloat64, extraction_end_indices[pvID]);
     createParam(("EXTRACTED_NO_OF_ELEMENTS" + std::to_string(pvID)).c_str(), asynParamInt32, extracted_elements_indices[pvID]);
@@ -177,8 +177,8 @@ void WaveformReader::streamTask(const char *streamInit = "/Stream0", std::string
         //TODO based on streamInit, add key and param to the asynPortDriver
 
         std::cout << "Passed pvID: " << pvID << std::endl;
-        int* waveform_param_index_ptr = pv_param_map[pvID];
-        std::cout << pvID << " corresponding index: " << *waveform_param_index_ptr << std::endl;
+        int waveform_param_index = pv_param_map[pvID];
+        std::cout << pvID << " corresponding index: " << waveform_param_index << std::endl;
 
         int index = index_map[pvID];
 
@@ -221,9 +221,9 @@ void WaveformReader::streamTask(const char *streamInit = "/Stream0", std::string
         while(1)
         {
             std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
-            std::cout << "Value of got before: " << got << std::endl;
+            // std::cout << "Value of got before: " << got << std::endl;
             got = stm->read( buf, MAX_BUFFER_SIZE, CTimeout(-1));
-            std::cout << "Value of got after: " << got << std::endl;
+            // std::cout << "Value of got after: " << got << std::endl;
             std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
             auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - begin);
             //printf("Getting from the buffer required %llu milliseconds\n", duration);
@@ -235,7 +235,7 @@ void WaveformReader::streamTask(const char *streamInit = "/Stream0", std::string
 
             if(got > 8)
             {
-                printf("There's a thing in the stream? %ld bytes\n", got);
+                // printf("There's a thing in the stream? %ld bytes\n", got);
                 lock();
                 nBytes = (got - 9); // header = 8 bytes, footer = 1 byte, data = 32bit words.
                 nWords16 = nBytes / 2; //Amount of words in our buffer to read
@@ -248,7 +248,7 @@ void WaveformReader::streamTask(const char *streamInit = "/Stream0", std::string
                   streaming_status[index] = "Successfully initialized but no data in buffer";
                 } 
 
-                doCallbacksInt16Array((epicsInt16*)(buf + 8), nWords16, *waveform_param_index_ptr, 0);
+                doCallbacksInt16Array((epicsInt16*)(buf + 8), nWords16, waveform_param_index, 0);
 
                 for(int i = 0; i < MAX_BUFFER_SIZE; i++)
                 {

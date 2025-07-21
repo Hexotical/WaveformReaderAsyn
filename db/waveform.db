@@ -100,16 +100,19 @@ record(calcout, "$(P):TO:DIV:0")
   }
 
 
-
+# This represents the physical location of the maximum beam loss 
+# computed by the maxBeamLoss function
+# Assuming units of meters
 record(ai, "$(P):BEAM:LOSS:LOC:0")
 {
     field(DTYP, "asynFloat64")
+    field(DESC, "Physical location of max beam loss")
     field(INP, "@asyn($(PORT),$(ADDR),$(TIMEOUT))BEAM_LOSS_LOC0")
     field(SCAN, "I/O Intr")
 }
 
-## This represents the threshold for finding the peak value of beam ##
-## loss; if the value is lower than this, then it should considered noise ##
+# This represents the threshold for finding the peak value of beam 
+# loss; if the value is lower than this, then it should considered noise
 record(ao, "$(P):THRESHOLD:0") 
 {
   field(DTYP, "asynFloat64")
@@ -122,15 +125,13 @@ record(ao, "$(P):THRESHOLD:0")
 
 # Length of the fiber
 # Assuming units of meters 
-record(ao,      "$(P):LENGTH:0") {
-    field(DESC, "Length in m")
+record(ao,      "$(P):FIBER:LENGTH:0") {
     field(PINI, "YES")
+    field(DESC, "Length in m")
     field(DTYP, "asynFloat64")
-    field(OUT,  "@asyn($(PORT), $(ADDR), $(TIMEOUT))LENGTH0")
+    field(OUT,  "@asyn($(PORT), $(ADDR), $(TIMEOUT))FIBER_LENGTH0")
     field(SCAN, "Passive")
-    field(PREC, "3")
-    field(VAL,  "100")
-    info(autosaveFields, "VAL")
+    field(VAL,  "150")
 }
 
 # Physical location of the start of the fiber
@@ -143,7 +144,6 @@ record(ao, "$(P):Z:OFFSET:START:0")
     field(OUT, "@asyn($(PORT),$(ADDR),$(TIMEOUT))Z_OFFSET_START0")
     field(SCAN, "Passive")
     field(VAL,  "0")
-    info(autosaveFields, "VAL")
 }
 
 # Physical location of the end of the fiber
@@ -163,7 +163,7 @@ record(ao,      "$(P):START:EXTRACTION:0") {
     field(PINI, "YES")
     field(DESC, "Start of extraction range in m")
     field(DTYP, "asynFloat64")
-    field(OUT,  "@asyn($(PORT), $(ADDR), $(TIMEOUT))EXTRACTION_START0")
+    field(OUT,  "@asyn($(PORT),$(ADDR),$(TIMEOUT))EXTRACTION_START0")
     field(SCAN, "Passive")
     field(VAL,  "0")
 }
@@ -179,6 +179,7 @@ record(ao,      "$(P):END:EXTRACTION:0") {
     field(VAL,  "100")
 }
 
+# The number of samples in the extracted range of values
 record(ai, "$(P):EXTRACTED:NO:OF:ELEMENTS:0")
 {
     field(DTYP, "asynInt32")
@@ -188,7 +189,7 @@ record(ai, "$(P):EXTRACTED:NO:OF:ELEMENTS:0")
     #field(VAL, "100")
 }
 
-# the X-axis of the final extracted waveforms, contains distance values in m
+# The X-axis of the final extracted waveform, contains distance values in m
 record(waveform, "$(P):EXTRACTED:X:WF:0") 
 {
   field(PINI, "1")
@@ -200,10 +201,11 @@ record(waveform, "$(P):EXTRACTED:X:WF:0")
   field(SCAN, "I/O Intr")
 }
 
+# Values of the extracted waveform
 record(waveform, "$(P):EXTRACTED:WF:0") 
 {
   field(PINI, "1")
-  field(DESC,    "X Subarray")
+  field(DESC,    "Extracted Subarray")
   field(INP, "@asyn($(PORT),$(ADDR),$(TIMEOUT))EXTRACTED_WAVEFORM:0")
   field(DTYP, "asynInt16ArrayIn")
   field(FTVL,    "SHORT")
@@ -312,16 +314,19 @@ record(calcout, "$(P):TO:DIV:1")
   }
 
 
-
+# This represents the physical location of the maximum beam loss 
+# computed by the maxBeamLoss function
+# Assuming units of meters
 record(ai, "$(P):BEAM:LOSS:LOC:1")
 {
     field(DTYP, "asynFloat64")
+    field(DESC, "Physical location of max beam loss")
     field(INP, "@asyn($(PORT),$(ADDR),$(TIMEOUT))BEAM_LOSS_LOC1")
     field(SCAN, "I/O Intr")
 }
 
-## This represents the threshold for finding the peak value of beam ##
-## loss; if the value is lower than this, then it should considered noise ##
+# This represents the threshold for finding the peak value of beam 
+# loss; if the value is lower than this, then it should considered noise
 record(ao, "$(P):THRESHOLD:1") 
 {
   field(DTYP, "asynFloat64")
@@ -334,15 +339,13 @@ record(ao, "$(P):THRESHOLD:1")
 
 # Length of the fiber
 # Assuming units of meters 
-record(ao,      "$(P):LENGTH:1") {
-    field(DESC, "Length in m")
+record(ao,      "$(P):FIBER:LENGTH:1") {
     field(PINI, "YES")
+    field(DESC, "Length in m")
     field(DTYP, "asynFloat64")
-    field(OUT,  "@asyn($(PORT), $(ADDR), $(TIMEOUT))LENGTH1")
+    field(OUT,  "@asyn($(PORT), $(ADDR), $(TIMEOUT))FIBER_LENGTH1")
     field(SCAN, "Passive")
-    field(PREC, "3")
-    field(VAL,  "100")
-    info(autosaveFields, "VAL")
+    field(VAL,  "150")
 }
 
 # Physical location of the start of the fiber
@@ -355,7 +358,6 @@ record(ao, "$(P):Z:OFFSET:START:1")
     field(OUT, "@asyn($(PORT),$(ADDR),$(TIMEOUT))Z_OFFSET_START1")
     field(SCAN, "Passive")
     field(VAL,  "0")
-    info(autosaveFields, "VAL")
 }
 
 # Physical location of the end of the fiber
@@ -375,7 +377,7 @@ record(ao,      "$(P):START:EXTRACTION:1") {
     field(PINI, "YES")
     field(DESC, "Start of extraction range in m")
     field(DTYP, "asynFloat64")
-    field(OUT,  "@asyn($(PORT), $(ADDR), $(TIMEOUT))EXTRACTION_START1")
+    field(OUT,  "@asyn($(PORT),$(ADDR),$(TIMEOUT))EXTRACTION_START1")
     field(SCAN, "Passive")
     field(VAL,  "0")
 }
@@ -391,6 +393,7 @@ record(ao,      "$(P):END:EXTRACTION:1") {
     field(VAL,  "100")
 }
 
+# The number of samples in the extracted range of values
 record(ai, "$(P):EXTRACTED:NO:OF:ELEMENTS:1")
 {
     field(DTYP, "asynInt32")
@@ -400,7 +403,7 @@ record(ai, "$(P):EXTRACTED:NO:OF:ELEMENTS:1")
     #field(VAL, "100")
 }
 
-# the X-axis of the final extracted waveforms, contains distance values in m
+# The X-axis of the final extracted waveform, contains distance values in m
 record(waveform, "$(P):EXTRACTED:X:WF:1") 
 {
   field(PINI, "1")
@@ -412,10 +415,11 @@ record(waveform, "$(P):EXTRACTED:X:WF:1")
   field(SCAN, "I/O Intr")
 }
 
+# Values of the extracted waveform
 record(waveform, "$(P):EXTRACTED:WF:1") 
 {
   field(PINI, "1")
-  field(DESC,    "X Subarray")
+  field(DESC,    "Extracted Subarray")
   field(INP, "@asyn($(PORT),$(ADDR),$(TIMEOUT))EXTRACTED_WAVEFORM:1")
   field(DTYP, "asynInt16ArrayIn")
   field(FTVL,    "SHORT")
@@ -524,16 +528,19 @@ record(calcout, "$(P):TO:DIV:2")
   }
 
 
-
+# This represents the physical location of the maximum beam loss 
+# computed by the maxBeamLoss function
+# Assuming units of meters
 record(ai, "$(P):BEAM:LOSS:LOC:2")
 {
     field(DTYP, "asynFloat64")
+    field(DESC, "Physical location of max beam loss")
     field(INP, "@asyn($(PORT),$(ADDR),$(TIMEOUT))BEAM_LOSS_LOC2")
     field(SCAN, "I/O Intr")
 }
 
-## This represents the threshold for finding the peak value of beam ##
-## loss; if the value is lower than this, then it should considered noise ##
+# This represents the threshold for finding the peak value of beam 
+# loss; if the value is lower than this, then it should considered noise
 record(ao, "$(P):THRESHOLD:2") 
 {
   field(DTYP, "asynFloat64")
@@ -546,15 +553,13 @@ record(ao, "$(P):THRESHOLD:2")
 
 # Length of the fiber
 # Assuming units of meters 
-record(ao,      "$(P):LENGTH:2") {
-    field(DESC, "Length in m")
+record(ao,      "$(P):FIBER:LENGTH:2") {
     field(PINI, "YES")
+    field(DESC, "Length in m")
     field(DTYP, "asynFloat64")
-    field(OUT,  "@asyn($(PORT), $(ADDR), $(TIMEOUT))LENGTH2")
+    field(OUT,  "@asyn($(PORT), $(ADDR), $(TIMEOUT))FIBER_LENGTH2")
     field(SCAN, "Passive")
-    field(PREC, "3")
-    field(VAL,  "100")
-    info(autosaveFields, "VAL")
+    field(VAL,  "150")
 }
 
 # Physical location of the start of the fiber
@@ -567,7 +572,6 @@ record(ao, "$(P):Z:OFFSET:START:2")
     field(OUT, "@asyn($(PORT),$(ADDR),$(TIMEOUT))Z_OFFSET_START2")
     field(SCAN, "Passive")
     field(VAL,  "0")
-    info(autosaveFields, "VAL")
 }
 
 # Physical location of the end of the fiber
@@ -587,7 +591,7 @@ record(ao,      "$(P):START:EXTRACTION:2") {
     field(PINI, "YES")
     field(DESC, "Start of extraction range in m")
     field(DTYP, "asynFloat64")
-    field(OUT,  "@asyn($(PORT), $(ADDR), $(TIMEOUT))EXTRACTION_START2")
+    field(OUT,  "@asyn($(PORT),$(ADDR),$(TIMEOUT))EXTRACTION_START2")
     field(SCAN, "Passive")
     field(VAL,  "0")
 }
@@ -603,6 +607,7 @@ record(ao,      "$(P):END:EXTRACTION:2") {
     field(VAL,  "100")
 }
 
+# The number of samples in the extracted range of values
 record(ai, "$(P):EXTRACTED:NO:OF:ELEMENTS:2")
 {
     field(DTYP, "asynInt32")
@@ -612,7 +617,7 @@ record(ai, "$(P):EXTRACTED:NO:OF:ELEMENTS:2")
     #field(VAL, "100")
 }
 
-# the X-axis of the final extracted waveforms, contains distance values in m
+# The X-axis of the final extracted waveform, contains distance values in m
 record(waveform, "$(P):EXTRACTED:X:WF:2") 
 {
   field(PINI, "1")
@@ -624,10 +629,11 @@ record(waveform, "$(P):EXTRACTED:X:WF:2")
   field(SCAN, "I/O Intr")
 }
 
+# Values of the extracted waveform
 record(waveform, "$(P):EXTRACTED:WF:2") 
 {
   field(PINI, "1")
-  field(DESC,    "X Subarray")
+  field(DESC,    "Extracted Subarray")
   field(INP, "@asyn($(PORT),$(ADDR),$(TIMEOUT))EXTRACTED_WAVEFORM:2")
   field(DTYP, "asynInt16ArrayIn")
   field(FTVL,    "SHORT")
