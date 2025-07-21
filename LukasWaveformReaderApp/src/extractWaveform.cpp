@@ -55,7 +55,7 @@ void WaveformReader::extractWaveform(int waveformIndex)
 
   if (extraneous_length < 0)
   {
-    std::cout << "Fiber length cannot be less than the actual length, resetting fiber length equal to actual length." << std::endl;
+    std::cout << "Fiber length cannot be less than the actual length, setting fiber length equal to actual length." << std::endl;
     fiber_length = actual_length;
     extraneous_length = 0;
   }
