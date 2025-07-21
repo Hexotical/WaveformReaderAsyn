@@ -105,18 +105,20 @@ class WaveformReader : public asynPortDriver
     static WaveformReader* getPortDriver();
     static void setPortDriver(WaveformReader* newPortDriver);
 
-    void statusCheck(void);
+    void extractWaveform(int waveformIndex);
     void fft(int waveformIndex);
+    void findLocalMaxima(int waveformIndex);
     int findMaxIndex(int waveformIndex);
     void findRange(int& low, int& high, int maxIndex, const int LOWER_LIMIT, int waveformIndex);
-    void findLocalMaxima(int waveformIndex);
     void maxBeamLoss(int waveformIndex);
-    void extractWaveform(int waveformIndex);
+    void statusCheck(void);
     WaveformReader& operator=(WaveformReader& rhs);
 
 
     void streamTask(const char *stream, std::string pvID);// takes a path to the stream and then a pv identifier for connection
     void streamInit(std::string pv_identifier, std::string stream_path);
+    virtual asynStatus readInt16Array(asynUser *pasynUser, epicsInt16 *value, size_t nElements, size_t *nIn);
+    virtual asynStatus readFloat64Array(asynUser *pasynUser, epicsFloat64 *value, size_t nElements, size_t *nIn);
     virtual asynStatus writeUInt32Digital(asynUser *pasynUser, epicsUInt32 value, epicsUInt32 mask);
     virtual asynStatus writeInt32(asynUser *pasynUser, epicsInt32 value);
 

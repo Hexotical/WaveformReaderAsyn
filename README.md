@@ -17,6 +17,7 @@ Usage: **maxBeamLossLocation** <Waveform Index>
 E.g. **maxBeamLossLocation** 0
 
 This command computes and displays the physical location where the maximum beam loss is detected by a beam loss monitor based on values of the starting and ending positions of the monitor as well as the size of the buffer or data that the beam loss monitor reads. The user must enter the index of the waveform, i.e., 0, 1, or 2, for WAVEFORM:0, WAVEFORM:1, or WAVEFORM:2, respectively.
+A minimum threshold value can be set for detecting maximum beam loss by writing to `$(P):THRESHOLD:${channel}`.
 
 The waveformExtraction command must be executed before executing this command.
 
