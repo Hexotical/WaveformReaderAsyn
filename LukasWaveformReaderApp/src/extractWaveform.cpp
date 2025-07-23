@@ -20,8 +20,8 @@ void WaveformReader::extractWaveform(int waveformIndex)
 
   std::string original_pvIdentifier = waveform_param_indices[waveformIndex];
 
-  epicsInt16 *refined_waveform = (epicsInt16 *)calloc(STREAM_MAX_SIZE, sizeof(epicsInt16));
-  epicsFloat64 *x_axis_time = (epicsFloat64 *)calloc(STREAM_MAX_SIZE, sizeof(epicsFloat64));  
+  epicsInt16 *refined_waveform = (epicsInt16 *)calloc(MAX_BUFFER_SIZE, sizeof(epicsInt16));
+  epicsFloat64 *x_axis_time = (epicsFloat64 *)calloc(MAX_BUFFER_SIZE, sizeof(epicsFloat64));  
 
   // Calculate the time in ns between each sample 
   //time_ns = 1000.0 / (2.0 * clock_frequency); // this assumes frequency is in Mhz
@@ -46,8 +46,8 @@ void WaveformReader::extractWaveform(int waveformIndex)
   getDoubleParam(*(extraction_end_indices[waveformIndex]), &extraction_end);
   getDoubleParam(*(fiber_length_indices[waveformIndex]), &fiber_length);
 
-  epicsInt16 *first_iteration = (epicsInt16 *)calloc(STREAM_MAX_SIZE, sizeof(epicsInt16)); 
-  epicsFloat64 *x_axis_distance = (epicsFloat64 *)calloc(STREAM_MAX_SIZE, sizeof(epicsFloat64)); 
+  epicsInt16 *first_iteration = (epicsInt16 *)calloc(MAX_BUFFER_SIZE, sizeof(epicsInt16)); 
+  epicsFloat64 *x_axis_distance = (epicsFloat64 *)calloc(MAX_BUFFER_SIZE, sizeof(epicsFloat64)); 
 
   // represents the length of each vertical part of the fiber (because it's symmetric)
   actual_length = z_offset_end - z_offset_start;
@@ -73,8 +73,8 @@ void WaveformReader::extractWaveform(int waveformIndex)
     no_of_elements++;
   }
 
-  epicsInt16 *waveform_data_clipped = (epicsInt16 *)calloc(STREAM_MAX_SIZE, sizeof(epicsInt16)); 
-  epicsFloat64 *x_axis_clipped = (epicsFloat64 *)calloc(STREAM_MAX_SIZE, sizeof(epicsFloat64));
+  epicsInt16 *waveform_data_clipped = (epicsInt16 *)calloc(MAX_BUFFER_SIZE, sizeof(epicsInt16)); 
+  epicsFloat64 *x_axis_clipped = (epicsFloat64 *)calloc(MAX_BUFFER_SIZE, sizeof(epicsFloat64));
 
   // remove data representing vertical parts
   int no_of_valid_elements = 0;
@@ -88,8 +88,8 @@ void WaveformReader::extractWaveform(int waveformIndex)
     }
   }
 
-  epicsInt16 *waveform_data = (epicsInt16 *)calloc(STREAM_MAX_SIZE, sizeof(epicsInt16)); 
-  epicsFloat64 *x_axis = (epicsFloat64 *)calloc(STREAM_MAX_SIZE, sizeof(epicsFloat64)); 
+  epicsInt16 *waveform_data = (epicsInt16 *)calloc(MAX_BUFFER_SIZE, sizeof(epicsInt16)); 
+  epicsFloat64 *x_axis = (epicsFloat64 *)calloc(MAX_BUFFER_SIZE, sizeof(epicsFloat64)); 
 
   // invert the waveforms because right now the data starts on the right side of the fiber
   for (int i = 0; i < no_of_valid_elements; i++) 
@@ -106,8 +106,8 @@ void WaveformReader::extractWaveform(int waveformIndex)
     extraction_end = z_offset_end;
   }
 
-  epicsInt16 *extracted_waveform_data = (epicsInt16 *)calloc(STREAM_MAX_SIZE, sizeof(epicsInt16)); 
-  epicsFloat64 *extracted_x_axis = (epicsFloat64 *)calloc(STREAM_MAX_SIZE, sizeof(epicsFloat64)); 
+  epicsInt16 *extracted_waveform_data = (epicsInt16 *)calloc(MAX_BUFFER_SIZE, sizeof(epicsInt16)); 
+  epicsFloat64 *extracted_x_axis = (epicsFloat64 *)calloc(MAX_BUFFER_SIZE, sizeof(epicsFloat64)); 
   int no_of_extracted_elements = 0;
 
   // extract relevant part of the waveform based on starting and ending extraction points entered by the user
@@ -136,6 +136,18 @@ void WaveformReader::extractWaveform(int waveformIndex)
 
   doCallbacksInt16Array(extracted_waveform_data, no_of_extracted_elements, extracted_param_map[extracted_pvIdentifier], 0);
   doCallbacksFloat64Array(extracted_x_axis, no_of_extracted_elements, x_axis_param_map[extracted_x_axis_pvIdentifier], 0);
+
+  // deallocate memory
+  free(refined_waveform);
+  free(x_axis_time);
+  free(first_iteration);
+  free(x_axis_distance);
+  free(waveform_data_clipped);
+  free(x_axis_clipped);
+  free(waveform_data);
+  free(x_axis);
+  free(extracted_waveform_data);
+  free(extracted_x_axis);
 }
 
 //-------------------------------------------------------------------------------------
