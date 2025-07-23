@@ -48,6 +48,10 @@ This command uses the following PVs for the extraction:
   8. `$(P):END:EXTRACTION:${channel}`
   9. `$(P):FIBER:LENGTH:${channel}`
 
+The following diagram can be used as a reference to visualize the fiber and the PVs:
+![annotated diagram of fiber](assets/fiber.png)
+
+
 ### waveformStatus
 Usage: **waveformStatus**
 
