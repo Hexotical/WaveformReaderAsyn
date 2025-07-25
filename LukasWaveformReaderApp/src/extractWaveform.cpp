@@ -91,12 +91,22 @@ void WaveformReader::extractWaveform(int waveformIndex)
   epicsInt16 *waveform_data = (epicsInt16 *)calloc(MAX_BUFFER_SIZE, sizeof(epicsInt16)); 
   epicsFloat64 *x_axis = (epicsFloat64 *)calloc(MAX_BUFFER_SIZE, sizeof(epicsFloat64)); 
 
+  std::string complete_pvIdentifier = complete_waveform_param_indices[waveformIndex];
+  std::string complete_x_axis_pvIdentifier = complete_x_axis_waveform_indices[waveformIndex];
+
   // invert the waveforms because right now the data starts on the right side of the fiber
   for (int i = 0; i < no_of_valid_elements; i++) 
   {
     waveform_data[i] = waveform_data_clipped[no_of_valid_elements - i - 1];
     x_axis[i] = actual_length - x_axis_clipped[no_of_valid_elements - i - 1] + z_offset_start;
+
+    complete_x_axis_waveform_map[complete_x_axis_pvIdentifier][i] = x_axis[i];
+    complete_waveform_map[complete_pvIdentifier][i] = waveform_data[i];
   }
+
+  // save the state of the waveform before extraction in PVs
+  doCallbacksInt16Array(waveform_data, no_of_valid_elements, complete_param_map[complete_pvIdentifier], 0);
+  doCallbacksFloat64Array(x_axis, no_of_valid_elements, complete_x_axis_param_map[complete_x_axis_pvIdentifier], 0);
 
   if (extraction_start > extraction_end || extraction_start < z_offset_start || extraction_start > z_offset_end
    || extraction_end > z_offset_end || extraction_end < z_offset_start) 

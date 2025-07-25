@@ -108,6 +108,18 @@ record(ai, "$(P):BEAM:LOSS:LOC:${channel}")
     field(DTYP, "asynFloat64")
     field(DESC, "Physical location of max beam loss")
     field(INP, "@asyn($(PORT),$(ADDR),$(TIMEOUT))BEAM_LOSS_LOC${channel}")
+    field(PREC, "3")
+    field(SCAN, "I/O Intr")
+    field(EGU, "m")
+}
+
+# This represents the value of the maximum beam loss 
+# computed by the maxBeamLoss function
+record(ai, "$(P):BEAM:LOSS:VAL:${channel}")
+{
+    field(DTYP, "asynInt32")
+    field(DESC, "Physical location of max beam loss")
+    field(INP, "@asyn($(PORT),$(ADDR),$(TIMEOUT))BEAM_LOSS_VAL${channel}")
     field(SCAN, "I/O Intr")
 }
 
@@ -132,6 +144,7 @@ record(ao,      "$(P):FIBER:LENGTH:${channel}") {
     field(OUT,  "@asyn($(PORT), $(ADDR), $(TIMEOUT))FIBER_LENGTH${channel}")
     field(SCAN, "Passive")
     field(VAL,  "150")
+    field(EGU, "m")
 }
 
 # Physical location of the start of the fiber
@@ -144,6 +157,8 @@ record(ao, "$(P):Z:OFFSET:START:${channel}")
     field(OUT, "@asyn($(PORT),$(ADDR),$(TIMEOUT))Z_OFFSET_START${channel}")
     field(SCAN, "Passive")
     field(VAL,  "0")
+    field(PREC, "3")
+    field(EGU, "m")
 }
 
 # Physical location of the end of the fiber
@@ -155,6 +170,8 @@ record(ao,      "$(P):Z:OFFSET:END:${channel}") {
     field(OUT, "@asyn($(PORT),$(ADDR),$(TIMEOUT))Z_OFFSET_END${channel}")
     field(SCAN, "Passive")
     field(VAL,  "100")
+    field(PREC, "3")
+    field(EGU, "m")
 }
 
 # Physical location of the start of the extraction range
@@ -165,7 +182,9 @@ record(ao,      "$(P):START:EXTRACTION:${channel}") {
     field(DTYP, "asynFloat64")
     field(OUT,  "@asyn($(PORT),$(ADDR),$(TIMEOUT))EXTRACTION_START${channel}")
     field(SCAN, "Passive")
-    field(VAL,  "0")
+    field(VAL,  "20")
+    field(PREC, "3")
+    field(EGU, "m")
 }
 
 # Physical location of the end of the extraction range
@@ -176,7 +195,9 @@ record(ao,      "$(P):END:EXTRACTION:${channel}") {
     field(DTYP, "asynFloat64")
     field(OUT,  "@asyn($(PORT), $(ADDR), $(TIMEOUT))EXTRACTION_END${channel}")
     field(SCAN, "Passive")
-    field(VAL,  "100")
+    field(VAL,  "80")
+    field(PREC, "3")
+    field(EGU, "m")
 }
 
 # The number of samples in the extracted range of values
@@ -187,6 +208,31 @@ record(ai, "$(P):EXTRACTED:NO:OF:ELEMENTS:${channel}")
     field(INP, "@asyn($(PORT),$(ADDR),$(TIMEOUT))EXTRACTED_NO_OF_ELEMENTS${channel}")
     field(SCAN, "I/O Intr")
     #field(VAL, "100")
+}
+
+# The X-axis of the waveform before extraction, contains distance values in m
+record(waveform, "$(P):COMPLETE:X:WF:${channel}") 
+{
+  field(PINI, "1")
+  field(DESC,    "X Subarray")
+  field(INP, "@asyn($(PORT),$(ADDR),$(TIMEOUT))COMPLETE_X_AXIS:$(channel)")
+  field(DTYP, "asynFloat64ArrayIn")
+  field(FTVL,    "DOUBLE")
+  field(NELM,    "$(WAVEFORM_SIZE)")
+  field(SCAN, "I/O Intr")
+}
+
+# Values of the waveform before extraction
+record(waveform, "$(P):COMPLETE:WF:${channel}") 
+{
+  field(PINI, "1")
+  field(DESC,    "Subarray")
+  field(INP, "@asyn($(PORT),$(ADDR),$(TIMEOUT))COMPLETE_WAVEFORM:$(channel)")
+  field(DTYP, "asynInt16ArrayIn")
+  field(FTVL,    "SHORT")
+  # NELM is the maximum number of values, NORD is the number of values actually read
+  field(NELM,    "$(WAVEFORM_SIZE)")
+  field(SCAN, "I/O Intr")
 }
 
 # The X-axis of the final extracted waveform, contains distance values in m

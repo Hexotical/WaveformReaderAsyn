@@ -29,6 +29,7 @@ void WaveformReader::maxBeamLoss(int waveformIndex)
     std::cout << "The location of maximum beam loss is " << locationOfMaxIndex << " m." <<  std::endl;
     std::cout << "The value of maximum beam loss is " <<  maxLoss << "." << std::endl;
     setDoubleParam(*(beam_loss_loc_indices[waveformIndex]), locationOfMaxIndex);
+    setIntegerParam(*(beam_loss_val_indices[waveformIndex]), maxLoss);
     callParamCallbacks();
   }
 }

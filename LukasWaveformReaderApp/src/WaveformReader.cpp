@@ -47,20 +47,30 @@ WaveformReader::WaveformReader(const char *portName, int bayNumber, int bufferSi
   {
     //For loop generates the string identifier for each Waveform records and then creates a parameter our asynDriver can interact with for it
     int waveform_param_index;
+    int complete_waveform_param_index;
+    int complete_x_axis_waveform_param_index;
     int extracted_waveform_param_index;
     int extracted_x_axis_waveform_param_index;
     std::string pvIdentifier = "WAVEFORM:" + std::to_string(pvID);
+    std::string complete_pvIdentifier = "COMPLETE_WAVEFORM:" + std::to_string(pvID);
+    std::string complete_x_axis_pvIdentifier = "COMPLETE_X_AXIS:" + std::to_string(pvID);
     std::string extracted_pvIdentifier = "EXTRACTED_WAVEFORM:" + std::to_string(pvID);
     std::string extracted_x_axis_pvIdentifier = "EXTRACTED_X_AXIS:" + std::to_string(pvID);
     std::cout << pvIdentifier << std::endl;
     createParam(pvIdentifier.c_str(), asynParamInt16Array, &waveform_param_index);
+    createParam(complete_pvIdentifier.c_str(), asynParamInt16Array, &complete_waveform_param_index);
+    createParam(complete_x_axis_pvIdentifier.c_str(), asynParamFloat64Array, &complete_x_axis_waveform_param_index);
     createParam(extracted_pvIdentifier.c_str(), asynParamInt16Array, &extracted_waveform_param_index);
     createParam(extracted_x_axis_pvIdentifier.c_str(), asynParamFloat64Array, &extracted_x_axis_waveform_param_index);
     std::cout << "The identifier is: " << pvIdentifier << " and the waveform_param_index is : " << waveform_param_index << std::endl;
     pv_param_map.insert(std::pair<std::string, int>(pvIdentifier, waveform_param_index));
+    complete_param_map.insert(std::pair<std::string, int>(complete_pvIdentifier, complete_waveform_param_index));
+    complete_x_axis_param_map.insert(std::pair<std::string, int>(complete_x_axis_pvIdentifier, complete_x_axis_waveform_param_index));
     extracted_param_map.insert(std::pair<std::string, int>(extracted_pvIdentifier, extracted_waveform_param_index));
     x_axis_param_map.insert(std::pair<std::string, int>(extracted_x_axis_pvIdentifier, extracted_x_axis_waveform_param_index));
     waveform_param_indices.push_back(pvIdentifier);
+    complete_waveform_param_indices.push_back(complete_pvIdentifier);
+    complete_x_axis_waveform_indices.push_back(complete_x_axis_pvIdentifier);
     extracted_waveform_param_indices.push_back(extracted_pvIdentifier);
     extracted_x_axis_waveform_indices.push_back(extracted_x_axis_pvIdentifier);
     // initialize values 
@@ -70,6 +80,8 @@ WaveformReader::WaveformReader(const char *portName, int bayNumber, int bufferSi
     duration_data[pvID] = std::chrono::milliseconds(0);
 
     waveform_map[pvIdentifier] = (epicsInt16 *)calloc(STREAM_MAX_SIZE, sizeof(epicsInt16)); 
+    complete_waveform_map[complete_pvIdentifier] = (epicsInt16 *)calloc(STREAM_MAX_SIZE, sizeof(epicsInt16)); 
+    complete_x_axis_waveform_map[complete_x_axis_pvIdentifier] = (epicsFloat64 *)calloc(STREAM_MAX_SIZE, sizeof(epicsFloat64)); 
     extracted_waveform_map[extracted_pvIdentifier] = (epicsInt16 *)calloc(STREAM_MAX_SIZE, sizeof(epicsInt16)); 
     extracted_x_axis_waveform_map[extracted_x_axis_pvIdentifier] = (epicsFloat64 *)calloc(STREAM_MAX_SIZE, sizeof(epicsFloat64)); 
 
@@ -77,6 +89,7 @@ WaveformReader::WaveformReader(const char *portName, int bayNumber, int bufferSi
     createParam(("END_ADDR" + std::to_string(pvID)).c_str(), asynParamInt32, endAddr_indices[pvID]);
     createParam(("BEGIN_ADDR" + std::to_string(pvID)).c_str(), asynParamInt32, beginAddr_indices[pvID]);
     createParam(("BEAM_LOSS_LOC" + std::to_string(pvID)).c_str(), asynParamFloat64, beam_loss_loc_indices[pvID]);
+    createParam(("BEAM_LOSS_VAL" + std::to_string(pvID)).c_str(), asynParamInt32, beam_loss_val_indices[pvID]);
     createParam(("Z_OFFSET_START" + std::to_string(pvID)).c_str(), asynParamFloat64, z_offset_start_indices[pvID]);
     createParam(("Z_OFFSET_END" + std::to_string(pvID)).c_str(), asynParamFloat64, z_offset_end_indices[pvID]);
     createParam(("FIBER_LENGTH" + std::to_string(pvID)).c_str(), asynParamFloat64, fiber_length_indices[pvID]);
