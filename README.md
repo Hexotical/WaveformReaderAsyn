@@ -49,7 +49,7 @@ This command uses the following PVs for the extraction:
   9. `$(P):FIBER:LENGTH:${channel}`
 
 The following diagram can be used as a reference to visualize the fiber and the PVs:
-![annotated diagram of fiber](assets/fiber.png)
+![annotated diagram of fiber](assets/optical_fiber.png)
 
 
 ### waveformStatus
@@ -66,3 +66,23 @@ This command initializes a thread that connects to your specified stream, reads 
 
 ## Importing
 To import this WaveformReader as a module, follow the steps listed [here](https://confluence.slac.stanford.edu/spaces/ACHIP/pages/610483645/Steps+to+add+WaveformReaderAsyn+to+another+app).
+
+## PyDM Displays
+This WaveformReader has three pydm screens associated with it:
+1. raw_waveform_data.ui => This displays the entire data buffer that we retrieve from the hardware.
+2. complete_waveform_data.ui => This displays the waveform from Z:OFFSET:START to Z:OFFSET_END i.e., the waveform data obtained after removing the redundant data representing the vertical parts on either end of the fiber.
+3. extracted_waveform_data.ui => This displays the waveform from START:EXTRACTION to END:EXTRACTION i.e., a subset of the complete_waveform_data obtained by extracting the waveform data between starting and ending locations entered by the user.
+
+To open the displays use the following commands:
+1. pydm -m '{"P":"MPLN:UNDH:MP06:6", "channel":0}' raw_waveform_data.ui
+2. pydm -m '{"P":"MPLN:UNDH:MP06:6", "channel":"0"}' complete_waveform_data.ui
+3. pydm -m '{"P":"MPLN:UNDH:MP06:6", "channel":"0"}' extracted_waveform_data.ui
+
+You can change the channel depending on which waveform you want to display.
+
+Here are sample screenshots of the three screens:
+
+1. ![PyDM screen for raw_waveform](assets/RAW_WAVEFORM.png)
+2. ![PyDM screen for complete_waveform](assets/COMPLETE_WAVEFORM.png)
+3. ![PyDM screen for extracted_waveform](assets/EXTRACTED_WAVEFORM.png)
+
