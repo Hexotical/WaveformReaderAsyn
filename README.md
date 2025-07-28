@@ -31,7 +31,14 @@ Usage: **waveformExtraction** <Waveform Index>
 
 E.g. **waveformExtraction** 0
 
-This command extracts the relevant portion of the waveform data required for the detection of maximum beam loss location. It saves the extracted waveform data in the following PVs:
+This command extracts the relevant portion of the waveform data required for the detection of maximum beam loss location. 
+The relevant portion is determined in three steps. First, we extract data corresponding to the complete length of the fiber and discard the excess data.
+Second, we remove the data representing the vertical parts of the optical fiber on either side since this data mostly represents noise. This is done by using
+`$(P):Z:OFFSET:START:${channel}` and `$(P):Z:OFFSET:END:${channel}`. Finally, we extract another subset of this data which represents the portion the user wants to
+focus on for the maximum beam loss location detection. This is done by utilizing the values entered by the user in the `$(P):START:EXTRACTION:${channel}` and 
+`$(P):END:EXTRACTION:${channel}` process variables.
+
+This command saves the extracted waveform data in the following PVs:
   1. `$(P):EXTRACTED:WF:${channel}` => contains the extracted waveform data.
   2. `$(P):EXTRACTED:X:WF:${channel}` => contains an x-axis of values corresponding to the physical locations of the waveform data values.
 
