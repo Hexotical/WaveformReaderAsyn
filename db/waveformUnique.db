@@ -1,7 +1,7 @@
 ## Records common to all streams
 
 
-record(bo, "$(P):WEB:INIT")
+record(bo, "$(P):WEB_INIT")
 {
     field(DTYP, "asynUInt32Digital")
     field(SCAN, "Passive")
@@ -11,8 +11,8 @@ record(bo, "$(P):WEB:INIT")
   }
 
 
-# The DaqMuxV2/DataBufferSize is set to NO:OF:WORDS/2 (as this is expressed in 32-bit words)
-record(longin, "$(P):BUFFER:SIZE")
+# The DaqMuxV2/DataBufferSize is set to NO_OF_WORDS/2 (as this is expressed in 32-bit words)
+record(longin, "$(P):BUFFER_SIZE")
 {
     field(DTYP, "asynInt32")
     field(SCAN, "I/O Intr")
@@ -33,7 +33,7 @@ record(bo, "$(P):RUN")
 
 
 ## This in the number of 16-bit words from the P (N) ##
-record(ao, "$(P):NO:OF:WORDS") 
+record(ao, "$(P):NO_OF_WORDS") 
 {
   field(DTYP, "asynInt32")
   field(SCAN, "Passive")
@@ -46,7 +46,7 @@ record(ao, "$(P):NO:OF:WORDS")
 }
 
 # In Hz
-record(longin, "$(P):CLK:FREQUENCY")
+record(longin, "$(P):CLK_FREQUENCY")
 {
     field(DTYP, "asynInt32")
     field(SCAN, "I/O Intr")
