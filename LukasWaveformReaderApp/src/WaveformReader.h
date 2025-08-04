@@ -22,6 +22,7 @@
 #include <math.h>
 #include <fftw3.h>
 #include <fstream>
+#include <pthread.h>
 
 #include <cpsw_api_user.h>
 #include <yaml-cpp/yaml.h>
@@ -55,6 +56,8 @@ class WaveformReader : public asynPortDriver
     void findLocalMaxima(int waveformIndex);
     int findMaxIndex(int waveformIndex);
     void findRange(int& low, int& high, int maxIndex, const int LOWER_LIMIT, int waveformIndex);
+    void healthCheck(void);
+    void healthTask(void);
     void maxBeamLoss(int waveformIndex);
     void statusCheck(void);
     WaveformReader& operator=(WaveformReader& rhs);
@@ -81,10 +84,13 @@ class WaveformReader : public asynPortDriver
     std::map<std::string, int> extracted_param_map;
     std::map<std::string, int> x_axis_param_map;
     std::map<std::string, int> index_map; // map string identifiers to indices 0, 1, and 2, which are used to get waveform-specific data from arrays
+    std::map<std::string, std::string> stream_path_map; // map PV identifier to the stream it was initialized with
     std::array<std::string, NUMBER_OF_WAVEFORM_RECORDS> streaming_status; // store the streaming status of the waveforms 
+    std::array<std::string, NUMBER_OF_WAVEFORM_RECORDS> thread_status; // store the status of the threads - executing or dead
     std::array<std::chrono::milliseconds, NUMBER_OF_WAVEFORM_RECORDS> duration_data; // store the time it takes to read the stream from the hardware
     std::array<std::chrono::system_clock::time_point, NUMBER_OF_WAVEFORM_RECORDS> initialization_times; // store initialization time of each stream
     std::array<std::chrono::system_clock::time_point, NUMBER_OF_WAVEFORM_RECORDS> retrieval_times; // store time of latest retrieval of each stream
+    std::array<std::chrono::steady_clock::time_point, NUMBER_OF_WAVEFORM_RECORDS> interval_times; // store the interval between the last and current retrieval
     std::array<bool, NUMBER_OF_WAVEFORM_RECORDS> initialization_status; // store initialization status (true/false) of each stream 
     std::vector<int> local_maxima_indices; // store indices of local maxima of the waveform data
 
@@ -108,6 +114,7 @@ class WaveformReader : public asynPortDriver
     int waveform0_extraction_start_index;
     int waveform0_extraction_end_index;
     int waveform0_extracted_elements_index;
+    int waveform0_interval_index;
     int waveform0_offset_index;
     int waveform0_slope_index;
 
@@ -122,6 +129,7 @@ class WaveformReader : public asynPortDriver
     int waveform1_extraction_start_index;
     int waveform1_extraction_end_index;
     int waveform1_extracted_elements_index;
+    int waveform1_interval_index;
     int waveform1_offset_index;
     int waveform1_slope_index;
     
@@ -136,6 +144,7 @@ class WaveformReader : public asynPortDriver
     int waveform2_extraction_start_index;
     int waveform2_extraction_end_index;
     int waveform2_extracted_elements_index;
+    int waveform2_interval_index;
     int waveform2_offset_index;
     int waveform2_slope_index;
     
@@ -151,6 +160,7 @@ class WaveformReader : public asynPortDriver
     int* extraction_start_indices[NUMBER_OF_WAVEFORM_RECORDS] = {&waveform0_extraction_start_index, &waveform1_extraction_start_index, &waveform2_extraction_start_index};
     int* extraction_end_indices[NUMBER_OF_WAVEFORM_RECORDS] = {&waveform0_extraction_end_index, &waveform1_extraction_end_index, &waveform2_extraction_end_index};
     int* extracted_elements_indices[NUMBER_OF_WAVEFORM_RECORDS] = {&waveform0_extracted_elements_index, &waveform1_extracted_elements_index, &waveform2_extracted_elements_index};
+    int* interval_indices[NUMBER_OF_WAVEFORM_RECORDS] = {&waveform0_interval_index, &waveform1_interval_index, &waveform2_interval_index};
     int* offset_indices[NUMBER_OF_WAVEFORM_RECORDS] = {&waveform0_offset_index, &waveform1_offset_index, &waveform2_offset_index};
     int* slope_indices[NUMBER_OF_WAVEFORM_RECORDS] = {&waveform0_slope_index, &waveform1_slope_index, &waveform2_slope_index};
 

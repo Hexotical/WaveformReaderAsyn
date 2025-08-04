@@ -75,6 +75,7 @@ LukasWaveformReader_SRCS += findLocalMaxima.cpp
 LukasWaveformReader_SRCS += findMaxIndex.cpp
 LukasWaveformReader_SRCS += findRange.cpp
 LukasWaveformReader_SRCS += gettersAndSetters.cpp
+LukasWaveformReader_SRCS += healthCheck.cpp
 LukasWaveformReader_SRCS += maxBeamLoss.cpp
 LukasWaveformReader_SRCS += operatorOverload.cpp
 LukasWaveformReader_SRCS += printHelp.cpp

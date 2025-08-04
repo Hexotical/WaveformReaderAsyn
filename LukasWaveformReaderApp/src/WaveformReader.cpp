@@ -76,6 +76,7 @@ WaveformReader::WaveformReader(const char *portName, int bayNumber, int bufferSi
     // initialize values 
     index_map[pvIdentifier] = pvID;
     streaming_status[pvID] = "Not initialized yet";
+    thread_status[pvID] = "N/A";
     initialization_status[pvID] = false;
     duration_data[pvID] = std::chrono::milliseconds(0);
 
@@ -97,6 +98,7 @@ WaveformReader::WaveformReader(const char *portName, int bayNumber, int bufferSi
     createParam(("EXTRACTION_START" + std::to_string(pvID)).c_str(), asynParamFloat64, extraction_start_indices[pvID]);
     createParam(("EXTRACTION_END" + std::to_string(pvID)).c_str(), asynParamFloat64, extraction_end_indices[pvID]);
     createParam(("EXTRACTED_NO_OF_ELEMENTS" + std::to_string(pvID)).c_str(), asynParamInt32, extracted_elements_indices[pvID]);
+    createParam(("INTERVAL" + std::to_string(pvID)).c_str(), asynParamInt32, interval_indices[pvID]);
     createParam(("OFFSET" + std::to_string(pvID)).c_str(), asynParamInt32, offset_indices[pvID]);
     createParam(("SLOPE" + std::to_string(pvID)).c_str(), asynParamInt32, slope_indices[pvID]);
 
@@ -111,7 +113,6 @@ WaveformReader::WaveformReader(const char *portName, int bayNumber, int bufferSi
     (*(end_addresses[pvID]))->getVal(&u32_end, 1);
     setIntegerParam(*(endAddr_indices[pvID]), u32_end);
     callParamCallbacks();
-
   }
 
   //TODO: Do this is a more systematic way, individually connecting isn't really aesthetic 
@@ -127,6 +128,9 @@ WaveformReader::WaveformReader(const char *portName, int bayNumber, int bufferSi
   _ClkFrequency->getVal(&clk_frequency, 1);
   setIntegerParam(clk_frequency_index, clk_frequency);
   callParamCallbacks();
+
+  // start health check function to check status of all threads
+  healthCheck();
 }
 
 
@@ -145,7 +149,7 @@ void WaveformReader::streamInit(std::string pv_identifier, std::string stream_pa
   toPass.pPvt = this;
   toPass.pv_identifier = pv_identifier;
   toPass.stream_path_to_find = stream_path; 
-
+  stream_path_map[pv_identifier] = stream_path;
   //std::cout << "The path we pass is: " << toPass.stream_path_to_find << std::endl;
   //printf("\nChannel number in toPass is %d\n" ,toPass.stream);
 
@@ -216,6 +220,7 @@ void WaveformReader::streamTask(const char *streamInit = "/Stream0", std::string
           initialization_status[index] = true;
           std::chrono::system_clock::time_point real_time = std::chrono::system_clock::now();
           initialization_times[index] = real_time;
+          interval_times[index] = std::chrono::steady_clock::now();
 
         }
         else {
@@ -234,9 +239,7 @@ void WaveformReader::streamTask(const char *streamInit = "/Stream0", std::string
         while(1)
         {
             std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
-            // std::cout << "Value of got before: " << got << std::endl;
             got = stm->read( buf, MAX_BUFFER_SIZE, CTimeout(-1));
-            // std::cout << "Value of got after: " << got << std::endl;
             std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
             auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - begin);
             //printf("Getting from the buffer required %llu milliseconds\n", duration);
@@ -244,7 +247,12 @@ void WaveformReader::streamTask(const char *streamInit = "/Stream0", std::string
 
             std::chrono::system_clock::time_point real_time = std::chrono::system_clock::now();
             retrieval_times[index] = real_time;
-            
+            std::chrono::steady_clock::time_point last_interval_time = interval_times[index];
+            interval_times[index] = end;
+            auto last_duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - last_interval_time);
+            int interval = last_duration.count();
+            setIntegerParam(*(interval_indices[index]), interval);
+            callParamCallbacks();
 
             if(got > 8)
             {
@@ -296,7 +304,6 @@ void WaveformReader::streamTask(const char *streamInit = "/Stream0", std::string
     **/ 
     return;
 }
-
 
 //-------------------------------------------------------------------------------------
 //IOCSH commands

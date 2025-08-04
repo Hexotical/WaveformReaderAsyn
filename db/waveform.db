@@ -258,6 +258,16 @@ record(waveform, "$(P):EXTRACTED_WF_0")
   # NELM is the maximum number of values, NORD is the number of values actually read
   field(NELM,    "$(WAVEFORM_SIZE)")
   field(SCAN, "I/O Intr")
+}
+
+
+record(ai, "$(P):INTERVAL_0")
+{
+    field(DTYP, "asynInt32")
+    #field(PINI, "YES")
+    field(INP, "@asyn($(PORT),$(ADDR),$(TIMEOUT))INTERVAL0")
+    field(SCAN, "I/O Intr")
+    #field(VAL, "100")
 }##Template file waveform
 
 record(ao,      "$(P):SLOPE_1") {
@@ -518,6 +528,16 @@ record(waveform, "$(P):EXTRACTED_WF_1")
   # NELM is the maximum number of values, NORD is the number of values actually read
   field(NELM,    "$(WAVEFORM_SIZE)")
   field(SCAN, "I/O Intr")
+}
+
+
+record(ai, "$(P):INTERVAL_1")
+{
+    field(DTYP, "asynInt32")
+    #field(PINI, "YES")
+    field(INP, "@asyn($(PORT),$(ADDR),$(TIMEOUT))INTERVAL1")
+    field(SCAN, "I/O Intr")
+    #field(VAL, "100")
 }##Template file waveform
 
 record(ao,      "$(P):SLOPE_2") {
@@ -778,4 +798,14 @@ record(waveform, "$(P):EXTRACTED_WF_2")
   # NELM is the maximum number of values, NORD is the number of values actually read
   field(NELM,    "$(WAVEFORM_SIZE)")
   field(SCAN, "I/O Intr")
+}
+
+
+record(ai, "$(P):INTERVAL_2")
+{
+    field(DTYP, "asynInt32")
+    #field(PINI, "YES")
+    field(INP, "@asyn($(PORT),$(ADDR),$(TIMEOUT))INTERVAL2")
+    field(SCAN, "I/O Intr")
+    #field(VAL, "100")
 }

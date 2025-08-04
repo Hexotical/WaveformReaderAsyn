@@ -11,7 +11,8 @@ int WaveformReader::findMaxIndex(int waveformIndex)
   int maxIndex = 0, number_of_elements;
   std::string pvIdentifier = extracted_waveform_param_indices[waveformIndex];
   getIntegerParam(*(extracted_elements_indices[waveformIndex]), &number_of_elements);
-
+  std::cout << "The extracted number of elements in findMaxIndex is " << number_of_elements << std::endl;
+ 
   for (int i = 1; i < number_of_elements; i++)
   {
     if (extracted_waveform_map[pvIdentifier][i] > extracted_waveform_map[pvIdentifier][maxIndex]) 

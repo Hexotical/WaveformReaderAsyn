@@ -259,3 +259,13 @@ record(waveform, "$(P):EXTRACTED_WF_${channel}")
   field(NELM,    "$(WAVEFORM_SIZE)")
   field(SCAN, "I/O Intr")
 }
+
+
+record(ai, "$(P):INTERVAL_${channel}")
+{
+    field(DTYP, "asynInt32")
+    #field(PINI, "YES")
+    field(INP, "@asyn($(PORT),$(ADDR),$(TIMEOUT))INTERVAL${channel}")
+    field(SCAN, "I/O Intr")
+    #field(VAL, "100")
+}
