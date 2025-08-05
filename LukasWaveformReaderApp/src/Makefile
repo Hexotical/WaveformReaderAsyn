@@ -73,6 +73,7 @@ LukasWaveformReader_SRCS += extractWaveform.cpp
 LukasWaveformReader_SRCS += fft.cpp
 LukasWaveformReader_SRCS += findLocalMaxima.cpp
 LukasWaveformReader_SRCS += findMaxIndex.cpp
+LukasWaveformReader_SRCS += findPrelimMax.cpp
 LukasWaveformReader_SRCS += findRange.cpp
 LukasWaveformReader_SRCS += gettersAndSetters.cpp
 LukasWaveformReader_SRCS += healthCheck.cpp

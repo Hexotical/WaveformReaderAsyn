@@ -55,6 +55,7 @@ class WaveformReader : public asynPortDriver
     void fft(int waveformIndex);
     void findLocalMaxima(int waveformIndex);
     int findMaxIndex(int waveformIndex);
+    void findPrelimMax(int waveformIndex);
     void findRange(int& low, int& high, int maxIndex, const int LOWER_LIMIT, int waveformIndex);
     void healthCheck(void);
     void healthTask(void);
@@ -117,6 +118,7 @@ class WaveformReader : public asynPortDriver
     int waveform0_interval_index;
     int waveform0_offset_index;
     int waveform0_slope_index;
+    int waveform0_extract_index;
 
     int waveform1_beginAddr_index;
     int waveform1_endAddr_index;
@@ -132,6 +134,7 @@ class WaveformReader : public asynPortDriver
     int waveform1_interval_index;
     int waveform1_offset_index;
     int waveform1_slope_index;
+    int waveform1_extract_index;
     
     int waveform2_beginAddr_index;
     int waveform2_endAddr_index;
@@ -147,6 +150,7 @@ class WaveformReader : public asynPortDriver
     int waveform2_interval_index;
     int waveform2_offset_index;
     int waveform2_slope_index;
+    int waveform2_extract_index;
     
     // the indices of the arrays, 0, 1, and 2, refer to WAVEFORM:0, WAVEFORM:1, and WAVEFORM:2, respectively
     int* beginAddr_indices[NUMBER_OF_WAVEFORM_RECORDS] = {&waveform0_beginAddr_index, &waveform1_beginAddr_index, &waveform2_beginAddr_index};
@@ -163,6 +167,7 @@ class WaveformReader : public asynPortDriver
     int* interval_indices[NUMBER_OF_WAVEFORM_RECORDS] = {&waveform0_interval_index, &waveform1_interval_index, &waveform2_interval_index};
     int* offset_indices[NUMBER_OF_WAVEFORM_RECORDS] = {&waveform0_offset_index, &waveform1_offset_index, &waveform2_offset_index};
     int* slope_indices[NUMBER_OF_WAVEFORM_RECORDS] = {&waveform0_slope_index, &waveform1_slope_index, &waveform2_slope_index};
+    int* extract_indices[NUMBER_OF_WAVEFORM_RECORDS] = {&waveform0_extract_index, &waveform1_extract_index, &waveform2_extract_index};
 
     //Hardware interfaces
   protected:

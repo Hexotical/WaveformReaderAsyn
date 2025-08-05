@@ -9,6 +9,7 @@
  */
 void WaveformReader::extractWaveform(int waveformIndex)
 {
+  std::cout << "Extracting region of interest" << std::endl;
   int clock_frequency = 0, scaled_input;
   double sum = 0;
   double time_ns = 0;

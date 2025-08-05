@@ -101,6 +101,7 @@ WaveformReader::WaveformReader(const char *portName, int bayNumber, int bufferSi
     createParam(("INTERVAL" + std::to_string(pvID)).c_str(), asynParamInt32, interval_indices[pvID]);
     createParam(("OFFSET" + std::to_string(pvID)).c_str(), asynParamInt32, offset_indices[pvID]);
     createParam(("SLOPE" + std::to_string(pvID)).c_str(), asynParamInt32, slope_indices[pvID]);
+    createParam(("EXTRACT" + std::to_string(pvID)).c_str(), asynParamUInt32Digital, extract_indices[pvID]);
 
 
     (*(start_addresses[pvID])) = IScalVal::create(p->findByName(("/mmio/AmcCarrierCore/AmcCarrierBsa/BsaWaveformEngine[" + std::to_string(bayNumber) + "]/WaveformEngineBuffers/StartAddr[" + std::to_string(pvID) + "]").c_str()));
@@ -236,8 +237,13 @@ void WaveformReader::streamTask(const char *streamInit = "/Stream0", std::string
 
         std::cout << "Outside the while loop now " << std::endl;
         std::cout << "MAX_BUFFER_SIZE is: " << MAX_BUFFER_SIZE << std::endl;
+
+        epicsUInt32 extract;
+        int counter = 0;
+
         while(1)
         {
+            getUIntDigitalParam(*(extract_indices[index]), &extract, 1);
             std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
             got = stm->read( buf, MAX_BUFFER_SIZE, CTimeout(-1));
             std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
@@ -269,7 +275,18 @@ void WaveformReader::streamTask(const char *streamInit = "/Stream0", std::string
                   streaming_status[index] = "Successfully initialized but no data in buffer";
                 } 
 
-                doCallbacksInt16Array((epicsInt16*)(buf + 8), nWords16, waveform_param_index, 0);
+                // if we don't want to perform the extraction, keep writing to the PV
+                if (!extract) 
+                {
+                  doCallbacksInt16Array((epicsInt16*)(buf + 8), nWords16, waveform_param_index, 0);
+                  counter = 0;
+                }
+
+                else if (extract && !counter)
+                {
+                  extractWaveform(index);
+                  counter++;
+                }
 
                 for(int i = 0; i < MAX_BUFFER_SIZE; i++)
                 {
@@ -278,6 +295,11 @@ void WaveformReader::streamTask(const char *streamInit = "/Stream0", std::string
                    * TODO take options so we know how we'd want to modify the array
                    */
                   waveform_map[pvID][i] = (int16_t)buf[i];
+                }
+
+                if (!counter)
+                {
+                  findPrelimMax(index);
                 }
 
                 if (lastGot > got)

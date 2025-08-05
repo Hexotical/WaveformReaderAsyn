@@ -270,3 +270,27 @@ record(ai, "$(P):INTERVAL_${channel}")
     field(SCAN, "I/O Intr")
     #field(VAL, "100")
 }
+
+# Set to TRUE if the waveform should be extracted, FALSE if not
+# determined by whether the max value of the waveform data is
+# above the threshold or not
+record(bi, "$(P):EXTRACT_${channel}")
+{
+    field(SCAN, "I/O Intr")
+    field(DESC, "Whether waveform should be extracted or not")
+    field(DTYP, "asynUInt32Digital")
+    field(INP, "@asynMask($(PORT),$(ADDR), 1, $(TIMEOUT))EXTRACT${channel}")
+    field(ZNAM, "FALSE")
+    field(ONAM, "TRUE")
+  }
+
+# Used to reset the value of "$(P):EXTRACT_${channel}" from the IOC
+record(bo, "$(P):EXTRACT_RBV_${channel}")
+{
+    field(SCAN, "Passive")
+    field(DTYP, "asynUInt32Digital")
+    field(OUT, "@asynMask($(PORT),$(ADDR), 1, $(TIMEOUT))EXTRACT${channel}")
+    field(ZNAM, "FALSE")
+    field(ONAM, "TRUE")
+    field(FLNK, "$(P):EXTRACT_${channel}")
+  }
