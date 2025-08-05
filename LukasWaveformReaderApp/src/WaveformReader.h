@@ -35,7 +35,7 @@
 #define WAVEFORM_BUFFER_SIZE_STRING "BUFFER_SIZE"
 #define WAVEFORM_INITIALIZE_STRING "INITIALIZE"
 #define CLK_FREQUENCY_STRING "CLK_FREQUENCY"
-#define SPEED_STRING "SPEED"
+#define SPEED_STRING "FIBER_SPEED_OF_LIGHT"
 
 #define REAL 0
 #define IMAG 1
@@ -75,14 +75,14 @@ class WaveformReader : public asynPortDriver
 
     std::vector<std::string> waveform_param_indices; // order matters
     std::vector<std::string> complete_waveform_param_indices;
-    std::vector<std::string> complete_x_axis_waveform_indices;
+    std::vector<std::string> complete_z_axis_waveform_indices;
     std::vector<std::string> extracted_waveform_param_indices;
-    std::vector<std::string> extracted_x_axis_waveform_indices;
+    std::vector<std::string> extracted_z_axis_waveform_indices;
     std::map<std::string, int> pv_param_map; //Identifier of pv to parameter in param list
     std::map<std::string, int> complete_param_map;
-    std::map<std::string, int> complete_x_axis_param_map;
+    std::map<std::string, int> complete_z_axis_param_map;
     std::map<std::string, int> extracted_param_map;
-    std::map<std::string, int> x_axis_param_map;
+    std::map<std::string, int> z_axis_param_map;
     std::map<std::string, int> index_map; // map string identifiers to indices 0, 1, and 2, which are used to get waveform-specific data from arrays
     std::map<std::string, std::string> stream_path_map; // map PV identifier to the stream it was initialized with
     std::array<std::string, NUMBER_OF_WAVEFORM_RECORDS> streaming_status; // store the streaming status of the waveforms 
@@ -187,9 +187,9 @@ class WaveformReader : public asynPortDriver
     //epicsInt16* waveformData0; //Not really necessary atm I want to use this when I do data modification things
     std::map<std::string, epicsInt16*> waveform_map; // maps the pv Identifier to the corresponding array
     std::map<std::string, epicsInt16*> complete_waveform_map; // maps the pv Identifier to the corresponding array
-    std::map<std::string, epicsFloat64*> complete_x_axis_waveform_map;
+    std::map<std::string, epicsFloat64*> complete_z_axis_waveform_map;
     std::map<std::string, epicsInt16*> extracted_waveform_map; // maps the pv Identifier to the corresponding array
-    std::map<std::string, epicsFloat64*> extracted_x_axis_waveform_map;
+    std::map<std::string, epicsFloat64*> extracted_z_axis_waveform_map;
     static WaveformReader* port_driver; // stores the port driver that will be used to execute the iocsh commands
 };
 

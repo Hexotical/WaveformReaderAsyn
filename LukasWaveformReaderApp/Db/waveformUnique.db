@@ -55,11 +55,11 @@ record(longin, "$(P):CLK_FREQUENCY")
 
 # Represents the speed of light/beam loss particles in the beam
 # Assuming units of m/ns
-record(ao,      "$(P):SPEED") {
+record(ao,      "$(P):FIBER_SPEED_OF_LIGHT") {
     field(PINI, "YES")
     field(DESC, "Speed of beam loss particles")
     field(DTYP, "asynFloat64")
-    field(OUT,  "@asyn($(PORT),$(ADDR),$(TIMEOUT))SPEED")
+    field(OUT,  "@asyn($(PORT),$(ADDR),$(TIMEOUT))FIBER_SPEED_OF_LIGHT")
     field(SCAN, "Passive")
     field(VAL,  "0.2")
 }

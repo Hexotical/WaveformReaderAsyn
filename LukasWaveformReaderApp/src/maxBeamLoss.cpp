@@ -12,9 +12,9 @@ void WaveformReader::maxBeamLoss(int waveformIndex)
   std::cout << "The threshold is: " << threshold << std::endl;
 
   std::string waveform_pvIdentifier = extracted_waveform_param_indices[waveformIndex];
-  std::string x_axis_pvIdentifier = extracted_x_axis_waveform_indices[waveformIndex];
+  std::string z_axis_pvIdentifier = extracted_z_axis_waveform_indices[waveformIndex];
   int maxIndex = findMaxIndex(waveformIndex);
-  double locationOfMaxIndex = extracted_x_axis_waveform_map[x_axis_pvIdentifier][maxIndex];
+  double locationOfMaxIndex = extracted_z_axis_waveform_map[z_axis_pvIdentifier][maxIndex];
 
   int maxLoss = extracted_waveform_map[waveform_pvIdentifier][maxIndex];
 

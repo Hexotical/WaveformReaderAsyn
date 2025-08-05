@@ -14,7 +14,6 @@ void WaveformReader::setPortDriver(WaveformReader* newPortDriver)
   if (WaveformReader::port_driver == nullptr)
   {
     WaveformReader::port_driver = newPortDriver;
-    std::cout << "This is the pointer address: " << &newPortDriver << " and the value is: " << newPortDriver << std::endl;
   }
 
 }
