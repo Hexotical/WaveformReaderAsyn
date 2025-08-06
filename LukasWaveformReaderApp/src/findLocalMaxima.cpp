@@ -2,7 +2,7 @@
 
 /**
  * Finds the indices of all the local maxima of the waveform data and stores them in local_maxima_indices
- * @param waveformIndex index of waveform: 0, 1, and 2, for WAVEFORM:0, WAVEFORM:1, and WAVEFORM:2 respectively
+ * @param waveformIndex index of the waveform, such as 0 for WAVEFORM_0
  */
 void WaveformReader::findLocalMaxima(int waveformIndex)
 {

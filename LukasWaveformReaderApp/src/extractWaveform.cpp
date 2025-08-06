@@ -5,7 +5,7 @@
  * starting and ending physical locations entered by the user in the extraction_start and extraction_end PVs.
  * Also creates an x_axis that contains physical locations corresponding to the values in the waveform.
  * 
- * @param waveformIndex index of waveform: 0, 1, and 2, for WAVEFORM:0, WAVEFORM:1, and WAVEFORM:2 respectively
+ * @param waveformIndex index of the waveform, such as 0 for WAVEFORM_0
  */
 void WaveformReader::extractWaveform(int waveformIndex)
 {

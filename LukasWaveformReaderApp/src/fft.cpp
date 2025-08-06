@@ -5,11 +5,11 @@
  * that contains the peak value
  * Uses the fftw library (https://www.fftw.org/)
  * 
- * @param waveformIndex index of waveform: 0, 1, and 2, for WAVEFORM:0, WAVEFORM:1, and WAVEFORM:2 respectively
+ * @param waveformIndex index of the waveform, such as 0 for WAVEFORM_0
  */
 void WaveformReader::fft(int waveformIndex)
 {
-  int maxIndex = findMaxIndex(waveformIndex);
+  int maxIndex = findPrelimMax(waveformIndex);
   int low, high;
   const int LOWER_LIMIT = 5;
   findRange(low, high, maxIndex, LOWER_LIMIT, waveformIndex);

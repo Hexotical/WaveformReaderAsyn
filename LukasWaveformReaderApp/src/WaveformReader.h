@@ -39,14 +39,14 @@
 
 #define REAL 0
 #define IMAG 1
-#define NUMBER_OF_WAVEFORM_RECORDS 3
+#define NUMBER_OF_WAVEFORM_RECORDS 6
 
 
 class WaveformReader : public asynPortDriver
 {
   public:
 
-    WaveformReader(const char *portName, int bayNumber, int bufferSize, int waveformPVs);
+    WaveformReader(const char *portName, int bufferSize, int waveformPVs);
 
     static WaveformReader* getPortDriver();
     static void setPortDriver(WaveformReader* newPortDriver);
@@ -55,7 +55,7 @@ class WaveformReader : public asynPortDriver
     void fft(int waveformIndex);
     void findLocalMaxima(int waveformIndex);
     int findMaxIndex(int waveformIndex);
-    void findPrelimMax(int waveformIndex);
+    int findPrelimMax(int waveformIndex);
     void findRange(int& low, int& high, int maxIndex, const int LOWER_LIMIT, int waveformIndex);
     void healthCheck(void);
     void healthTask(void);
@@ -151,23 +151,86 @@ class WaveformReader : public asynPortDriver
     int waveform2_offset_index;
     int waveform2_slope_index;
     int waveform2_extract_index;
+
+    int waveform3_beginAddr_index;
+    int waveform3_endAddr_index;
+    int waveform3_beam_loss_loc_index;
+    int waveform3_beam_loss_val_index;
+    int waveform3_threshold_index;
+    int waveform3_z_offset_start_index;
+    int waveform3_z_offset_end_index;
+    int waveform3_fiber_length_index;
+    int waveform3_extraction_start_index;
+    int waveform3_extraction_end_index;
+    int waveform3_extracted_elements_index;
+    int waveform3_interval_index;
+    int waveform3_offset_index;
+    int waveform3_slope_index;
+    int waveform3_extract_index;
+
+    int waveform4_beginAddr_index;
+    int waveform4_endAddr_index;
+    int waveform4_beam_loss_loc_index;
+    int waveform4_beam_loss_val_index;
+    int waveform4_threshold_index;
+    int waveform4_z_offset_start_index;
+    int waveform4_z_offset_end_index;
+    int waveform4_fiber_length_index;
+    int waveform4_extraction_start_index;
+    int waveform4_extraction_end_index;
+    int waveform4_extracted_elements_index;
+    int waveform4_interval_index;
+    int waveform4_offset_index;
+    int waveform4_slope_index;
+    int waveform4_extract_index;
+
+    int waveform5_beginAddr_index;
+    int waveform5_endAddr_index;
+    int waveform5_beam_loss_loc_index;
+    int waveform5_beam_loss_val_index;
+    int waveform5_threshold_index;
+    int waveform5_z_offset_start_index;
+    int waveform5_z_offset_end_index;
+    int waveform5_fiber_length_index;
+    int waveform5_extraction_start_index;
+    int waveform5_extraction_end_index;
+    int waveform5_extracted_elements_index;
+    int waveform5_interval_index;
+    int waveform5_offset_index;
+    int waveform5_slope_index;
+    int waveform5_extract_index;
     
     // the indices of the arrays, 0, 1, and 2, refer to WAVEFORM:0, WAVEFORM:1, and WAVEFORM:2, respectively
-    int* beginAddr_indices[NUMBER_OF_WAVEFORM_RECORDS] = {&waveform0_beginAddr_index, &waveform1_beginAddr_index, &waveform2_beginAddr_index};
-    int* endAddr_indices[NUMBER_OF_WAVEFORM_RECORDS] = {&waveform0_endAddr_index, &waveform1_endAddr_index, &waveform2_endAddr_index};
-    int* beam_loss_loc_indices[NUMBER_OF_WAVEFORM_RECORDS] = {&waveform0_beam_loss_loc_index, &waveform1_beam_loss_loc_index, &waveform2_beam_loss_loc_index};
-    int* beam_loss_val_indices[NUMBER_OF_WAVEFORM_RECORDS] = {&waveform0_beam_loss_val_index, &waveform1_beam_loss_val_index, &waveform2_beam_loss_val_index};
-    int* threshold_indices[NUMBER_OF_WAVEFORM_RECORDS] = {&waveform0_threshold_index, &waveform1_threshold_index, &waveform2_threshold_index};
-    int* z_offset_start_indices[NUMBER_OF_WAVEFORM_RECORDS] = {&waveform0_z_offset_start_index, &waveform1_z_offset_start_index, &waveform2_z_offset_start_index};
-    int* z_offset_end_indices[NUMBER_OF_WAVEFORM_RECORDS] = {&waveform0_z_offset_end_index, &waveform1_z_offset_end_index, &waveform2_z_offset_end_index};
-    int* fiber_length_indices[NUMBER_OF_WAVEFORM_RECORDS] = {&waveform0_fiber_length_index, &waveform1_fiber_length_index, &waveform2_fiber_length_index};
-    int* extraction_start_indices[NUMBER_OF_WAVEFORM_RECORDS] = {&waveform0_extraction_start_index, &waveform1_extraction_start_index, &waveform2_extraction_start_index};
-    int* extraction_end_indices[NUMBER_OF_WAVEFORM_RECORDS] = {&waveform0_extraction_end_index, &waveform1_extraction_end_index, &waveform2_extraction_end_index};
-    int* extracted_elements_indices[NUMBER_OF_WAVEFORM_RECORDS] = {&waveform0_extracted_elements_index, &waveform1_extracted_elements_index, &waveform2_extracted_elements_index};
-    int* interval_indices[NUMBER_OF_WAVEFORM_RECORDS] = {&waveform0_interval_index, &waveform1_interval_index, &waveform2_interval_index};
-    int* offset_indices[NUMBER_OF_WAVEFORM_RECORDS] = {&waveform0_offset_index, &waveform1_offset_index, &waveform2_offset_index};
-    int* slope_indices[NUMBER_OF_WAVEFORM_RECORDS] = {&waveform0_slope_index, &waveform1_slope_index, &waveform2_slope_index};
-    int* extract_indices[NUMBER_OF_WAVEFORM_RECORDS] = {&waveform0_extract_index, &waveform1_extract_index, &waveform2_extract_index};
+    int* beginAddr_indices[NUMBER_OF_WAVEFORM_RECORDS] = {&waveform0_beginAddr_index, &waveform1_beginAddr_index, &waveform2_beginAddr_index,
+                                                          &waveform3_beginAddr_index, &waveform4_beginAddr_index, &waveform5_beginAddr_index};
+    int* endAddr_indices[NUMBER_OF_WAVEFORM_RECORDS] = {&waveform0_endAddr_index, &waveform1_endAddr_index, &waveform2_endAddr_index,
+                                                        &waveform3_endAddr_index, &waveform4_endAddr_index, &waveform5_endAddr_index};
+    int* beam_loss_loc_indices[NUMBER_OF_WAVEFORM_RECORDS] = {&waveform0_beam_loss_loc_index, &waveform1_beam_loss_loc_index, &waveform2_beam_loss_loc_index,
+                                                              &waveform3_beam_loss_loc_index, &waveform4_beam_loss_loc_index, &waveform5_beam_loss_loc_index};
+    int* beam_loss_val_indices[NUMBER_OF_WAVEFORM_RECORDS] = {&waveform0_beam_loss_val_index, &waveform1_beam_loss_val_index, &waveform2_beam_loss_val_index,
+                                                              &waveform3_beam_loss_val_index, &waveform4_beam_loss_val_index, &waveform5_beam_loss_val_index};
+    int* threshold_indices[NUMBER_OF_WAVEFORM_RECORDS] = {&waveform0_threshold_index, &waveform1_threshold_index, &waveform2_threshold_index,
+                                                          &waveform3_threshold_index, &waveform4_threshold_index, &waveform5_threshold_index};
+    int* z_offset_start_indices[NUMBER_OF_WAVEFORM_RECORDS] = {&waveform0_z_offset_start_index, &waveform1_z_offset_start_index, &waveform2_z_offset_start_index,
+                                                               &waveform3_z_offset_start_index, &waveform4_z_offset_start_index, &waveform5_z_offset_start_index};
+    int* z_offset_end_indices[NUMBER_OF_WAVEFORM_RECORDS] = {&waveform0_z_offset_end_index, &waveform1_z_offset_end_index, &waveform2_z_offset_end_index,
+                                                             &waveform3_z_offset_end_index, &waveform4_z_offset_end_index, &waveform5_z_offset_end_index};
+    int* fiber_length_indices[NUMBER_OF_WAVEFORM_RECORDS] = {&waveform0_fiber_length_index, &waveform1_fiber_length_index, &waveform2_fiber_length_index,
+                                                             &waveform3_fiber_length_index, &waveform4_fiber_length_index, &waveform5_fiber_length_index};
+    int* extraction_start_indices[NUMBER_OF_WAVEFORM_RECORDS] = {&waveform0_extraction_start_index, &waveform1_extraction_start_index, &waveform2_extraction_start_index,
+                                                                 &waveform3_extraction_start_index, &waveform4_extraction_start_index, &waveform5_extraction_start_index};
+    int* extraction_end_indices[NUMBER_OF_WAVEFORM_RECORDS] = {&waveform0_extraction_end_index, &waveform1_extraction_end_index, &waveform2_extraction_end_index,
+                                                               &waveform3_extraction_end_index, &waveform4_extraction_end_index, &waveform5_extraction_end_index};
+    int* extracted_elements_indices[NUMBER_OF_WAVEFORM_RECORDS] = {&waveform0_extracted_elements_index, &waveform1_extracted_elements_index, &waveform2_extracted_elements_index,
+                                                                   &waveform3_extracted_elements_index, &waveform4_extracted_elements_index, &waveform5_extracted_elements_index};
+    int* interval_indices[NUMBER_OF_WAVEFORM_RECORDS] = {&waveform0_interval_index, &waveform1_interval_index, &waveform2_interval_index,
+                                                         &waveform3_interval_index, &waveform4_interval_index, &waveform5_interval_index};
+    int* offset_indices[NUMBER_OF_WAVEFORM_RECORDS] = {&waveform0_offset_index, &waveform1_offset_index, &waveform2_offset_index,
+                                                       &waveform3_offset_index, &waveform4_offset_index, &waveform5_offset_index};
+    int* slope_indices[NUMBER_OF_WAVEFORM_RECORDS] = {&waveform0_slope_index, &waveform1_slope_index, &waveform2_slope_index,
+                                                      &waveform3_slope_index, &waveform4_slope_index, &waveform5_slope_index};
+    int* extract_indices[NUMBER_OF_WAVEFORM_RECORDS] = {&waveform0_extract_index, &waveform1_extract_index, &waveform2_extract_index,
+                                                        &waveform3_extract_index, &waveform4_extract_index, &waveform5_extract_index};
 
     //Hardware interfaces
   protected:
@@ -183,9 +246,15 @@ class WaveformReader : public asynPortDriver
     ScalVal _Web1EndAddr;
     ScalVal _Web2StartAddr;
     ScalVal _Web2EndAddr;
+    ScalVal _Web3StartAddr;
+    ScalVal _Web3EndAddr;
+    ScalVal _Web4StartAddr;
+    ScalVal _Web4EndAddr;
+    ScalVal _Web5StartAddr;
+    ScalVal _Web5EndAddr;
 
-    ScalVal* start_addresses[NUMBER_OF_WAVEFORM_RECORDS] = {&_Web0StartAddr, &_Web1StartAddr, &_Web2StartAddr};
-    ScalVal* end_addresses[NUMBER_OF_WAVEFORM_RECORDS] = {&_Web0EndAddr, &_Web1EndAddr, &_Web2EndAddr};
+    ScalVal* start_addresses[NUMBER_OF_WAVEFORM_RECORDS] = {&_Web0StartAddr, &_Web1StartAddr, &_Web2StartAddr, &_Web3StartAddr, &_Web4StartAddr, &_Web5StartAddr};
+    ScalVal* end_addresses[NUMBER_OF_WAVEFORM_RECORDS] = {&_Web0EndAddr, &_Web1EndAddr, &_Web2EndAddr, &_Web3EndAddr, &_Web4EndAddr, &_Web5EndAddr};
 
 
   private:

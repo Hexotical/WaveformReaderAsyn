@@ -15,11 +15,10 @@ WaveformReader* WaveformReader::port_driver = nullptr;
  * Initialize an ASYN Port Driver
  *
  * @param portName port for the asyn driver to use
- * @param bayNumber bay for the asyn driver to use (0 or 1)
  * @param bufferSize amount of words to read from the buffer
  * @param waveformPVs amount of EPICS waveform records our port driver should be of
  */
-WaveformReader::WaveformReader(const char *portName, int bayNumber, int bufferSize, int waveformPVs) : asynPortDriver
+WaveformReader::WaveformReader(const char *portName, int bufferSize, int waveformPVs) : asynPortDriver
                                                        (
                                                         portName,
                                                         1,//Max Signals?
@@ -35,13 +34,17 @@ WaveformReader::WaveformReader(const char *portName, int bayNumber, int bufferSi
   //We register some useful hardware interfaces our port driver could want to know
   Path p;
   p = cpswGetRoot();
-  
-  _TriggerHwAutoRearm = IScalVal::create(p->findByName(("/mmio/AppTop/DaqMuxV2[" + std::to_string(bayNumber) + "]/TriggerHwAutoRearm").c_str()));
-  _DataBufferSize = IScalVal::create(p->findByName(("/mmio/AppTop/DaqMuxV2[" + std::to_string(bayNumber) + "]/DataBufferSize").c_str()));
-  _TrigCount = IScalVal_RO::create(p->findByName(("/mmio/AppTop/DaqMuxV2[" + std::to_string(bayNumber) + "]/TrigCount").c_str()));
-  _WebInit = ICommand::create(p->findByName(("/mmio/AmcCarrierCore/AmcCarrierBsa/BsaWaveformEngine[" + std::to_string(bayNumber) + "]/WaveformEngineBuffers/Initialize").c_str()));
-  _ClkFrequency = IScalVal_RO::create(p->findByName(("/mmio/AppTop/AppCore/AmcGenericAdcDacCore[" + std::to_string(bayNumber) + "]/AmcGenericAdcDacCtrl/AmcClkFreq").c_str()));
 
+  for (int bayNumber = 0; bayNumber < 2; bayNumber++)
+  {
+    _TriggerHwAutoRearm = IScalVal::create(p->findByName(("/mmio/AppTop/DaqMuxV2[" + std::to_string(bayNumber) + "]/TriggerHwAutoRearm").c_str()));
+    _DataBufferSize = IScalVal::create(p->findByName(("/mmio/AppTop/DaqMuxV2[" + std::to_string(bayNumber) + "]/DataBufferSize").c_str()));
+    _TrigCount = IScalVal_RO::create(p->findByName(("/mmio/AppTop/DaqMuxV2[" + std::to_string(bayNumber) + "]/TrigCount").c_str()));
+    _WebInit = ICommand::create(p->findByName(("/mmio/AmcCarrierCore/AmcCarrierBsa/BsaWaveformEngine[" + std::to_string(bayNumber) + "]/WaveformEngineBuffers/Initialize").c_str()));
+    _ClkFrequency = IScalVal_RO::create(p->findByName(("/mmio/AppTop/AppCore/AmcGenericAdcDacCore[" + std::to_string(bayNumber) + "]/AmcGenericAdcDacCtrl/AmcClkFreq").c_str()));
+  }
+  
+  
   //Connecting to the records our port driver will eventually need to interact with
   for(int pvID = 0; pvID < waveformPVs; pvID++)
   {
@@ -56,7 +59,6 @@ WaveformReader::WaveformReader(const char *portName, int bayNumber, int bufferSi
     std::string complete_z_axis_pvIdentifier = "COMPLETE_Z_" + std::to_string(pvID);
     std::string extracted_pvIdentifier = "ROI_BEAM_LOSS_" + std::to_string(pvID);
     std::string extracted_z_axis_pvIdentifier = "ROI_Z_" + std::to_string(pvID);
-    std::cout << pvIdentifier << std::endl;
     createParam(pvIdentifier.c_str(), asynParamInt16Array, &waveform_param_index);
     createParam(complete_pvIdentifier.c_str(), asynParamInt16Array, &complete_waveform_param_index);
     createParam(complete_z_axis_pvIdentifier.c_str(), asynParamFloat64Array, &complete_z_axis_waveform_param_index);
@@ -104,8 +106,8 @@ WaveformReader::WaveformReader(const char *portName, int bayNumber, int bufferSi
     createParam(("EXTRACT" + std::to_string(pvID)).c_str(), asynParamUInt32Digital, extract_indices[pvID]);
 
 
-    (*(start_addresses[pvID])) = IScalVal::create(p->findByName(("/mmio/AmcCarrierCore/AmcCarrierBsa/BsaWaveformEngine[" + std::to_string(bayNumber) + "]/WaveformEngineBuffers/StartAddr[" + std::to_string(pvID) + "]").c_str()));
-    (*(end_addresses[pvID])) = IScalVal::create(p->findByName(("/mmio/AmcCarrierCore/AmcCarrierBsa/BsaWaveformEngine[" + std::to_string(bayNumber) + "]/WaveformEngineBuffers/EndAddr[" + std::to_string(pvID) + "]").c_str()));
+    (*(start_addresses[pvID])) = IScalVal::create(p->findByName(("/mmio/AmcCarrierCore/AmcCarrierBsa/BsaWaveformEngine[" + std::to_string(pvID / 3) + "]/WaveformEngineBuffers/StartAddr[" + std::to_string(pvID % 3) + "]").c_str()));
+    (*(end_addresses[pvID])) = IScalVal::create(p->findByName(("/mmio/AmcCarrierCore/AmcCarrierBsa/BsaWaveformEngine[" + std::to_string(pvID / 3) + "]/WaveformEngineBuffers/EndAddr[" + std::to_string(pvID % 3) + "]").c_str()));
 
     //retrieve hardware addresses and store them into corresponding records
     uint32_t u32_begin, u32_end;
@@ -331,22 +333,21 @@ void WaveformReader::streamTask(const char *streamInit = "/Stream0", std::string
 //IOCSH commands
 //-------------------------------------------------------------------------------------
 
-int waveformReaderConfigure(const char* portName, int bayNumber, int bufferSize, int waveformPVs)
+int waveformReaderConfigure(const char* portName, int bufferSize, int waveformPVs)
 {
-  WaveformReader* temp = new WaveformReader(portName, bayNumber, bufferSize, waveformPVs);
+  WaveformReader* temp = new WaveformReader(portName, bufferSize, waveformPVs);
   WaveformReader::setPortDriver(temp);
   return asynSuccess;
 }
 
 static const iocshArg initArg0 = {"portName", iocshArgString};
-static const iocshArg initArg1 = {"bayNumber", iocshArgInt};
-static const iocshArg initArg2 = {"bufferSize", iocshArgInt};
-static const iocshArg initArg3 = {"waveformPVs", iocshArgInt};
-static const iocshArg * const initArgs[] = {&initArg0, &initArg1, &initArg2, &initArg3};
-static const iocshFuncDef initFuncDef = {"waveformReaderConfigure", 4, initArgs};
+static const iocshArg initArg1 = {"bufferSize", iocshArgInt};
+static const iocshArg initArg2 = {"waveformPVs", iocshArgInt};
+static const iocshArg * const initArgs[] = {&initArg0, &initArg1, &initArg2};
+static const iocshFuncDef initFuncDef = {"waveformReaderConfigure", 3, initArgs};
 static void initCallFunc(const iocshArgBuf *args)
 {
-  waveformReaderConfigure(args[0].sval, args[1].ival, args[2].ival, args[3].ival);
+  waveformReaderConfigure(args[0].sval, args[1].ival, args[2].ival);
 }
 
 void waveformReaderRegister(void)

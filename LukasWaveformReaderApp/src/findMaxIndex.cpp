@@ -1,9 +1,9 @@
 #include "WaveformReader.h"
 
 /**
- * Finds the index of the peak or global maximum value in waveformData
+ * Finds the index of the peak or global maximum value in extracted waveform data
  * 
- * @param waveformIndex index of waveform: 0, 1, and 2, for WAVEFORM:0, WAVEFORM:1, and WAVEFORM:2 respectively
+ * @param waveformIndex index of the waveform, such as 0 for WAVEFORM_0
  * @return the index of the peak value
  */
 int WaveformReader::findMaxIndex(int waveformIndex)

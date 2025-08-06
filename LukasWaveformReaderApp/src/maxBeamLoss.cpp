@@ -3,7 +3,7 @@
 /**
  * Computes and displays the location of the maximum beam loss detected by the monitor
  * 
- * @param waveformIndex index of waveform: 0, 1, and 2, for WAVEFORM:0, WAVEFORM:1, and WAVEFORM:2 respectively
+ * @param waveformIndex index of the waveform, such as 0 for WAVEFORM_0
  */
 void WaveformReader::maxBeamLoss(int waveformIndex)
 {

@@ -31,7 +31,7 @@ cpswLoadYamlFile("${YAML}", "NetIODev", "", "${FPGA_IP}")
 cpswLoadConfigFile("${DEFAULTS_FILE}", "mmio")
 
 # Waveform Reader config
-waveformReaderConfigure(${WAVEFORM_PORT}, 1, 1000000, 3)
+waveformReaderConfigure(${WAVEFORM_PORT}, 1000000, 6)
 
 
 cd "${TOP}/iocBoot/${IOC}"

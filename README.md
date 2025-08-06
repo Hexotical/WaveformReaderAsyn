@@ -16,7 +16,7 @@ Usage: **maxBeamLossLocation** <Waveform Index>
 
 E.g. **maxBeamLossLocation** 0
 
-This command computes and displays the physical location where the maximum beam loss is detected by a beam loss monitor based on values of the starting and ending positions of the monitor as well as the size of the buffer or data that the beam loss monitor reads. The user must enter the index of the waveform, i.e., 0, 1, or 2, for WAVEFORM:0, WAVEFORM:1, or WAVEFORM:2, respectively.
+This command computes and displays the physical location where the maximum beam loss is detected by a beam loss monitor based on values of the starting and ending positions of the monitor as well as the size of the buffer or data that the beam loss monitor reads. The user must enter the index of the waveform, such as 0 for WAVEFORM_0.
 A minimum threshold value can be set for detecting maximum beam loss by writing to `$(P):THRESHOLD:${channel}`.
 
 The waveformExtraction command must be executed before executing this command.
@@ -67,7 +67,7 @@ This command provides a health-check for the various streams our port driver is 
 ### waveformStreamInit
 Usage: **waveformStreamInit** "<Path to stream>" "<Waveform record asyn Identifier>"
 
-E.g. **waveformStreamInit** "/Stream0" "WAVEFORM:0"
+E.g. **waveformStreamInit** "/Stream0" "WAVEFORM_0"
 
 This command initializes a thread that connects to your specified stream, reads from the stream and proceeds to write the data it receives to the waveform record you specify.
 
@@ -77,8 +77,8 @@ To import this WaveformReader as a module, follow the steps listed [here](https:
 ## PyDM Displays
 This WaveformReader has three pydm screens associated with it:
 1. raw_waveform_data.ui => This displays the entire data buffer that we retrieve from the hardware.
-2. complete_waveform_data.ui => This displays the waveform from Z:OFFSET:START to Z:OFFSET_END i.e., the waveform data obtained after removing the redundant data representing the vertical parts on either end of the fiber.
-3. extracted_waveform_data.ui => This displays the waveform from START:EXTRACTION to END:EXTRACTION i.e., a subset of the complete_waveform_data obtained by extracting the waveform data between starting and ending locations entered by the user.
+2. complete_waveform_data.ui => This displays the waveform from Z_OFFSET_START to Z_OFFSET_END i.e., the waveform data obtained after removing the redundant data representing the vertical parts on either end of the fiber.
+3. extracted_waveform_data.ui => This displays the waveform from ROI_START to ROI_END i.e., a subset of the complete_waveform_data obtained by extracting the waveform data between starting and ending locations entered by the user.
 
 To open the displays use the following commands:
 1. pydm -m '{"P":"MPLN:UNDH:MP06:6", "channel":0}' raw_waveform_data.ui
