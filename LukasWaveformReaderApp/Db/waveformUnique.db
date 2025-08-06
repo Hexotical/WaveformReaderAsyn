@@ -1,7 +1,7 @@
 ## Records common to all streams
 
 
-record(bo, "$(USER):WEB:INIT")
+record(bo, "$(P):WEB:INIT")
 {
     field(DTYP, "asynUInt32Digital")
     field(SCAN, "Passive")
@@ -12,7 +12,7 @@ record(bo, "$(USER):WEB:INIT")
 
 
 # The DaqMuxV2/DataBufferSize is set to NO:OF:WORDS/2 (as this is expressed in 32-bit words)
-record(longin, "$(USER):BUFFER:SIZE")
+record(longin, "$(P):BUFFER:SIZE")
 {
     field(DTYP, "asynInt32")
     field(SCAN, "I/O Intr")
@@ -21,7 +21,7 @@ record(longin, "$(USER):BUFFER:SIZE")
 
 
 #Single register for all the things
-record(bo, "$(USER):RUN")
+record(bo, "$(P):RUN")
 {
     field(SCAN, "Passive")
     field(DTYP, "asynUInt32Digital")
@@ -32,8 +32,8 @@ record(bo, "$(USER):RUN")
   }
 
 
-## This in the number of 16-bit words from the user (N) ##
-record(ao, "$(USER):NO:OF:WORDS") 
+## This in the number of 16-bit words from the P (N) ##
+record(ao, "$(P):NO:OF:WORDS") 
 {
   field(DTYP, "asynInt32")
   field(SCAN, "Passive")
@@ -45,5 +45,21 @@ record(ao, "$(USER):NO:OF:WORDS")
   info(autosaveFields, "VAL")
 }
 
+# In Hz
+record(longin, "$(P):CLK:FREQUENCY")
+{
+    field(DTYP, "asynInt32")
+    field(SCAN, "I/O Intr")
+    field(INP, "@asyn($(PORT), $(ADDR), $(TIMEOUT))CLK_FREQUENCY")
+}
 
-
+# Represents the speed of light/beam loss particles in the beam
+# Assuming units of m/ns
+record(ao,      "$(P):SPEED") {
+    field(PINI, "YES")
+    field(DESC, "Speed of beam loss particles")
+    field(DTYP, "asynFloat64")
+    field(OUT,  "@asyn($(PORT),$(ADDR),$(TIMEOUT))SPEED")
+    field(SCAN, "Passive")
+    field(VAL,  "0.2")
+}

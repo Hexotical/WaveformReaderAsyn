@@ -8,7 +8,6 @@
 #include <epicsTimer.h>
 #include <epicsTypes.h>
 
-//#include <fstream>
 #include <boost/array.hpp>
 #include <stdio.h>
 #include <string.h>
@@ -34,34 +33,8 @@
 #define NO_OF_WORDS_STRING "NO_OF_WORDS"
 #define WAVEFORM_BUFFER_SIZE_STRING "BUFFER_SIZE"
 #define WAVEFORM_INITIALIZE_STRING "INITIALIZE"
-
-
-#define WAVEFORM0_PV_STRING "WAVEFORM:0"
-#define WAVEFORM0_END_ADDR_STRING "END_ADDR0"
-#define WAVEFORM0_BEGIN_ADDR_STRING "BEGIN_ADDR0"
-#define WAVEFORM0_STARTING_LOCATION_STRING "START_LOC0"
-#define WAVEFORM0_ENDING_LOCATION_STRING "END_LOC0"
-#define WAVEFORM0_BEAM_LOSS_LOCATION_STRING "BEAM_LOSS_LOC0"
-#define WAVEFORM0_BUFFER_SIZE_INIT_STRING "WAVEFORM_BUFFER_SIZE_INIT0"
-
-
-#define WAVEFORM1_PV_STRING "WAVEFORM:1"
-#define WAVEFORM1_END_ADDR_STRING "END_ADDR1"
-#define WAVEFORM1_BEGIN_ADDR_STRING "BEGIN_ADDR1"
-#define WAVEFORM1_STARTING_LOCATION_STRING "START_LOC1"
-#define WAVEFORM1_ENDING_LOCATION_STRING "END_LOC1"
-#define WAVEFORM1_BEAM_LOSS_LOCATION_STRING "BEAM_LOSS_LOC1"
-#define WAVEFORM1_BUFFER_SIZE_INIT_STRING "WAVEFORM_BUFFER_SIZE_INIT1"
-
-
-#define WAVEFORM2_PV_STRING "WAVEFORM:2"
-#define WAVEFORM2_END_ADDR_STRING "END_ADDR2"
-#define WAVEFORM2_BEGIN_ADDR_STRING "BEGIN_ADDR2"
-#define WAVEFORM2_STARTING_LOCATION_STRING "START_LOC2"
-#define WAVEFORM2_ENDING_LOCATION_STRING "END_LOC2"
-#define WAVEFORM2_BEAM_LOSS_LOCATION_STRING "BEAM_LOSS_LOC2"
-#define WAVEFORM2_BUFFER_SIZE_INIT_STRING "WAVEFORM_BUFFER_SIZE_INIT2"
-
+#define CLK_FREQUENCY_STRING "CLK_FREQUENCY"
+#define SPEED_STRING "SPEED"
 
 #define REAL 0
 #define IMAG 1
@@ -77,17 +50,20 @@ class WaveformReader : public asynPortDriver
     static WaveformReader* getPortDriver();
     static void setPortDriver(WaveformReader* newPortDriver);
 
-    void statusCheck(void);
+    void extractWaveform(int waveformIndex);
     void fft(int waveformIndex);
+    void findLocalMaxima(int waveformIndex);
     int findMaxIndex(int waveformIndex);
     void findRange(int& low, int& high, int maxIndex, const int LOWER_LIMIT, int waveformIndex);
-    void findLocalMaxima(int waveformIndex);
     void maxBeamLoss(int waveformIndex);
+    void statusCheck(void);
     WaveformReader& operator=(WaveformReader& rhs);
 
 
     void streamTask(const char *stream, std::string pvID);// takes a path to the stream and then a pv identifier for connection
     void streamInit(std::string pv_identifier, std::string stream_path);
+    virtual asynStatus readInt16Array(asynUser *pasynUser, epicsInt16 *value, size_t nElements, size_t *nIn);
+    virtual asynStatus readFloat64Array(asynUser *pasynUser, epicsFloat64 *value, size_t nElements, size_t *nIn);
     virtual asynStatus writeUInt32Digital(asynUser *pasynUser, epicsUInt32 value, epicsUInt32 mask);
     virtual asynStatus writeInt32(asynUser *pasynUser, epicsInt32 value);
 
@@ -95,7 +71,15 @@ class WaveformReader : public asynPortDriver
     //TODO find a way to make these read only without having to write a weird get or set method
 
     std::vector<std::string> waveform_param_indices; // order matters
+    std::vector<std::string> complete_waveform_param_indices;
+    std::vector<std::string> complete_x_axis_waveform_indices;
+    std::vector<std::string> extracted_waveform_param_indices;
+    std::vector<std::string> extracted_x_axis_waveform_indices;
     std::map<std::string, int> pv_param_map; //Identifier of pv to parameter in param list
+    std::map<std::string, int> complete_param_map;
+    std::map<std::string, int> complete_x_axis_param_map;
+    std::map<std::string, int> extracted_param_map;
+    std::map<std::string, int> x_axis_param_map;
     std::map<std::string, int> index_map; // map string identifiers to indices 0, 1, and 2, which are used to get waveform-specific data from arrays
     std::array<std::string, NUMBER_OF_WAVEFORM_RECORDS> streaming_status; // store the streaming status of the waveforms 
     std::array<std::chrono::milliseconds, NUMBER_OF_WAVEFORM_RECORDS> duration_data; // store the time it takes to read the stream from the hardware
@@ -110,38 +94,71 @@ class WaveformReader : public asynPortDriver
     int waveform_buffer_size_index;
     int waveform_init_index;
     int MAX_BUFFER_SIZE;
+    int clk_frequency_index;
+    int speed_index;
 
     int waveform0_beginAddr_index;
     int waveform0_endAddr_index;
-    int waveform0_start_loc_index;
-    int waveform0_end_loc_index;
     int waveform0_beam_loss_loc_index;
-    
+    int waveform0_beam_loss_val_index;
+    int waveform0_threshold_index;
+    int waveform0_z_offset_start_index;
+    int waveform0_z_offset_end_index;
+    int waveform0_fiber_length_index;
+    int waveform0_extraction_start_index;
+    int waveform0_extraction_end_index;
+    int waveform0_extracted_elements_index;
+    int waveform0_offset_index;
+    int waveform0_slope_index;
+
     int waveform1_beginAddr_index;
     int waveform1_endAddr_index;
-    int waveform1_start_loc_index;
-    int waveform1_end_loc_index;
     int waveform1_beam_loss_loc_index;
+    int waveform1_beam_loss_val_index;
+    int waveform1_threshold_index;
+    int waveform1_z_offset_start_index;
+    int waveform1_z_offset_end_index;
+    int waveform1_fiber_length_index;
+    int waveform1_extraction_start_index;
+    int waveform1_extraction_end_index;
+    int waveform1_extracted_elements_index;
+    int waveform1_offset_index;
+    int waveform1_slope_index;
     
     int waveform2_beginAddr_index;
     int waveform2_endAddr_index;
-    int waveform2_start_loc_index;
-    int waveform2_end_loc_index;
     int waveform2_beam_loss_loc_index;
+    int waveform2_beam_loss_val_index;
+    int waveform2_threshold_index;
+    int waveform2_z_offset_start_index;
+    int waveform2_z_offset_end_index;
+    int waveform2_fiber_length_index;
+    int waveform2_extraction_start_index;
+    int waveform2_extraction_end_index;
+    int waveform2_extracted_elements_index;
+    int waveform2_offset_index;
+    int waveform2_slope_index;
     
     // the indices of the arrays, 0, 1, and 2, refer to WAVEFORM:0, WAVEFORM:1, and WAVEFORM:2, respectively
     int* beginAddr_indices[NUMBER_OF_WAVEFORM_RECORDS] = {&waveform0_beginAddr_index, &waveform1_beginAddr_index, &waveform2_beginAddr_index};
     int* endAddr_indices[NUMBER_OF_WAVEFORM_RECORDS] = {&waveform0_endAddr_index, &waveform1_endAddr_index, &waveform2_endAddr_index};
-    int* start_loc_indices[NUMBER_OF_WAVEFORM_RECORDS] = {&waveform0_start_loc_index, &waveform1_start_loc_index, &waveform2_start_loc_index};
-    int* end_loc_indices[NUMBER_OF_WAVEFORM_RECORDS] = {&waveform0_end_loc_index, &waveform1_end_loc_index, &waveform2_end_loc_index};   
     int* beam_loss_loc_indices[NUMBER_OF_WAVEFORM_RECORDS] = {&waveform0_beam_loss_loc_index, &waveform1_beam_loss_loc_index, &waveform2_beam_loss_loc_index};
-
-
+    int* beam_loss_val_indices[NUMBER_OF_WAVEFORM_RECORDS] = {&waveform0_beam_loss_val_index, &waveform1_beam_loss_val_index, &waveform2_beam_loss_val_index};
+    int* threshold_indices[NUMBER_OF_WAVEFORM_RECORDS] = {&waveform0_threshold_index, &waveform1_threshold_index, &waveform2_threshold_index};
+    int* z_offset_start_indices[NUMBER_OF_WAVEFORM_RECORDS] = {&waveform0_z_offset_start_index, &waveform1_z_offset_start_index, &waveform2_z_offset_start_index};
+    int* z_offset_end_indices[NUMBER_OF_WAVEFORM_RECORDS] = {&waveform0_z_offset_end_index, &waveform1_z_offset_end_index, &waveform2_z_offset_end_index};
+    int* fiber_length_indices[NUMBER_OF_WAVEFORM_RECORDS] = {&waveform0_fiber_length_index, &waveform1_fiber_length_index, &waveform2_fiber_length_index};
+    int* extraction_start_indices[NUMBER_OF_WAVEFORM_RECORDS] = {&waveform0_extraction_start_index, &waveform1_extraction_start_index, &waveform2_extraction_start_index};
+    int* extraction_end_indices[NUMBER_OF_WAVEFORM_RECORDS] = {&waveform0_extraction_end_index, &waveform1_extraction_end_index, &waveform2_extraction_end_index};
+    int* extracted_elements_indices[NUMBER_OF_WAVEFORM_RECORDS] = {&waveform0_extracted_elements_index, &waveform1_extracted_elements_index, &waveform2_extracted_elements_index};
+    int* offset_indices[NUMBER_OF_WAVEFORM_RECORDS] = {&waveform0_offset_index, &waveform1_offset_index, &waveform2_offset_index};
+    int* slope_indices[NUMBER_OF_WAVEFORM_RECORDS] = {&waveform0_slope_index, &waveform1_slope_index, &waveform2_slope_index};
 
     //Hardware interfaces
   protected:
     ScalVal _TriggerHwAutoRearm;
     ScalVal _DataBufferSize;
+    ScalVal_RO _ClkFrequency;
     ScalVal_RO _TrigCount;
     Command _WebInit;
 
@@ -159,6 +176,10 @@ class WaveformReader : public asynPortDriver
   private:
     //epicsInt16* waveformData0; //Not really necessary atm I want to use this when I do data modification things
     std::map<std::string, epicsInt16*> waveform_map; // maps the pv Identifier to the corresponding array
+    std::map<std::string, epicsInt16*> complete_waveform_map; // maps the pv Identifier to the corresponding array
+    std::map<std::string, epicsFloat64*> complete_x_axis_waveform_map;
+    std::map<std::string, epicsInt16*> extracted_waveform_map; // maps the pv Identifier to the corresponding array
+    std::map<std::string, epicsFloat64*> extracted_x_axis_waveform_map;
     static WaveformReader* port_driver; // stores the port driver that will be used to execute the iocsh commands
 };
 

@@ -38,13 +38,6 @@ tirpc_DIR        = $(TIRPC_LIB)
 # LINK "NON EPICS" EXTERNAL PACKAGE LIBRARIES STATICALLY
 # ======================================================
 
-# USR_LIBS_Linux += cpsw
-# USR_LIBS_Linux += boost_system
-# USR_LIBS_Linux += yaml-cpp
-# USR_LIBS_Linux += yamlReader 
-# USR_LIBS_Linux += deviceLib
-# USR_LIBS_Linux += fftw3
-
 LDIR  = -L. 
 LDIR += -L$(cpsw_DIR)
 LDIR += -L$(yaml-cpp_DIR)
@@ -76,6 +69,7 @@ LukasWaveformReader_DBD += waveform.dbd
 # LukasWaveformReader_registerRecordDeviceDriver.cpp derives from LukasWaveformReader.dbd
 LukasWaveformReader_SRCS += LukasWaveformReader_registerRecordDeviceDriver.cpp
 
+LukasWaveformReader_SRCS += extractWaveform.cpp
 LukasWaveformReader_SRCS += fft.cpp
 LukasWaveformReader_SRCS += findLocalMaxima.cpp
 LukasWaveformReader_SRCS += findMaxIndex.cpp
@@ -84,11 +78,12 @@ LukasWaveformReader_SRCS += gettersAndSetters.cpp
 LukasWaveformReader_SRCS += maxBeamLoss.cpp
 LukasWaveformReader_SRCS += operatorOverload.cpp
 LukasWaveformReader_SRCS += printHelp.cpp
+LukasWaveformReader_SRCS += readArray.cpp
+LukasWaveformReader_SRCS += resetRegisters.cpp
 LukasWaveformReader_SRCS += statusCheck.cpp
 LukasWaveformReader_SRCS += WaveformReader.cpp
 LukasWaveformReader_SRCS += writeInt32.cpp
 LukasWaveformReader_SRCS += writeUInt32Digital.cpp
-
 
 # Build the main IOC entry point on workstation OSs.
 LukasWaveformReader_SRCS_DEFAULT += LukasWaveformReaderMain.cpp

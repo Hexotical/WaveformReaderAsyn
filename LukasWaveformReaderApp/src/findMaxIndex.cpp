@@ -8,16 +8,18 @@
  */
 int WaveformReader::findMaxIndex(int waveformIndex)
 {
-  int maxIndex = 0;
-  std::string pvIdentifier = waveform_param_indices[waveformIndex];
+  int maxIndex = 0, number_of_elements;
+  std::string pvIdentifier = extracted_waveform_param_indices[waveformIndex];
+  getIntegerParam(*(extracted_elements_indices[waveformIndex]), &number_of_elements);
 
-  for (int i = 1; i < MAX_BUFFER_SIZE; i++)
+  for (int i = 1; i < number_of_elements; i++)
   {
-    if (waveform_map[pvIdentifier][i] > waveform_map[pvIdentifier][maxIndex]) 
+    if (extracted_waveform_map[pvIdentifier][i] > extracted_waveform_map[pvIdentifier][maxIndex]) 
     {
       maxIndex = i;
     }
   }
+  std::cout << "Max index is: " << maxIndex << std::endl;
   return maxIndex;
 
 }

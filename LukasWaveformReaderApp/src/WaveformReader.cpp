@@ -23,8 +23,8 @@ WaveformReader::WaveformReader(const char *portName, int bayNumber, int bufferSi
                                                        (
                                                         portName,
                                                         1,//Max Signals?
-                                                        asynDrvUserMask | asynInt32ArrayMask | asynInt16ArrayMask | asynUInt32DigitalMask | asynInt32Mask | asynFloat64Mask,
-                                                        asynInt32ArrayMask | asynInt16ArrayMask | asynInt32Mask | asynUInt32DigitalMask | asynFloat64Mask,
+                                                        asynDrvUserMask | asynInt32ArrayMask | asynInt16ArrayMask | asynUInt32DigitalMask | asynInt32Mask | asynFloat64Mask | asynFloat64ArrayMask,
+                                                        asynInt32ArrayMask | asynInt16ArrayMask | asynInt32Mask | asynUInt32DigitalMask | asynFloat64Mask | asynFloat64ArrayMask,
                                                         ASYN_MULTIDEVICE | ASYN_CANBLOCK,
                                                         1,
                                                         0,
@@ -40,18 +40,39 @@ WaveformReader::WaveformReader(const char *portName, int bayNumber, int bufferSi
   _DataBufferSize = IScalVal::create(p->findByName(("/mmio/AppTop/DaqMuxV2[" + std::to_string(bayNumber) + "]/DataBufferSize").c_str()));
   _TrigCount = IScalVal_RO::create(p->findByName(("/mmio/AppTop/DaqMuxV2[" + std::to_string(bayNumber) + "]/TrigCount").c_str()));
   _WebInit = ICommand::create(p->findByName(("/mmio/AmcCarrierCore/AmcCarrierBsa/BsaWaveformEngine[" + std::to_string(bayNumber) + "]/WaveformEngineBuffers/Initialize").c_str()));
- 
+  _ClkFrequency = IScalVal_RO::create(p->findByName(("/mmio/AppTop/AppCore/AmcGenericAdcDacCore[" + std::to_string(bayNumber) + "]/AmcGenericAdcDacCtrl/AmcClkFreq").c_str()));
+
   //Connecting to the records our port driver will eventually need to interact with
   for(int pvID = 0; pvID < waveformPVs; pvID++)
   {
     //For loop generates the string identifier for each Waveform records and then creates a parameter our asynDriver can interact with for it
     int waveform_param_index;
+    int complete_waveform_param_index;
+    int complete_x_axis_waveform_param_index;
+    int extracted_waveform_param_index;
+    int extracted_x_axis_waveform_param_index;
     std::string pvIdentifier = "WAVEFORM:" + std::to_string(pvID);
+    std::string complete_pvIdentifier = "COMPLETE_WAVEFORM:" + std::to_string(pvID);
+    std::string complete_x_axis_pvIdentifier = "COMPLETE_X_AXIS:" + std::to_string(pvID);
+    std::string extracted_pvIdentifier = "EXTRACTED_WAVEFORM:" + std::to_string(pvID);
+    std::string extracted_x_axis_pvIdentifier = "EXTRACTED_X_AXIS:" + std::to_string(pvID);
     std::cout << pvIdentifier << std::endl;
     createParam(pvIdentifier.c_str(), asynParamInt16Array, &waveform_param_index);
+    createParam(complete_pvIdentifier.c_str(), asynParamInt16Array, &complete_waveform_param_index);
+    createParam(complete_x_axis_pvIdentifier.c_str(), asynParamFloat64Array, &complete_x_axis_waveform_param_index);
+    createParam(extracted_pvIdentifier.c_str(), asynParamInt16Array, &extracted_waveform_param_index);
+    createParam(extracted_x_axis_pvIdentifier.c_str(), asynParamFloat64Array, &extracted_x_axis_waveform_param_index);
     std::cout << "The identifier is: " << pvIdentifier << " and the waveform_param_index is : " << waveform_param_index << std::endl;
     pv_param_map.insert(std::pair<std::string, int>(pvIdentifier, waveform_param_index));
+    complete_param_map.insert(std::pair<std::string, int>(complete_pvIdentifier, complete_waveform_param_index));
+    complete_x_axis_param_map.insert(std::pair<std::string, int>(complete_x_axis_pvIdentifier, complete_x_axis_waveform_param_index));
+    extracted_param_map.insert(std::pair<std::string, int>(extracted_pvIdentifier, extracted_waveform_param_index));
+    x_axis_param_map.insert(std::pair<std::string, int>(extracted_x_axis_pvIdentifier, extracted_x_axis_waveform_param_index));
     waveform_param_indices.push_back(pvIdentifier);
+    complete_waveform_param_indices.push_back(complete_pvIdentifier);
+    complete_x_axis_waveform_indices.push_back(complete_x_axis_pvIdentifier);
+    extracted_waveform_param_indices.push_back(extracted_pvIdentifier);
+    extracted_x_axis_waveform_indices.push_back(extracted_x_axis_pvIdentifier);
     // initialize values 
     index_map[pvIdentifier] = pvID;
     streaming_status[pvID] = "Not initialized yet";
@@ -59,13 +80,25 @@ WaveformReader::WaveformReader(const char *portName, int bayNumber, int bufferSi
     duration_data[pvID] = std::chrono::milliseconds(0);
 
     waveform_map[pvIdentifier] = (epicsInt16 *)calloc(STREAM_MAX_SIZE, sizeof(epicsInt16)); 
+    complete_waveform_map[complete_pvIdentifier] = (epicsInt16 *)calloc(STREAM_MAX_SIZE, sizeof(epicsInt16)); 
+    complete_x_axis_waveform_map[complete_x_axis_pvIdentifier] = (epicsFloat64 *)calloc(STREAM_MAX_SIZE, sizeof(epicsFloat64)); 
+    extracted_waveform_map[extracted_pvIdentifier] = (epicsInt16 *)calloc(STREAM_MAX_SIZE, sizeof(epicsInt16)); 
+    extracted_x_axis_waveform_map[extracted_x_axis_pvIdentifier] = (epicsFloat64 *)calloc(STREAM_MAX_SIZE, sizeof(epicsFloat64)); 
 
     // connect to the PVs that represent parameters of each waveform record using corresponding arrays
     createParam(("END_ADDR" + std::to_string(pvID)).c_str(), asynParamInt32, endAddr_indices[pvID]);
     createParam(("BEGIN_ADDR" + std::to_string(pvID)).c_str(), asynParamInt32, beginAddr_indices[pvID]);
-    createParam(("START_LOC" + std::to_string(pvID)).c_str(), asynParamFloat64, start_loc_indices[pvID]);
-    createParam(("END_LOC" + std::to_string(pvID)).c_str(), asynParamFloat64, end_loc_indices[pvID]);
     createParam(("BEAM_LOSS_LOC" + std::to_string(pvID)).c_str(), asynParamFloat64, beam_loss_loc_indices[pvID]);
+    createParam(("BEAM_LOSS_VAL" + std::to_string(pvID)).c_str(), asynParamInt32, beam_loss_val_indices[pvID]);
+    createParam(("Z_OFFSET_START" + std::to_string(pvID)).c_str(), asynParamFloat64, z_offset_start_indices[pvID]);
+    createParam(("Z_OFFSET_END" + std::to_string(pvID)).c_str(), asynParamFloat64, z_offset_end_indices[pvID]);
+    createParam(("FIBER_LENGTH" + std::to_string(pvID)).c_str(), asynParamFloat64, fiber_length_indices[pvID]);
+    createParam(("THRESHOLD:" + std::to_string(pvID)).c_str(), asynParamFloat64, threshold_indices[pvID]);
+    createParam(("EXTRACTION_START" + std::to_string(pvID)).c_str(), asynParamFloat64, extraction_start_indices[pvID]);
+    createParam(("EXTRACTION_END" + std::to_string(pvID)).c_str(), asynParamFloat64, extraction_end_indices[pvID]);
+    createParam(("EXTRACTED_NO_OF_ELEMENTS" + std::to_string(pvID)).c_str(), asynParamInt32, extracted_elements_indices[pvID]);
+    createParam(("OFFSET" + std::to_string(pvID)).c_str(), asynParamInt32, offset_indices[pvID]);
+    createParam(("SLOPE" + std::to_string(pvID)).c_str(), asynParamInt32, slope_indices[pvID]);
 
 
     (*(start_addresses[pvID])) = IScalVal::create(p->findByName(("/mmio/AmcCarrierCore/AmcCarrierBsa/BsaWaveformEngine[" + std::to_string(bayNumber) + "]/WaveformEngineBuffers/StartAddr[" + std::to_string(pvID) + "]").c_str()));
@@ -87,7 +120,13 @@ WaveformReader::WaveformReader(const char *portName, int bayNumber, int bufferSi
   createParam(WAVEFORM_BUFFER_SIZE_STRING, asynParamInt32, &waveform_buffer_size_index);
   createParam(WAVEFORM_INITIALIZE_STRING, asynParamUInt32Digital, &waveform_init_index);
   //MAX_BUFFER_SIZE = bufferSize; //One of the parameters we pass to our port driver is the bufferSize, which is essentially how many words of information we want at a time
-
+  createParam(CLK_FREQUENCY_STRING, asynParamInt32, &clk_frequency_index); // assuming clk frequency is a 32-bit integer
+  createParam(SPEED_STRING, asynParamFloat64, &speed_index);
+  // need to do this because we are retrieving clock frequency from hardware
+  uint32_t clk_frequency;
+  _ClkFrequency->getVal(&clk_frequency, 1);
+  setIntegerParam(clk_frequency_index, clk_frequency);
+  callParamCallbacks();
 }
 
 
@@ -195,7 +234,9 @@ void WaveformReader::streamTask(const char *streamInit = "/Stream0", std::string
         while(1)
         {
             std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
+            // std::cout << "Value of got before: " << got << std::endl;
             got = stm->read( buf, MAX_BUFFER_SIZE, CTimeout(-1));
+            // std::cout << "Value of got after: " << got << std::endl;
             std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
             auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - begin);
             //printf("Getting from the buffer required %llu milliseconds\n", duration);
@@ -207,7 +248,7 @@ void WaveformReader::streamTask(const char *streamInit = "/Stream0", std::string
 
             if(got > 8)
             {
-                //printf("There's a thing in the stream? %ld bytes\n", got);
+                // printf("There's a thing in the stream? %ld bytes\n", got);
                 lock();
                 nBytes = (got - 9); // header = 8 bytes, footer = 1 byte, data = 32bit words.
                 nWords16 = nBytes / 2; //Amount of words in our buffer to read

@@ -1,0 +1,249 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Form</class>
+ <widget class="QWidget" name="Form">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1010</width>
+    <height>678</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <widget class="PyDMWaveformPlot" name="PyDMWaveformPlot">
+   <property name="geometry">
+    <rect>
+     <x>9</x>
+     <y>36</y>
+     <width>993</width>
+     <height>565</height>
+    </rect>
+   </property>
+   <property name="toolTip">
+    <string/>
+   </property>
+   <property name="rubberBandSelectionMode">
+    <enum>Qt::IntersectsItemShape</enum>
+   </property>
+   <property name="showXGrid">
+    <bool>true</bool>
+   </property>
+   <property name="showYGrid">
+    <bool>true</bool>
+   </property>
+   <property name="yAxes">
+    <stringlist>
+     <string>{&quot;name&quot;: &quot;Axis 1&quot;, &quot;orientation&quot;: &quot;left&quot;, &quot;label&quot;: null, &quot;minRange&quot;: -1.6650735073103877, &quot;maxRange&quot;: 1.6650735073103877, &quot;autoRange&quot;: true, &quot;logMode&quot;: false}</string>
+    </stringlist>
+   </property>
+   <property name="curves">
+    <stringlist>
+     <string>{&quot;y_channel&quot;: &quot;ca://${P}:COMPLETE:WF:${channel}.VAL&quot;, &quot;x_channel&quot;: &quot;ca://${P}:COMPLETE:X:WF:${channel}.VAL&quot;, &quot;plot_style&quot;: null, &quot;name&quot;: &quot;Beam Loss&quot;, &quot;color&quot;: &quot;#cc0ea9&quot;, &quot;lineStyle&quot;: 1, &quot;lineWidth&quot;: 1, &quot;symbol&quot;: null, &quot;symbolSize&quot;: 10, &quot;yAxisName&quot;: &quot;Axis 1&quot;, &quot;barWidth&quot;: null, &quot;upperThreshold&quot;: null, &quot;lowerThreshold&quot;: null, &quot;thresholdColor&quot;: &quot;white&quot;, &quot;redraw_mode&quot;: 2}</string>
+    </stringlist>
+   </property>
+  </widget>
+  <widget class="PyDMLabel" name="PyDMLabel">
+   <property name="geometry">
+    <rect>
+     <x>370</x>
+     <y>10</y>
+     <width>274</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>C059 [urw]</family>
+     <weight>75</weight>
+     <bold>true</bold>
+    </font>
+   </property>
+   <property name="toolTip">
+    <string/>
+   </property>
+   <property name="text">
+    <string>Plot of Beam Loss vs. Physical Locations</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignCenter</set>
+   </property>
+  </widget>
+  <widget class="PyDMLabel" name="PyDMLabel_2">
+   <property name="geometry">
+    <rect>
+     <x>410</x>
+     <y>610</y>
+     <width>172</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>C059 [urw]</family>
+     <weight>75</weight>
+     <bold>true</bold>
+    </font>
+   </property>
+   <property name="toolTip">
+    <string/>
+   </property>
+   <property name="text">
+    <string>Physical Locations (in m)</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignCenter</set>
+   </property>
+  </widget>
+  <widget class="PyDMLabel" name="PyDMLabel_3">
+   <property name="geometry">
+    <rect>
+     <x>170</x>
+     <y>630</y>
+     <width>91</width>
+     <height>17</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>C059 [urw]</family>
+     <weight>75</weight>
+     <bold>true</bold>
+    </font>
+   </property>
+   <property name="toolTip">
+    <string/>
+   </property>
+   <property name="precision" stdset="0">
+    <number>0</number>
+   </property>
+   <property name="showUnits" stdset="0">
+    <bool>true</bool>
+   </property>
+   <property name="precisionFromPV" stdset="0">
+    <bool>true</bool>
+   </property>
+   <property name="alarmSensitiveContent" stdset="0">
+    <bool>false</bool>
+   </property>
+   <property name="alarmSensitiveBorder" stdset="0">
+    <bool>true</bool>
+   </property>
+   <property name="PyDMToolTip" stdset="0">
+    <string/>
+   </property>
+   <property name="channel" stdset="0">
+    <string>ca://${P}:Z:OFFSET:START:${channel}.VAL</string>
+   </property>
+   <property name="enableRichText" stdset="0">
+    <bool>false</bool>
+   </property>
+  </widget>
+  <widget class="PyDMLabel" name="PyDMLabel_4">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>630</y>
+     <width>131</width>
+     <height>17</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>C059 [urw]</family>
+     <weight>75</weight>
+     <bold>true</bold>
+    </font>
+   </property>
+   <property name="toolTip">
+    <string/>
+   </property>
+   <property name="text">
+    <string>Z:OFFSET:START</string>
+   </property>
+  </widget>
+  <widget class="PyDMLabel" name="PyDMLabel_5">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>650</y>
+     <width>131</width>
+     <height>17</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>C059 [urw]</family>
+     <weight>75</weight>
+     <bold>true</bold>
+    </font>
+   </property>
+   <property name="toolTip">
+    <string/>
+   </property>
+   <property name="text">
+    <string>Z:OFFSET:END</string>
+   </property>
+  </widget>
+  <widget class="PyDMLabel" name="PyDMLabel_6">
+   <property name="geometry">
+    <rect>
+     <x>170</x>
+     <y>650</y>
+     <width>111</width>
+     <height>17</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>C059 [urw]</family>
+     <weight>75</weight>
+     <bold>true</bold>
+    </font>
+   </property>
+   <property name="toolTip">
+    <string/>
+   </property>
+   <property name="precision" stdset="0">
+    <number>0</number>
+   </property>
+   <property name="showUnits" stdset="0">
+    <bool>true</bool>
+   </property>
+   <property name="precisionFromPV" stdset="0">
+    <bool>true</bool>
+   </property>
+   <property name="alarmSensitiveContent" stdset="0">
+    <bool>false</bool>
+   </property>
+   <property name="alarmSensitiveBorder" stdset="0">
+    <bool>true</bool>
+   </property>
+   <property name="PyDMToolTip" stdset="0">
+    <string/>
+   </property>
+   <property name="channel" stdset="0">
+    <string>ca://${P}:Z:OFFSET:END:${channel}.VAL</string>
+   </property>
+   <property name="enableRichText" stdset="0">
+    <bool>false</bool>
+   </property>
+  </widget>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>PyDMLabel</class>
+   <extends>QLabel</extends>
+   <header>pydm.widgets.label</header>
+  </customwidget>
+  <customwidget>
+   <class>PyDMWaveformPlot</class>
+   <extends>QGraphicsView</extends>
+   <header>pydm.widgets.waveformplot</header>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>
