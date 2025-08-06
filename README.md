@@ -17,7 +17,7 @@ Usage: **maxBeamLossLocation** <Waveform Index>
 E.g. **maxBeamLossLocation** 0
 
 This command computes and displays the physical location where the maximum beam loss is detected by a beam loss monitor based on values of the starting and ending positions of the monitor as well as the size of the buffer or data that the beam loss monitor reads. The user must enter the index of the waveform, such as 0 for WAVEFORM_0.
-A minimum threshold value can be set for detecting maximum beam loss by writing to `$(P):THRESHOLD:${channel}`.
+A minimum threshold value can be set for detecting maximum beam loss by writing to `$(P):THRESHOLD_${channel}`.
 
 The waveformExtraction command must be executed before executing this command.
 
@@ -34,26 +34,26 @@ E.g. **waveformExtraction** 0
 This command extracts the relevant portion of the waveform data required for the detection of maximum beam loss location. 
 The relevant portion is determined in three steps. First, we extract data corresponding to the complete length of the fiber and discard the excess data.
 Second, we remove the data representing the vertical parts of the optical fiber on either side since this data mostly represents noise. This is done by using
-`$(P):Z:OFFSET:START:${channel}` and `$(P):Z:OFFSET:END:${channel}`. Finally, we extract another subset of this data which represents the portion the user wants to
-focus on for the maximum beam loss location detection. This is done by utilizing the values entered by the user in the `$(P):START:EXTRACTION:${channel}` and 
-`$(P):END:EXTRACTION:${channel}` process variables.
+`$(P):Z_OFFSET_START_${channel}` and `$(P):Z_OFFSET_END_${channel}`. Finally, we extract another subset of this data which represents the portion the user wants to
+focus on for the maximum beam loss location detection. This is done by utilizing the values entered by the user in the `$(P):ROI_START_${channel}` and 
+`$(P):ROI_END_${channel}` process variables.
 
 This command saves the extracted waveform data in the following PVs:
-  1. `$(P):EXTRACTED:WF:${channel}` => contains the extracted waveform data.
-  2. `$(P):EXTRACTED:X:WF:${channel}` => contains an x-axis of values corresponding to the physical locations of the waveform data values.
+  1. `$(P):ROI_BEAM_LOSS_${channel}` => contains the waveform data in the region of interest.
+  2. `$(P):ROI_Z_${channel}` => contains the z values corresponding to the physical locations of the waveform data values.
 
 This command must be called before calling maxBeamLossLocation. 
 
 This command uses the following PVs for the extraction:
-  1. `$(P):CLK:FREQUENCY`
-  2. `$(P):SLOPE:${channel}`
-  3. `$(P):OFFSET:${channel}`
-  4. `$(P):Z:OFFSET:START:${channel}`
-  5. `$(P):Z:OFFSET:END:${channel}`
-  6. `$(P):SPEED`
-  7. `$(P):START:EXTRACTION:${channel}`
-  8. `$(P):END:EXTRACTION:${channel}`
-  9. `$(P):FIBER:LENGTH:${channel}`
+  1. `$(P):CLK_FREQUENCY`
+  2. `$(P):SLOPE_${channel}`
+  3. `$(P):OFFSET_${channel}`
+  4. `$(P):Z_OFFSET_START_${channel}`
+  5. `$(P):Z_OFFSET_END_${channel}`
+  6. `$(P):FIBER_SPEED_OF_LIGHT`
+  7. `$(P):ROI_START_${channel}`
+  8. `$(P):ROI_END_${channel}`
+  9. `$(P):FIBER_LENGTH_${channel}`
 
 The following diagram can be used as a reference to visualize the fiber and the PVs:
 ![annotated diagram of fiber](assets/optical_fiber.png)
