@@ -36,12 +36,12 @@
    </property>
    <property name="yAxes">
     <stringlist>
-     <string>{&quot;name&quot;: &quot;Axis 1&quot;, &quot;orientation&quot;: &quot;left&quot;, &quot;label&quot;: null, &quot;minRange&quot;: -1.6650735073103877, &quot;maxRange&quot;: 1.6650735073103877, &quot;autoRange&quot;: true, &quot;logMode&quot;: false}</string>
+     <string>{&quot;name&quot;: &quot;Axis 1&quot;, &quot;orientation&quot;: &quot;left&quot;, &quot;label&quot;: null, &quot;minRange&quot;: -1.8009435055069154, &quot;maxRange&quot;: 1.8009435055069154, &quot;autoRange&quot;: true, &quot;logMode&quot;: false}</string>
     </stringlist>
    </property>
    <property name="curves">
     <stringlist>
-     <string>{&quot;y_channel&quot;: &quot;ca://${P}:COMPLETE:WF:${channel}.VAL&quot;, &quot;x_channel&quot;: &quot;ca://${P}:COMPLETE:X:WF:${channel}.VAL&quot;, &quot;plot_style&quot;: null, &quot;name&quot;: &quot;Beam Loss&quot;, &quot;color&quot;: &quot;#cc0ea9&quot;, &quot;lineStyle&quot;: 1, &quot;lineWidth&quot;: 1, &quot;symbol&quot;: null, &quot;symbolSize&quot;: 10, &quot;yAxisName&quot;: &quot;Axis 1&quot;, &quot;barWidth&quot;: null, &quot;upperThreshold&quot;: null, &quot;lowerThreshold&quot;: null, &quot;thresholdColor&quot;: &quot;white&quot;, &quot;redraw_mode&quot;: 2}</string>
+     <string>{&quot;y_channel&quot;: &quot;ca://${P}:COMPLETE_BEAM_LOSS_${channel}.VAL&quot;, &quot;x_channel&quot;: &quot;ca://${P}:COMPLETE_Z_${channel}.VAL&quot;, &quot;plot_style&quot;: null, &quot;name&quot;: &quot;Beam Loss&quot;, &quot;color&quot;: &quot;#cc0ea9&quot;, &quot;lineStyle&quot;: 1, &quot;lineWidth&quot;: 1, &quot;symbol&quot;: null, &quot;symbolSize&quot;: 10, &quot;yAxisName&quot;: &quot;Axis 1&quot;, &quot;barWidth&quot;: null, &quot;upperThreshold&quot;: null, &quot;lowerThreshold&quot;: null, &quot;thresholdColor&quot;: &quot;white&quot;, &quot;redraw_mode&quot;: 2}</string>
     </stringlist>
    </property>
   </widget>
@@ -135,7 +135,7 @@
     <string/>
    </property>
    <property name="channel" stdset="0">
-    <string>ca://${P}:Z:OFFSET:START:${channel}.VAL</string>
+    <string>ca://${P}:Z_OFFSET_START_${channel}.VAL</string>
    </property>
    <property name="enableRichText" stdset="0">
     <bool>false</bool>
@@ -161,7 +161,7 @@
     <string/>
    </property>
    <property name="text">
-    <string>Z:OFFSET:START</string>
+    <string>Z_OFFSET_START</string>
    </property>
   </widget>
   <widget class="PyDMLabel" name="PyDMLabel_5">
@@ -184,7 +184,7 @@
     <string/>
    </property>
    <property name="text">
-    <string>Z:OFFSET:END</string>
+    <string>Z_OFFSET_END</string>
    </property>
   </widget>
   <widget class="PyDMLabel" name="PyDMLabel_6">
@@ -225,7 +225,7 @@
     <string/>
    </property>
    <property name="channel" stdset="0">
-    <string>ca://${P}:Z:OFFSET:END:${channel}.VAL</string>
+    <string>ca://${P}:Z_OFFSET_END_${channel}.VAL</string>
    </property>
    <property name="enableRichText" stdset="0">
     <bool>false</bool>
