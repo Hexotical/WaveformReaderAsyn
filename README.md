@@ -90,6 +90,6 @@ You can change the channel depending on which waveform you want to display.
 Here are sample screenshots of the three screens:
 
 1. ![PyDM screen for raw_waveform](assets/RAW_WAVEFORM.png)
-2. ![PyDM screen for complete_waveform](assets/COMPLETE_WAVEFORM.png)
-3. ![PyDM screen for extracted_waveform](assets/EXTRACTED_WAVEFORM.png)
+2. ![PyDM screen for complete_waveform](assets/COMPLETE_WAVEFORM_.png)
+3. ![PyDM screen for extracted_waveform](assets/EXTRACTED_WAVEFORM_.png)
 
