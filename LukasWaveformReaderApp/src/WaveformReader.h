@@ -34,7 +34,6 @@
 #define NO_OF_WORDS_STRING "NO_OF_WORDS"
 #define WAVEFORM_BUFFER_SIZE_STRING "BUFFER_SIZE"
 #define WAVEFORM_INITIALIZE_STRING "INITIALIZE"
-#define CLK_FREQUENCY_STRING "CLK_FREQUENCY"
 #define SPEED_STRING "FIBER_SPEED_OF_LIGHT"
 
 #define REAL 0
@@ -101,8 +100,10 @@ class WaveformReader : public asynPortDriver
     int waveform_buffer_size_index;
     int waveform_init_index;
     int MAX_BUFFER_SIZE;
-    int clk_frequency_index;
     int speed_index;
+
+    int clk_frequency_0_index;
+    int clk_frequency_1_index;
 
     int waveform0_beginAddr_index;
     int waveform0_endAddr_index;
@@ -234,11 +235,17 @@ class WaveformReader : public asynPortDriver
 
     //Hardware interfaces
   protected:
-    ScalVal _TriggerHwAutoRearm;
-    ScalVal _DataBufferSize;
-    ScalVal_RO _ClkFrequency;
-    ScalVal_RO _TrigCount;
-    Command _WebInit;
+    // bay 0
+    ScalVal _TriggerHwAutoRearm_0;
+    ScalVal _DataBufferSize_0;
+    ScalVal_RO _ClkFrequency_0;
+    Command _WebInit_0;
+
+    // bay 1
+    ScalVal _TriggerHwAutoRearm_1;
+    ScalVal _DataBufferSize_1;
+    ScalVal_RO _ClkFrequency_1;
+    Command _WebInit_1;
 
     ScalVal _Web0StartAddr;
     ScalVal _Web0EndAddr;

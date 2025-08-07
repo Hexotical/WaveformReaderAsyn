@@ -35,17 +35,16 @@ WaveformReader::WaveformReader(const char *portName, int bufferSize, int wavefor
   Path p;
   p = cpswGetRoot();
 
-  for (int bayNumber = 0; bayNumber < 2; bayNumber++)
-  {
-    _TriggerHwAutoRearm = IScalVal::create(p->findByName(("/mmio/AppTop/DaqMuxV2[" + std::to_string(bayNumber) + "]/TriggerHwAutoRearm").c_str()));
-    _DataBufferSize = IScalVal::create(p->findByName(("/mmio/AppTop/DaqMuxV2[" + std::to_string(bayNumber) + "]/DataBufferSize").c_str()));
-    _TrigCount = IScalVal_RO::create(p->findByName(("/mmio/AppTop/DaqMuxV2[" + std::to_string(bayNumber) + "]/TrigCount").c_str()));
-    _WebInit = ICommand::create(p->findByName(("/mmio/AmcCarrierCore/AmcCarrierBsa/BsaWaveformEngine[" + std::to_string(bayNumber) + "]/WaveformEngineBuffers/Initialize").c_str()));
-    _ClkFrequency = IScalVal_RO::create(p->findByName(("/mmio/AppTop/AppCore/AmcGenericAdcDacCore[" + std::to_string(bayNumber) + "]/AmcGenericAdcDacCtrl/AmcClkFreq").c_str()));
-  }
+  _TriggerHwAutoRearm_0 = IScalVal::create(p->findByName(("/mmio/AppTop/DaqMuxV2[" + std::to_string(0) + "]/TriggerHwAutoRearm").c_str()));
+  _DataBufferSize_0 = IScalVal::create(p->findByName(("/mmio/AppTop/DaqMuxV2[" + std::to_string(0) + "]/DataBufferSize").c_str()));
+  _WebInit_0 = ICommand::create(p->findByName(("/mmio/AmcCarrierCore/AmcCarrierBsa/BsaWaveformEngine[" + std::to_string(0) + "]/WaveformEngineBuffers/Initialize").c_str()));
+  _ClkFrequency_0 = IScalVal_RO::create(p->findByName(("/mmio/AppTop/AppCore/AmcGenericAdcDacCore[" + std::to_string(0) + "]/AmcGenericAdcDacCtrl/AmcClkFreq").c_str()));
+
+  _TriggerHwAutoRearm_1 = IScalVal::create(p->findByName(("/mmio/AppTop/DaqMuxV2[" + std::to_string(1) + "]/TriggerHwAutoRearm").c_str()));
+  _DataBufferSize_1 = IScalVal::create(p->findByName(("/mmio/AppTop/DaqMuxV2[" + std::to_string(1) + "]/DataBufferSize").c_str()));
+  _WebInit_1 = ICommand::create(p->findByName(("/mmio/AmcCarrierCore/AmcCarrierBsa/BsaWaveformEngine[" + std::to_string(1) + "]/WaveformEngineBuffers/Initialize").c_str()));
+  _ClkFrequency_1 = IScalVal_RO::create(p->findByName(("/mmio/AppTop/AppCore/AmcGenericAdcDacCore[" + std::to_string(1) + "]/AmcGenericAdcDacCtrl/AmcClkFreq").c_str()));
   
-  
-  //Connecting to the records our port driver will eventually need to interact with
   for(int pvID = 0; pvID < waveformPVs; pvID++)
   {
     //For loop generates the string identifier for each Waveform records and then creates a parameter our asynDriver can interact with for it
@@ -124,12 +123,16 @@ WaveformReader::WaveformReader(const char *portName, int bufferSize, int wavefor
   createParam(WAVEFORM_BUFFER_SIZE_STRING, asynParamInt32, &waveform_buffer_size_index);
   createParam(WAVEFORM_INITIALIZE_STRING, asynParamUInt32Digital, &waveform_init_index);
   //MAX_BUFFER_SIZE = bufferSize; //One of the parameters we pass to our port driver is the bufferSize, which is essentially how many words of information we want at a time
-  createParam(CLK_FREQUENCY_STRING, asynParamInt32, &clk_frequency_index); // assuming clk frequency is a 32-bit integer
   createParam(SPEED_STRING, asynParamFloat64, &speed_index);
+
+  createParam("CLK_FREQUENCY_0", asynParamInt32, &clk_frequency_0_index); // assuming clk frequency is a 32-bit integer
+  createParam("CLK_FREQUENCY_1", asynParamInt32, &clk_frequency_1_index);
   // need to do this because we are retrieving clock frequency from hardware
-  uint32_t clk_frequency;
-  _ClkFrequency->getVal(&clk_frequency, 1);
-  setIntegerParam(clk_frequency_index, clk_frequency);
+  uint32_t clk_frequency_0, clk_frequency_1;
+  _ClkFrequency_0->getVal(&clk_frequency_0, 1);
+  setIntegerParam(clk_frequency_0_index, clk_frequency_0);
+  _ClkFrequency_1->getVal(&clk_frequency_1, 1);
+  setIntegerParam(clk_frequency_1_index, clk_frequency_1);
   callParamCallbacks();
 
   // start health check function to check status of all threads

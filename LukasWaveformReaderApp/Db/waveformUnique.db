@@ -45,12 +45,20 @@ record(ao, "$(P):NO_OF_WORDS")
   info(autosaveFields, "VAL")
 }
 
-# In Hz
-record(longin, "$(P):CLK_FREQUENCY")
+# In Hz, bay 0
+record(longin, "$(P):CLK_FREQUENCY_0")
 {
     field(DTYP, "asynInt32")
     field(SCAN, "I/O Intr")
-    field(INP, "@asyn($(PORT), $(ADDR), $(TIMEOUT))CLK_FREQUENCY")
+    field(INP, "@asyn($(PORT), $(ADDR), $(TIMEOUT))CLK_FREQUENCY_0")
+}
+
+# In Hz, bay 1
+record(longin, "$(P):CLK_FREQUENCY_1")
+{
+    field(DTYP, "asynInt32")
+    field(SCAN, "I/O Intr")
+    field(INP, "@asyn($(PORT), $(ADDR), $(TIMEOUT))CLK_FREQUENCY_1")
 }
 
 # Represents the speed of light/beam loss particles in the beam

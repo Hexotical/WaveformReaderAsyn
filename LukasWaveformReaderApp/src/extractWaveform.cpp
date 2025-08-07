@@ -1,4 +1,5 @@
 #include "WaveformReader.h"
+#include <typeinfo>
 
 /**
  * Extracts relevant portion of the waveform from the entire buffer by removing extraneous data and clipping the remaining data based on 
@@ -14,12 +15,18 @@ void WaveformReader::extractWaveform(int waveformIndex)
   double sum = 0;
   double time_ns = 0;
   int offset, slope;
+  std::string original_pvIdentifier = waveform_param_indices[waveformIndex];
 
-  getIntegerParam(clk_frequency_index, &clock_frequency);
+  int stream_no = (stream_path_map[original_pvIdentifier]).back() - '0';
+
+  // use clk_freq of bay 0 for streams 0, 1, and 2
+  // use clk_freq of bay 1 for streams 4, 5, and 6
+  // there is no stream 3
+  if (stream_no / 3 == 0) {getIntegerParam(clk_frequency_0_index, &clock_frequency);}
+  else {getIntegerParam(clk_frequency_1_index, &clock_frequency);}
+
   getIntegerParam(*(offset_indices[waveformIndex]), &offset);
   getIntegerParam(*(slope_indices[waveformIndex]), &slope);
-
-  std::string original_pvIdentifier = waveform_param_indices[waveformIndex];
 
   epicsInt16 *refined_waveform = (epicsInt16 *)calloc(MAX_BUFFER_SIZE, sizeof(epicsInt16));
   epicsFloat64 *x_axis_time = (epicsFloat64 *)calloc(MAX_BUFFER_SIZE, sizeof(epicsFloat64));  
