@@ -7,6 +7,7 @@
  * @param high the ending point of the window
  * @param maxIndex the index of the peak value of the waveform data
  * @param LOWER_LIMIT the smallest value of a local maxima that the window will include
+ * @param waveformIndex index of the waveform, such as 0 for WAVEFORM_0
  */
 void WaveformReader::findRange(int& low, int& high, int maxIndex, const int LOWER_LIMIT, int waveformIndex)
 {

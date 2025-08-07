@@ -1,6 +1,6 @@
 ##Template file waveform
 
-record(ao,      "$(P):SLOPE:${channel}") {
+record(ao,      "$(P):SLOPE_${channel}") {
     field(DESC, "Slope of channel in EGU/raw")
     field(DTYP, "asynInt32")
     field(PINI, "YES")
@@ -10,7 +10,7 @@ record(ao,      "$(P):SLOPE:${channel}") {
     field(VAL,  "1")
     info(autosaveFields, "VAL")
 }
-record(ao,      "$(P):OFFSET:${channel}") {
+record(ao,      "$(P):OFFSET_${channel}") {
     field(DESC, "Offset of channel in EGU")
     field(DTYP, "asynInt32")
     field(PINI, "YES")
@@ -21,21 +21,21 @@ record(ao,      "$(P):OFFSET:${channel}") {
     info(autosaveFields, "VAL")
 }
 
-record(waveform, "$(P):WAVEFORM:${channel}")
+record(waveform, "$(P):WAVEFORM_${channel}")
 {
     field(PINI, "1")
+    field(DESC, "Raw input buffer data")
     field(DTYP, "asynInt16ArrayIn")
-    field(INP, "@asyn($(PORT),$(ADDR),$(TIMEOUT))WAVEFORM:$(channel)")
+    field(INP, "@asyn($(PORT),$(ADDR),$(TIMEOUT))WAVEFORM_$(channel)")
     field(FTVL, "SHORT")
     field(NELM, "$(WAVEFORM_SIZE)")
-    #field(FLNK, "$(P):X_WAVEFORM:${channel} PP")
-    field(FLNK, "$(P):SUBARRAY:${channel} PP")
+    field(FLNK, "$(P):SUBARRAY_${channel} PP")
     field(SCAN, "I/O Intr")
   }
 
-record(subArray, "$(P):SUBARRAY:${channel}")
+record(subArray, "$(P):SUBARRAY_${channel}")
 {
-  field(INP, "$(P):WAVEFORM:${channel}.VAL")
+  field(INP, "$(P):WAVEFORM_${channel}.VAL")
   field(FTVL, "SHORT")
   field(MALM, "$(WAVEFORM_SIZE)")
   field(NELM, "25000")
@@ -44,7 +44,7 @@ record(subArray, "$(P):SUBARRAY:${channel}")
   }
 
 
-record(longin, "$(P):BEGIN:ADDR:${channel}")
+record(longin, "$(P):BEGIN_ADDR_${channel}")
 {
     field(DTYP, "asynInt32")
     field(INP, "@asyn($(PORT), $(ADDR), $(TIMEOUT))BEGIN_ADDR${channel}")
@@ -52,7 +52,7 @@ record(longin, "$(P):BEGIN:ADDR:${channel}")
   }
 
 
-record(longin, "$(P):END:ADDR:${channel}")
+record(longin, "$(P):END_ADDR_${channel}")
 {
     field(DTYP, "asynInt32")
     field(INP, "@asyn($(PORT), $(ADDR), $(TIMEOUT))END_ADDR${channel}")
@@ -60,54 +60,54 @@ record(longin, "$(P):END:ADDR:${channel}")
   }
 
 
-record(ao, "$(P):WORD:COUNT:${channel}")
+record(ao, "$(P):WORD_COUNT_${channel}")
 {
     field(SCAN, "Passive")
-    field(OUT, "$(P):INIT:SEQ:${channel}  PP")
+    field(OUT, "$(P):INIT_SEQ_${channel}  PP")
   }
 
 
-record(seq, "$(P):INIT:SEQ:${channel}")
+record(seq, "$(P):INIT_SEQ_${channel}")
 {
     field(SCAN, "Passive")
-    field(DOL1, "$(P):WORD:COUNT:${channel}")
-    field(LNK1, "$(P):FANOUT:BUFFER:${channel} PP")
+    field(DOL1, "$(P):WORD_COUNT_${channel}")
+    field(LNK1, "$(P):FANOUT_BUFFER_${channel} PP")
     field(DO2, "1")
-    field(LNK2, "$(P):WEB:INIT:${channel} PP")
+    field(LNK2, "$(P):WEB_INIT_${channel} PP")
   }
 
 
-record(dfanout, "$(P):FANOUT:BUFFER:${channel}")
+record(dfanout, "$(P):FANOUT_BUFFER_${channel}")
 {
     field(SCAN, "Passive")
-    field(OUTA, "$(P):BUFFER:RBV:${channel} PP")
-    field(OUTB, "$(P):TO:DIV:${channel}.A PP")
-    field(OUTC, "$(P):WEB:INIT:${channel}.A PP")
+    field(OUTA, "$(P):BUFFER_RBV_${channel} PP")
+    field(OUTB, "$(P):TO_DIV_${channel}.A PP")
+    field(OUTC, "$(P):WEB_INIT_${channel}.A PP")
   }
 
 
-record(ai, "$(P):BUFFER:RBV:${channel}")
+record(ai, "$(P):BUFFER_RBV_${channel}")
 {
     field(SCAN, "Passive")
   }
 
 
-record(calcout, "$(P):TO:DIV:${channel}")
+record(calcout, "$(P):TO_DIV_${channel}")
 {
     field(SCAN, "Passive")
     field(CALC, "A/2")
-    field(OUT, "$(P):BUFFER:SIZE PP")
+    field(OUT, "$(P):BUFFER_SIZE PP")
   }
 
 
 # This represents the physical location of the maximum beam loss 
 # computed by the maxBeamLoss function
 # Assuming units of meters
-record(ai, "$(P):BEAM:LOSS:LOC:${channel}")
+record(ai, "$(P):BEAM_LOSS_Z_${channel}")
 {
     field(DTYP, "asynFloat64")
-    field(DESC, "Physical location of max beam loss")
-    field(INP, "@asyn($(PORT),$(ADDR),$(TIMEOUT))BEAM_LOSS_LOC${channel}")
+    field(DESC, "Z-value of max beam loss")
+    field(INP, "@asyn($(PORT),$(ADDR),$(TIMEOUT))BEAM_LOSS_Z${channel}")
     field(PREC, "3")
     field(SCAN, "I/O Intr")
     field(EGU, "m")
@@ -115,29 +115,29 @@ record(ai, "$(P):BEAM:LOSS:LOC:${channel}")
 
 # This represents the value of the maximum beam loss 
 # computed by the maxBeamLoss function
-record(ai, "$(P):BEAM:LOSS:VAL:${channel}")
+record(ai, "$(P):BEAM_LOSS_${channel}")
 {
     field(DTYP, "asynInt32")
-    field(DESC, "Physical location of max beam loss")
-    field(INP, "@asyn($(PORT),$(ADDR),$(TIMEOUT))BEAM_LOSS_VAL${channel}")
+    field(DESC, "Maximum beam loss value")
+    field(INP, "@asyn($(PORT),$(ADDR),$(TIMEOUT))BEAM_LOSS${channel}")
     field(SCAN, "I/O Intr")
 }
 
 # This represents the threshold for finding the peak value of beam 
 # loss; if the value is lower than this, then it should considered noise
-record(ao, "$(P):THRESHOLD:${channel}") 
+record(ao, "$(P):THRESHOLD_${channel}") 
 {
   field(DTYP, "asynFloat64")
   field(PINI, "YES")
   field(SCAN, "Passive")
-  field(DESC, "Threshold for beam loss")
+  field(DESC, "Threshold for max beam loss")
   field(VAL, 0)
-  field(OUT,  "@asyn($(PORT), $(ADDR), $(TIMEOUT))THRESHOLD:${channel}")
+  field(OUT,  "@asyn($(PORT), $(ADDR), $(TIMEOUT))THRESHOLD${channel}")
 }
 
-# Length of the fiber
+# Length of the optical fiber
 # Assuming units of meters 
-record(ao,      "$(P):FIBER:LENGTH:${channel}") {
+record(ao,      "$(P):FIBER_LENGTH_${channel}") {
     field(PINI, "YES")
     field(DESC, "Length in m")
     field(DTYP, "asynFloat64")
@@ -149,9 +149,9 @@ record(ao,      "$(P):FIBER:LENGTH:${channel}") {
 
 # Physical location of the start of the fiber
 # Assuming units of meters
-record(ao, "$(P):Z:OFFSET:START:${channel}")
+record(ao, "$(P):Z_OFFSET_START_${channel}")
 {
-    field(DESC, "Location of the start of the fiber in m")
+    field(DESC, "Start of the fiber in m")
     field(PINI, "YES")
     field(DTYP, "asynFloat64")
     field(OUT, "@asyn($(PORT),$(ADDR),$(TIMEOUT))Z_OFFSET_START${channel}")
@@ -163,8 +163,8 @@ record(ao, "$(P):Z:OFFSET:START:${channel}")
 
 # Physical location of the end of the fiber
 # Assuming units of meters
-record(ao,      "$(P):Z:OFFSET:END:${channel}") {
-    field(DESC, "Location of the end of the fiber in m")
+record(ao,      "$(P):Z_OFFSET_END_${channel}") {
+    field(DESC, "End of the fiber in m")
     field(PINI, "YES")
     field(DTYP, "asynFloat64")
     field(OUT, "@asyn($(PORT),$(ADDR),$(TIMEOUT))Z_OFFSET_END${channel}")
@@ -174,88 +174,131 @@ record(ao,      "$(P):Z:OFFSET:END:${channel}") {
     field(EGU, "m")
 }
 
-# Physical location of the start of the extraction range
+# Physical location of the start of the region of interest
 # Assuming units of meters
-record(ao,      "$(P):START:EXTRACTION:${channel}") {
+record(ao,      "$(P):ROI_START_${channel}") {
     field(PINI, "YES")
-    field(DESC, "Start of extraction range in m")
+    field(DESC, "Start of ROI in m")
     field(DTYP, "asynFloat64")
-    field(OUT,  "@asyn($(PORT),$(ADDR),$(TIMEOUT))EXTRACTION_START${channel}")
+    field(OUT,  "@asyn($(PORT),$(ADDR),$(TIMEOUT))ROI_START${channel}")
     field(SCAN, "Passive")
     field(VAL,  "20")
     field(PREC, "3")
     field(EGU, "m")
 }
 
-# Physical location of the end of the extraction range
+# Physical location of the end of the region of interest
 # Assuming units of meters
-record(ao,      "$(P):END:EXTRACTION:${channel}") {
+record(ao,      "$(P):ROI_END_${channel}") {
     field(PINI, "YES")
-    field(DESC, "End of extraction range in m")
+    field(DESC, "End of ROI in m")
     field(DTYP, "asynFloat64")
-    field(OUT,  "@asyn($(PORT), $(ADDR), $(TIMEOUT))EXTRACTION_END${channel}")
+    field(OUT,  "@asyn($(PORT), $(ADDR), $(TIMEOUT))ROI_END${channel}")
     field(SCAN, "Passive")
     field(VAL,  "80")
     field(PREC, "3")
     field(EGU, "m")
 }
 
-# The number of samples in the extracted range of values
-record(ai, "$(P):EXTRACTED:NO:OF:ELEMENTS:${channel}")
+# The number of samples in the region of interest
+record(ai, "$(P):ROI_NELM_${channel}")
+{
+    field(DTYP, "asynInt32")
+    field(DESC, "NELM in ROI")
+    field(INP, "@asyn($(PORT),$(ADDR),$(TIMEOUT))ROI_NELM${channel}")
+    field(SCAN, "I/O Intr")
+}
+
+# The Z-axis of the complete waveform, before extracting region of interest, 
+# contains distance values in m
+record(waveform, "$(P):COMPLETE_Z_${channel}") 
+{
+  field(PINI, "1")
+  field(DESC,    "Z values of complete waveform")
+  field(INP, "@asyn($(PORT),$(ADDR),$(TIMEOUT))COMPLETE_Z_$(channel)")
+  field(DTYP, "asynFloat64ArrayIn")
+  field(FTVL,    "DOUBLE")
+  field(NELM,    "$(WAVEFORM_SIZE)")
+  field(SCAN, "I/O Intr")
+}
+
+# Beam loss values, before extracting region of interest
+record(waveform, "$(P):COMPLETE_BEAM_LOSS_${channel}") 
+{
+  field(PINI, "1")
+  field(DESC,    "Beam loss values")
+  field(INP, "@asyn($(PORT),$(ADDR),$(TIMEOUT))COMPLETE_BEAM_LOSS_$(channel)")
+  field(DTYP, "asynInt16ArrayIn")
+  field(FTVL,    "SHORT")
+  # NELM is the maximum number of values, NORD is the number of values actually read
+  field(NELM,    "$(WAVEFORM_SIZE)")
+  field(SCAN, "I/O Intr")
+}
+
+# The Z-axis of the region of interest, contains distance values in m
+record(waveform, "$(P):ROI_Z_${channel}") 
+{
+  field(PINI, "1")
+  field(DESC,    "Z values of ROI")
+  field(INP, "@asyn($(PORT),$(ADDR),$(TIMEOUT))ROI_Z_$(channel)")
+  field(DTYP, "asynFloat64ArrayIn")
+  field(FTVL,    "DOUBLE")
+  field(NELM,    "$(WAVEFORM_SIZE)")
+  field(SCAN, "I/O Intr")
+}
+
+# Beam loss values in ROI
+record(waveform, "$(P):ROI_BEAM_LOSS_${channel}") 
+{
+  field(PINI, "1")
+  field(DESC,    "Beam loss values in ROI")
+  field(INP, "@asyn($(PORT),$(ADDR),$(TIMEOUT))ROI_BEAM_LOSS_$(channel)")
+  field(DTYP, "asynInt16ArrayIn")
+  field(FTVL,    "SHORT")
+  # NELM is the maximum number of values, NORD is the number of values actually read
+  field(NELM,    "$(WAVEFORM_SIZE)")
+  field(SCAN, "I/O Intr")
+}
+
+# Store the time passed between the current and previous 
+# retrieval of data from a stream
+record(ai, "$(P):INTERVAL_${channel}")
 {
     field(DTYP, "asynInt32")
     #field(PINI, "YES")
-    field(INP, "@asyn($(PORT),$(ADDR),$(TIMEOUT))EXTRACTED_NO_OF_ELEMENTS${channel}")
+    field(INP, "@asyn($(PORT),$(ADDR),$(TIMEOUT))INTERVAL${channel}")
     field(SCAN, "I/O Intr")
     #field(VAL, "100")
 }
 
-# The X-axis of the waveform before extraction, contains distance values in m
-record(waveform, "$(P):COMPLETE:X:WF:${channel}") 
+# This record determines whether to extract the region of interest from the 
+# waveform buffer or not using the extractWaveform function.
+# If its value is TRUE, we stop copying the streamed waveform buffer to the 
+# $(P):WAVEFORM_${channel} PV and call the extractWaveform function.
+# If its value is FALSE, we keep copying the streamed waveform buffer to 
+# $(P):WAVEFORM_${channel}.
+# Its value is determined by whether the peak value of the streamed waveform
+# buffer is above the threshold (stored in $(P):THRESHOLD_${channel}) or not.
+record(bi, "$(P):EXTRACT_RBV_${channel}")
 {
-  field(PINI, "1")
-  field(DESC,    "X Subarray")
-  field(INP, "@asyn($(PORT),$(ADDR),$(TIMEOUT))COMPLETE_X_AXIS:$(channel)")
-  field(DTYP, "asynFloat64ArrayIn")
-  field(FTVL,    "DOUBLE")
-  field(NELM,    "$(WAVEFORM_SIZE)")
-  field(SCAN, "I/O Intr")
-}
+    field(SCAN, "I/O Intr")
+    field(DESC, "Whether to extract waveform")
+    field(DTYP, "asynUInt32Digital")
+    field(INP, "@asynMask($(PORT),$(ADDR), 1, $(TIMEOUT))EXTRACT${channel}")
+    field(ZNAM, "FALSE")
+    field(ONAM, "TRUE")
+  }
 
-# Values of the waveform before extraction
-record(waveform, "$(P):COMPLETE:WF:${channel}") 
+# Once the value of $(P):EXTRACT_RBV_${channel} has been set to TRUE and the 
+# extraction of the region of interest has been performed, we can choose to restart
+# the process and start copying the streamed waveform buffer to $(P):WAVEFORM_${channel}
+# again by setting this PV to FALSE from the IOC.
+record(bo, "$(P):EXTRACT_${channel}")
 {
-  field(PINI, "1")
-  field(DESC,    "Subarray")
-  field(INP, "@asyn($(PORT),$(ADDR),$(TIMEOUT))COMPLETE_WAVEFORM:$(channel)")
-  field(DTYP, "asynInt16ArrayIn")
-  field(FTVL,    "SHORT")
-  # NELM is the maximum number of values, NORD is the number of values actually read
-  field(NELM,    "$(WAVEFORM_SIZE)")
-  field(SCAN, "I/O Intr")
-}
-
-# The X-axis of the final extracted waveform, contains distance values in m
-record(waveform, "$(P):EXTRACTED:X:WF:${channel}") 
-{
-  field(PINI, "1")
-  field(DESC,    "X Subarray")
-  field(INP, "@asyn($(PORT),$(ADDR),$(TIMEOUT))EXTRACTED_X_AXIS:$(channel)")
-  field(DTYP, "asynFloat64ArrayIn")
-  field(FTVL,    "DOUBLE")
-  field(NELM,    "$(WAVEFORM_SIZE)")
-  field(SCAN, "I/O Intr")
-}
-
-# Values of the extracted waveform
-record(waveform, "$(P):EXTRACTED:WF:${channel}") 
-{
-  field(PINI, "1")
-  field(DESC,    "Extracted Subarray")
-  field(INP, "@asyn($(PORT),$(ADDR),$(TIMEOUT))EXTRACTED_WAVEFORM:$(channel)")
-  field(DTYP, "asynInt16ArrayIn")
-  field(FTVL,    "SHORT")
-  # NELM is the maximum number of values, NORD is the number of values actually read
-  field(NELM,    "$(WAVEFORM_SIZE)")
-  field(SCAN, "I/O Intr")
-}
+    field(SCAN, "Passive")
+    field(DTYP, "asynUInt32Digital")
+    field(OUT, "@asynMask($(PORT),$(ADDR), 1, $(TIMEOUT))EXTRACT${channel}")
+    field(ZNAM, "FALSE")
+    field(ONAM, "TRUE")
+    field(FLNK, "$(P):EXTRACT_${channel}")
+  }

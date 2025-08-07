@@ -16,8 +16,8 @@ Usage: **maxBeamLossLocation** <Waveform Index>
 
 E.g. **maxBeamLossLocation** 0
 
-This command computes and displays the physical location where the maximum beam loss is detected by a beam loss monitor based on values of the starting and ending positions of the monitor as well as the size of the buffer or data that the beam loss monitor reads. The user must enter the index of the waveform, i.e., 0, 1, or 2, for WAVEFORM:0, WAVEFORM:1, or WAVEFORM:2, respectively.
-A minimum threshold value can be set for detecting maximum beam loss by writing to `$(P):THRESHOLD:${channel}`.
+This command computes and displays the physical location where the maximum beam loss is detected by a beam loss monitor based on values of the starting and ending positions of the monitor as well as the size of the buffer or data that the beam loss monitor reads. The user must enter the index of the waveform, such as 0 for WAVEFORM_0.
+A minimum threshold value can be set for detecting maximum beam loss by writing to `$(P):THRESHOLD_${channel}`.
 
 The waveformExtraction command must be executed before executing this command.
 
@@ -34,26 +34,26 @@ E.g. **waveformExtraction** 0
 This command extracts the relevant portion of the waveform data required for the detection of maximum beam loss location. 
 The relevant portion is determined in three steps. First, we extract data corresponding to the complete length of the fiber and discard the excess data.
 Second, we remove the data representing the vertical parts of the optical fiber on either side since this data mostly represents noise. This is done by using
-`$(P):Z:OFFSET:START:${channel}` and `$(P):Z:OFFSET:END:${channel}`. Finally, we extract another subset of this data which represents the portion the user wants to
-focus on for the maximum beam loss location detection. This is done by utilizing the values entered by the user in the `$(P):START:EXTRACTION:${channel}` and 
-`$(P):END:EXTRACTION:${channel}` process variables.
+`$(P):Z_OFFSET_START_${channel}` and `$(P):Z_OFFSET_END_${channel}`. Finally, we extract another subset of this data which represents the portion the user wants to
+focus on for the maximum beam loss location detection. This is done by utilizing the values entered by the user in the `$(P):ROI_START_${channel}` and 
+`$(P):ROI_END_${channel}` process variables.
 
 This command saves the extracted waveform data in the following PVs:
-  1. `$(P):EXTRACTED:WF:${channel}` => contains the extracted waveform data.
-  2. `$(P):EXTRACTED:X:WF:${channel}` => contains an x-axis of values corresponding to the physical locations of the waveform data values.
+  1. `$(P):ROI_BEAM_LOSS_${channel}` => contains the waveform data in the region of interest.
+  2. `$(P):ROI_Z_${channel}` => contains the z values corresponding to the physical locations of the waveform data values.
 
 This command must be called before calling maxBeamLossLocation. 
 
 This command uses the following PVs for the extraction:
-  1. `$(P):CLK:FREQUENCY`
-  2. `$(P):SLOPE:${channel}`
-  3. `$(P):OFFSET:${channel}`
-  4. `$(P):Z:OFFSET:START:${channel}`
-  5. `$(P):Z:OFFSET:END:${channel}`
-  6. `$(P):SPEED`
-  7. `$(P):START:EXTRACTION:${channel}`
-  8. `$(P):END:EXTRACTION:${channel}`
-  9. `$(P):FIBER:LENGTH:${channel}`
+  1. `$(P):CLK_FREQUENCY`
+  2. `$(P):SLOPE_${channel}`
+  3. `$(P):OFFSET_${channel}`
+  4. `$(P):Z_OFFSET_START_${channel}`
+  5. `$(P):Z_OFFSET_END_${channel}`
+  6. `$(P):FIBER_SPEED_OF_LIGHT`
+  7. `$(P):ROI_START_${channel}`
+  8. `$(P):ROI_END_${channel}`
+  9. `$(P):FIBER_LENGTH_${channel}`
 
 The following diagram can be used as a reference to visualize the fiber and the PVs:
 ![annotated diagram of fiber](assets/optical_fiber.png)
@@ -67,7 +67,7 @@ This command provides a health-check for the various streams our port driver is 
 ### waveformStreamInit
 Usage: **waveformStreamInit** "<Path to stream>" "<Waveform record asyn Identifier>"
 
-E.g. **waveformStreamInit** "/Stream0" "WAVEFORM:0"
+E.g. **waveformStreamInit** "/Stream0" "WAVEFORM_0"
 
 This command initializes a thread that connects to your specified stream, reads from the stream and proceeds to write the data it receives to the waveform record you specify.
 
@@ -77,8 +77,8 @@ To import this WaveformReader as a module, follow the steps listed [here](https:
 ## PyDM Displays
 This WaveformReader has three pydm screens associated with it:
 1. raw_waveform_data.ui => This displays the entire data buffer that we retrieve from the hardware.
-2. complete_waveform_data.ui => This displays the waveform from Z:OFFSET:START to Z:OFFSET_END i.e., the waveform data obtained after removing the redundant data representing the vertical parts on either end of the fiber.
-3. extracted_waveform_data.ui => This displays the waveform from START:EXTRACTION to END:EXTRACTION i.e., a subset of the complete_waveform_data obtained by extracting the waveform data between starting and ending locations entered by the user.
+2. complete_waveform_data.ui => This displays the waveform from Z_OFFSET_START to Z_OFFSET_END i.e., the waveform data obtained after removing the redundant data representing the vertical parts on either end of the fiber.
+3. extracted_waveform_data.ui => This displays the waveform from ROI_START to ROI_END i.e., a subset of the complete_waveform_data obtained by extracting the waveform data between starting and ending locations entered by the user.
 
 To open the displays use the following commands:
 1. pydm -m '{"P":"MPLN:UNDH:MP06:6", "channel":0}' raw_waveform_data.ui
@@ -90,6 +90,6 @@ You can change the channel depending on which waveform you want to display.
 Here are sample screenshots of the three screens:
 
 1. ![PyDM screen for raw_waveform](assets/RAW_WAVEFORM.png)
-2. ![PyDM screen for complete_waveform](assets/COMPLETE_WAVEFORM.png)
-3. ![PyDM screen for extracted_waveform](assets/EXTRACTED_WAVEFORM.png)
+2. ![PyDM screen for complete_waveform](assets/COMPLETE_WAVEFORM_.png)
+3. ![PyDM screen for extracted_waveform](assets/EXTRACTED_WAVEFORM_.png)
 

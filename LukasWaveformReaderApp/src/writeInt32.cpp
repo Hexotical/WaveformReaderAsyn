@@ -16,7 +16,8 @@ asynStatus WaveformReader::writeInt32(asynUser *pasynUser, epicsInt32 value)
     if(pasynUser->reason == (*(endAddr_indices[i])))
     {
       (*(end_addresses[i]))->setVal((int64_t)value);
-      _WebInit->execute();
+      _WebInit_0->execute();
+      _WebInit_1->execute();
     }
 
     if(pasynUser->reason == (*(beginAddr_indices[i])))
@@ -27,7 +28,8 @@ asynStatus WaveformReader::writeInt32(asynUser *pasynUser, epicsInt32 value)
 
   if(pasynUser->reason == waveform_buffer_size_index)
   {
-    _DataBufferSize->setVal((int64_t)value);
+    _DataBufferSize_0->setVal((int64_t)value);
+    _DataBufferSize_1->setVal((int64_t)value);
     MAX_BUFFER_SIZE = 4 * value ;
   }
 
@@ -37,9 +39,7 @@ asynStatus WaveformReader::writeInt32(asynUser *pasynUser, epicsInt32 value)
     int number_of_words;
     getIntegerParam(number_of_words_index, &number_of_words);
 
-    /// TO BE TESTED
     number_of_words = ((number_of_words + 4) / 8) * 8;
-    ///
 
     // Calculate the DaqMux Data Buffer Size (N/2)
     // Set the DaqMuxV2/DataBufferSize to N/2 (as this is expressed in 32-bit words)
@@ -47,7 +47,8 @@ asynStatus WaveformReader::writeInt32(asynUser *pasynUser, epicsInt32 value)
     setIntegerParam(waveform_buffer_size_index, daqMuxBufferSize);
     callParamCallbacks();
 
-    _DataBufferSize->setVal(daqMuxBufferSize);
+    _DataBufferSize_0->setVal(daqMuxBufferSize);
+    _DataBufferSize_1->setVal(daqMuxBufferSize);
     MAX_BUFFER_SIZE = 2 * number_of_words;
     
 
@@ -68,8 +69,8 @@ asynStatus WaveformReader::writeInt32(asynUser *pasynUser, epicsInt32 value)
       
     }
     // initialize once for the entire bay
-    _WebInit->execute();
-    
+    _WebInit_0->execute();
+    _WebInit_1->execute();
   }
 
   return status;

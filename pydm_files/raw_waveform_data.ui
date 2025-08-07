@@ -69,12 +69,12 @@
      </property>
      <property name="yAxes">
       <stringlist>
-       <string>{&quot;name&quot;: &quot;Axis 1&quot;, &quot;orientation&quot;: &quot;left&quot;, &quot;label&quot;: null, &quot;minRange&quot;: -1.4233118124214843, &quot;maxRange&quot;: 1.4233118124214843, &quot;autoRange&quot;: true, &quot;logMode&quot;: false}</string>
+       <string>{&quot;name&quot;: &quot;Axis 1&quot;, &quot;orientation&quot;: &quot;left&quot;, &quot;label&quot;: null, &quot;minRange&quot;: -1.5394540563150774, &quot;maxRange&quot;: 1.5394540563150774, &quot;autoRange&quot;: true, &quot;logMode&quot;: false}</string>
       </stringlist>
      </property>
      <property name="curves">
       <stringlist>
-       <string>{&quot;y_channel&quot;: &quot;ca://${P}:WAVEFORM:${channel}.VAL&quot;, &quot;x_channel&quot;: null, &quot;plot_style&quot;: null, &quot;name&quot;: &quot;Beam Loss&quot;, &quot;color&quot;: &quot;#3ed6ce&quot;, &quot;lineStyle&quot;: 1, &quot;lineWidth&quot;: 1, &quot;symbol&quot;: null, &quot;symbolSize&quot;: 10, &quot;yAxisName&quot;: &quot;Axis 1&quot;, &quot;barWidth&quot;: null, &quot;upperThreshold&quot;: null, &quot;lowerThreshold&quot;: null, &quot;thresholdColor&quot;: &quot;white&quot;, &quot;redraw_mode&quot;: 2}</string>
+       <string>{&quot;y_channel&quot;: &quot;ca://${P}:WAVEFORM_${channel}.VAL&quot;, &quot;x_channel&quot;: null, &quot;plot_style&quot;: null, &quot;name&quot;: &quot;Beam Loss&quot;, &quot;color&quot;: &quot;#3ed6ce&quot;, &quot;lineStyle&quot;: 1, &quot;lineWidth&quot;: 1, &quot;symbol&quot;: null, &quot;symbolSize&quot;: 10, &quot;yAxisName&quot;: &quot;Axis 1&quot;, &quot;barWidth&quot;: null, &quot;upperThreshold&quot;: null, &quot;lowerThreshold&quot;: null, &quot;thresholdColor&quot;: &quot;white&quot;, &quot;redraw_mode&quot;: 2}</string>
       </stringlist>
      </property>
     </widget>

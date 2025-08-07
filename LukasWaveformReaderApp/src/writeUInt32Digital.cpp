@@ -14,11 +14,13 @@ asynStatus WaveformReader::writeUInt32Digital(asynUser *pasynUser, epicsUInt32 v
     //Do a thing with the firmware here?????? I mean if I'm writing I just need to set the value don't I
     //This is for turning on and off so this should in theory be the TriggerHardwareAutoRearm
     //Essentially just using my ScalVal interface to tell the address to turn on or off, should be that simple according to Jeremy
-    _TriggerHwAutoRearm->setVal((int64_t)value);
+    _TriggerHwAutoRearm_0->setVal((int64_t)value);
+    _TriggerHwAutoRearm_1->setVal((int64_t)value);
   }
   if(pasynUser->reason == waveform_init_index)
   {
-    _WebInit->execute();
+    _WebInit_0->execute();
+    _WebInit_1->execute();
   }
 
   return status;
