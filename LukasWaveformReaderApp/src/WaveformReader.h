@@ -39,6 +39,7 @@
 #define REAL 0
 #define IMAG 1
 #define NUMBER_OF_WAVEFORM_RECORDS 6
+#define HEALTH_CHECK_SLEEP_TIME 5
 
 
 class WaveformReader : public asynPortDriver

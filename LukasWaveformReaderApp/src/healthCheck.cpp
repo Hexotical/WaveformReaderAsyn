@@ -32,7 +32,7 @@ void WaveformReader::healthTask(void)
 {
     while(1)
     {
-        sleep(5);
+        sleep(HEALTH_CHECK_SLEEP_TIME);
         for (int i = 0; i < NUMBER_OF_WAVEFORM_RECORDS; i++)
         {
             std::string paramIndex = waveform_param_indices[i];

@@ -271,9 +271,14 @@ record(ai, "$(P):INTERVAL_${channel}")
     #field(VAL, "100")
 }
 
-# Set to TRUE if the waveform should be extracted, FALSE if not
-# determined by whether the max value of the waveform data is
-# above the threshold or not
+# This record determines whether to extract the region of interest from the 
+# waveform buffer or not using the extractWaveform function.
+# If its value is TRUE, we stop copying the streamed waveform buffer to the 
+# $(P):WAVEFORM_${channel} PV and call the extractWaveform function.
+# If its value is FALSE, we keep copying the streamed waveform buffer to 
+# $(P):WAVEFORM_${channel}.
+# Its value is determined by whether the peak value of the streamed waveform
+# buffer is above the threshold (stored in $(P):THRESHOLD_${channel}) or not.
 record(bi, "$(P):EXTRACT_RBV_${channel}")
 {
     field(SCAN, "I/O Intr")
@@ -284,7 +289,10 @@ record(bi, "$(P):EXTRACT_RBV_${channel}")
     field(ONAM, "TRUE")
   }
 
-# Used to reset the value of "$(P):EXTRACT_${channel}" from the IOC
+# Once the value of $(P):EXTRACT_RBV_${channel} has been set to TRUE and the 
+# extraction of the region of interest has been performed, we can choose to restart
+# the process and start copying the streamed waveform buffer to $(P):WAVEFORM_${channel}
+# again by setting this PV to FALSE from the IOC.
 record(bo, "$(P):EXTRACT_${channel}")
 {
     field(SCAN, "Passive")
