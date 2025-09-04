@@ -24,7 +24,7 @@ The waveformExtraction command must be executed before executing this command.
 ### resetRegisters
 Usage: **resetRegisters**
 
-This command sets relevant registers to values required by the port driver to function properly.
+This command sets relevant registers to values required by the port driver to function properly. Execute this command before executing any other commands.
 
 ### waveformExtraction
 Usage: **waveformExtraction** <Waveform Index>
@@ -72,13 +72,13 @@ E.g. **waveformStreamInit** "/Stream0" "WAVEFORM_0"
 This command initializes a thread that connects to your specified stream, reads from the stream and proceeds to write the data it receives to the waveform record you specify.
 
 ## Importing
-To import this WaveformReader as a module, follow the steps listed [here](https://confluence.slac.stanford.edu/spaces/ACHIP/pages/610483645/Steps+to+add+WaveformReaderAsyn+to+another+app).
+To import this WaveformReader as a module, follow the steps listed [here](https://confluence.slac.stanford.edu/spaces/~tanisha@slac.stanford.edu/pages/610483645/Steps+to+add+WaveformReaderAsyn+to+another+app).
 
 ## PyDM Displays
 This WaveformReader has three pydm screens associated with it:
 1. raw_waveform_data.ui => This displays the entire data buffer that we retrieve from the hardware.
-2. complete_waveform_data.ui => This displays the waveform from Z_OFFSET_START to Z_OFFSET_END i.e., the waveform data obtained after removing the redundant data representing the vertical parts on either end of the fiber.
-3. extracted_waveform_data.ui => This displays the waveform from ROI_START to ROI_END i.e., a subset of the complete_waveform_data obtained by extracting the waveform data between starting and ending locations entered by the user.
+2. complete_waveform_data.ui => This displays the waveform from Z_OFFSET_START to Z_OFFSET_END, i.e., the waveform data obtained after removing the redundant data representing the vertical parts on either end of the fiber.
+3. extracted_waveform_data.ui => This displays the waveform from ROI_START to ROI_END, i.e., a subset of the complete_waveform_data obtained by extracting the waveform data between starting and ending locations entered by the user.
 
 To open the displays use the following commands:
 1. pydm -m '{"P":"MPLN:UNDH:MP06:6", "channel":0}' raw_waveform_data.ui
